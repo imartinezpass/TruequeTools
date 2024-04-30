@@ -22,6 +22,8 @@ namespace TruequeTools.Data
 		}
 
         public DbSet<Categoria> Categorias { get; set; }
+        public DbSet<Comentario> Comentarios { get; set; }
+        public DbSet<Producto> Productos { get; set; }
         public DbSet<Publicacion> Publicaciones { get; set; }
         public DbSet<Sucursal> Sucursales { get; set; }
 		public DbSet<Usuario> Usuarios { get; set; }

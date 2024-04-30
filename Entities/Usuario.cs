@@ -19,7 +19,7 @@ namespace TruequeTools.Entities
         public string? Email { get; set; }
         public string? Contraseña { get; set; }
         public DateOnly FechaNacimiento { get; set; }
-        public string? Sucursal { get; set; }
+        public string? Sucursal { get; set; } //ESTO DEBERIA APUNTAR AL ID DE SUCURSAL
 
         //MEDATDATA
         public string? Rol { get; set; }

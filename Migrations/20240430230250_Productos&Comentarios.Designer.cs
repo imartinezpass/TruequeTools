@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TruequeTools.Data;
 
@@ -11,9 +12,11 @@ using TruequeTools.Data;
 namespace TruequeTools.Migrations
 {
     [DbContext(typeof(TruequeToolsDataContext))]
-    partial class TruequeToolsDataContextModelSnapshot : ModelSnapshot
+    [Migration("20240430230250_Productos&Comentarios")]
+    partial class ProductosComentarios
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -46,7 +49,7 @@ namespace TruequeTools.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("RespuestaId")
+                    b.Property<int>("RespuestaId")
                         .HasColumnType("int");
 
                     b.Property<string>("Texto")
@@ -65,7 +68,7 @@ namespace TruequeTools.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CategoriaId")
+                    b.Property<int>("Categoria")
                         .HasColumnType("int");
 
                     b.Property<string>("Descripcion")

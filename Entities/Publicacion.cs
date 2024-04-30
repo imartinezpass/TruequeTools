@@ -13,16 +13,15 @@ namespace TruequeTools.Entities
 		//ID UNIVOCO
 		public int Id { get; set; }
 
-		//DATOS INGRESADOS POR EL USUARIO
-		public string? Nombre { get; set; }
-		public string? Descripcion { get; set; }
-		public string? Sucursal { get; set; }
-		public int Categoria { get; set; }
-		public byte[]? Foto { get; set; }
-
+        //DATOS INGRESADOS POR EL USUARIO
+        public string? Titulo { get; set; }
+        public string? Sucursal { get; set; } //ESTO DEBERIA SER EL ID DE LA SUCURSAL
+		public int ProductoId { get; set; }
+		
 		//METADATA
-		public int PropietarioId { get; set; }
-		public bool? IsPremium { get; set; } 
+		public int UsuarioId { get; set; }
+        public List<int>? ComentarioId { get; set; } //VER POR QUE PINGO NO FUNCIONA
+        public bool? IsPremium { get; set; } 
 		public bool? IsOculta { get;}
 		public DateOnly FechaPublicacion { get; set; }
 
