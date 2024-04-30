@@ -1,0 +1,124 @@
+﻿@page "/registrarse"
+
+@using Microsoft.AspNetCore.Identity
+@using System.ComponentModel.DataAnnotations
+@using System.Text
+@using System.Text.Encodings.Web
+@using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.Extensions.Logging
+@using TruequeTools.Data
+@using TruequeTools.Entities
+
+@inject TruequeToolsDataContext appDbContext
+@inject NavigationManager NavMan
+@inject InterfazServiciosUsuario UsuariosService
+@inject InterfazServiciosSucursal SucursalService
+
+<PageTitle>Registrarse</PageTitle>
+
+<div class="row">
+    <div class="col-md-4 offset-lg-4 pt-4 pb-4 border">
+        <h1 style="text-align:center">Registrarse</h1>
+        <EditForm Model="@Modelo" OnValidSubmit="RegistrarUsuario" FormName="RegisterForm">
+            <DataAnnotationsValidator />
+            <h2 style="text-align:center">Crear una cuenta nueva</h2>
+            <hr />
+            <ValidationSummary class="text-danger" role="alert" />
+            @if (!string.IsNullOrEmpty(MensajeError))
+            {
+                <div class="alert alert-danger mt-3" role="alert">
+                    @MensajeError
+                </div>
+            }
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Modelo.Nombre" class="form-control" autocomplete="nombre" aria-required="true" placeholder="" maxlength="50" />
+                <label for="nombre">Nombre</label>
+                <ValidationMessage For="() => Modelo.Nombre" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Modelo.Apellido" class="form-control" autocomplete="apellido" aria-required="true" placeholder="" maxlength="50" />
+                <label for="apellido">Apellido</label>
+                <ValidationMessage For="() => Modelo.Apellido" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputDate @bind-Value="Modelo.FechaNacimiento" class="form-control" autocomplete="fecha-nacimiento" aria-required="true" placeholder="" maxlength="50" />
+                <label for="fecha-nacimiento">Fecha de Nacimiento</label>
+                <ValidationMessage For="() => Modelo.FechaNacimiento" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputSelect @bind-Value="@Modelo.Sucursal" class="form-control" autocomplete="sucursal" aria-required="true" placeholder="" maxlength="50">
+                    @foreach (var suc in sucrusales)
+                    {
+                        <option value="@suc.Nombre">@suc.Nombre</option>
+                    }
+                </InputSelect>
+                <label for="sucursal">Sucursal</label>
+                <ValidationMessage For="() => Modelo.Sucursal" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Modelo.Correo" class="form-control" autocomplete="correo" aria-required="true" placeholder="name@example.com" maxlength="50" />
+                <label for="correo">Correo Electronico</label>
+                <ValidationMessage For="() => Modelo.Correo" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText type="password" @bind-Value="Modelo.Contraseña" class="form-control" autocomplete="contraseña" aria-required="true" placeholder="password" maxlength="50" />
+                <label for="contraseña">Contraseña</label>
+                <ValidationMessage For="() => Modelo.Contraseña" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText type="password" @bind-Value="Modelo.ConfirmarContraseña" class="form-control" autocomplete="confirmar-contraseña" aria-required="true" placeholder="password" maxlength="50" />
+                <label for="confirmar-contraseña">Confirmar Contraseña</label>
+                <ValidationMessage For="() => Modelo.ConfirmarContraseña" class="text-danger" />
+            </div>
+            <button type="submit" class="w-100 btn btn-lg btn-primary">Registrarse</button>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+
+    List<Sucursal> sucrusales = new List<Sucursal>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        sucrusales = await SucursalService.ReadAllSucursales(); //LECTURA DE TODAS LAS SUCURSALES
+    }
+
+    private String? MensajeError;
+
+    [SupplyParameterFromForm]
+    private RegisterViewModel Modelo { get; set; } = new();
+
+    public async Task RegistrarUsuario(EditContext editContext)
+    {
+
+        var fechaMinima = DateOnly.FromDateTime(DateTime.Today.AddYears(-18));
+        if (Modelo.FechaNacimiento >= fechaMinima)
+        {
+            MensajeError = "Error: Debes tenes al menos 18 años para poder registrarte.";
+            return;
+        }
+
+        if (await UsuariosService.SeEncuentraRegistrado(Modelo.Correo))
+        {
+            MensajeError = "Error: El correo electrónico ya se encuentra registrado.";
+            return;
+        }
+       
+
+        var usuario = new Usuario();
+
+        usuario.Nombre = Modelo.Nombre;
+        usuario.Apellido = Modelo.Apellido;
+        usuario.FechaNacimiento = Modelo.FechaNacimiento;
+        usuario.Sucursal = Modelo.Sucursal;
+        usuario.Email = Modelo.Correo;
+        usuario.Contraseña = Modelo.Contraseña;
+        usuario.Rol = "User";
+
+        await UsuariosService.RegisterUsuario(usuario);
+        NavMan.NavigateTo("/");
+
+	}
+
+}

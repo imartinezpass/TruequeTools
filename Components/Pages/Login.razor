@@ -1,0 +1,72 @@
+﻿@page "/identificarse"
+
+@using TruequeTools.Data
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+
+@inject TruequeToolsDataContext appDbContext
+@inject NavigationManager NavMan
+
+<PageTitle>Identificarse</PageTitle>
+
+<div class="row">
+	<div class="col-lg-4 offset-lg-4 pt-4 pb-4 border">
+		<h1 style="text-align:center">Identificarse</h1>
+		<EditForm Model="@Modelo" OnValidSubmit="AutenticarUsuario" FormName="LoginForm">
+			<DataAnnotationsValidator />
+			<h2 style="text-align:center">Acceder a la plataforma</h2>
+			<hr />
+			<ValidationSummary class="text-danger" role="alert" />
+			@if (!string.IsNullOrEmpty(MensajeError))
+			{
+				<div class="alert alert-danger mt-3" role="alert">
+					@MensajeError
+				</div>
+			}
+			<div class="form-floating mb-3">
+				<InputText @bind-Value="Modelo.Correo" class="form-control" autocomplete="nombre" aria-required="true" placeholder="" maxlength="50" />
+				<label for="nombre">Correo Electronico</label>
+				<ValidationMessage For="() => Modelo.Correo" class="text-danger" />
+			</div>
+			<div class="form-floating mb-3">
+				<InputText type="password" @bind-Value="Modelo.Contraseña" class="form-control" autocomplete="nombre" aria-required="true" placeholder="" maxlength="50" />
+				<label for="nombre">Contraseña</label>
+				<ValidationMessage For="() => Modelo.Contraseña" class="text-danger" />
+			</div>
+			<button type="submit" class="w-100 btn btn-lg btn-primary">Iniciar Sesion</button>
+		</EditForm>
+	</div> 
+</div>
+
+@code {
+	[CascadingParameter]
+	public HttpContext? HttpContext { get; set; }
+
+	[SupplyParameterFromForm]
+	public LoginViewModel Modelo { get; set; } = new();
+
+	private string? MensajeError;
+
+	private async Task AutenticarUsuario()
+	{
+		var cuenta = appDbContext.Usuarios.Where(x => x.Email == Modelo.Correo).FirstOrDefault();
+		if(cuenta is null || cuenta.Contraseña != Modelo.Contraseña)
+		{
+			MensajeError = "Error: El correo o la contraseña no son correctos";
+			return;
+		}
+
+		var claims = new List<Claim>
+		{
+			new Claim(ClaimTypes.Name, cuenta.Nombre),
+			new Claim(ClaimTypes.Role, cuenta.Rol),
+		};
+
+		var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+		var principal = new ClaimsPrincipal(identity);
+		await HttpContext.SignInAsync(principal);
+		NavMan.NavigateTo("/");
+	}
+
+}

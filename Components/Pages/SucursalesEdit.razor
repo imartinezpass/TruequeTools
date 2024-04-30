@@ -1,0 +1,73 @@
+﻿@page "/sucursales-edit"
+@page "/sucursales-edit/{Id:int}"
+
+@using TruequeTools.Entities
+
+@inject InterfazServiciosSucursal SucursalService
+@inject NavigationManager NavMan
+
+@rendermode @(new InteractiveServerRenderMode(prerender:false))
+@attribute [Authorize(Roles = "Admin")]
+
+@if (Id is null)
+{
+	<PageTitle>Nueva Sucursal</PageTitle>
+	<h3>Dar de alta una nueva sucursal</h3>
+}
+else
+{
+	<PageTitle>Editar Sucursal "@SucursalActual.Nombre"</PageTitle>
+	<h3>Editar sucursal "@SucursalActual.Nombre"</h3>
+}
+
+<EditForm Model="SucursalActual" OnSubmit="HandleSubmit">
+	<div>
+		<label for="nombre">Nombre</label>
+		<InputText id="nombre" @bind-Value="SucursalActual.Nombre" class="form-control" />
+	</div>
+	<div>
+		<label for="direccion">Direccion</label>
+		<InputText id="direccion" @bind-Value="SucursalActual.Direccion" class="form-control" />
+	</div>
+	<div>
+		<label for="localidad">Localidad</label>
+		<InputText id="localidad" @bind-Value="SucursalActual.Localidad" class="form-control" />
+	</div>
+	<div style="margin-top: 10px;"></div>
+	<button type="submit" class="btn btn-primary">Guardar</button>
+</EditForm>
+
+@code {
+
+	[Parameter]
+	public int? Id { get; set; }
+
+	public Sucursal SucursalActual { get; set; } = new();
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if (Id is not null)
+		{
+			var sucursal = await SucursalService.ReadSucursalById((int)Id);
+			if (sucursal is not null)
+			{
+				SucursalActual = sucursal;
+			}
+		}
+	}
+
+	async Task HandleSubmit()
+	{
+		if (Id is not null)
+		{
+			await SucursalService.UpdateSucursal(SucursalActual, (int)Id);
+			NavMan.NavigateTo("/sucursales");
+		}
+		else
+		{
+			await SucursalService.CreateSucursal(SucursalActual);
+			NavMan.NavigateTo("/sucursales");
+		}
+	}
+
+}

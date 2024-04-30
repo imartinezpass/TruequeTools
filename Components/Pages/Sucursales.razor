@@ -1,0 +1,77 @@
+﻿@page "/sucursales"
+
+@using TruequeTools.Entities
+
+@inject InterfazServiciosSucursal SucursalService
+@inject NavigationManager NavMan
+
+@rendermode @(new InteractiveServerRenderMode(prerender:false))
+@attribute [Authorize(Roles="Admin")]
+
+<PageTitle>Sucursales</PageTitle>
+
+<h3>Sucursales</h3>
+
+@if (sucrusales.Count == 0)
+{
+	<p><em>Cargando sucursales...</em></p>
+}
+else
+{
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Id</th>
+				<th>Nombre</th>
+				<th>Direccion</th>
+				<th>Localidad</th>
+				<th style="width: 120px;"></th>
+				<th style="width: 120px;"></th>
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var suc in sucrusales)
+			{
+				<tr>
+					<td>@suc.Id</td>
+					<td>@suc.Nombre</td>
+					<td>@suc.Direccion</td>
+					<td>@suc.Localidad</td>
+					<td style="text-align: right;"><button class="btn btn-primary" @onclick="@(() => EditarSucursal(suc.Id))">Editar</button></td>
+					<td style="text-align: right;"><button class="btn btn-danger" @onclick="@(() => EliminarSucursal(suc.Id))">Eliminar</button></td>
+				</tr>
+			}
+		</tbody>
+	</table>
+
+	<button class="btn btn-success" @onclick="CrearSucursal">Nueva Sucursal</button>
+}
+
+@code {
+
+	List<Sucursal> sucrusales = new List<Sucursal>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		await Task.Delay(1000);
+		sucrusales = await SucursalService.ReadAllSucursales(); //LECTURA DE TODAS LAS SUCURSALES
+	}
+
+	void CrearSucursal()
+	{
+		NavMan.NavigateTo("/sucursales-edit"); //ALTA DE SUCURSAL
+	}
+
+	void EditarSucursal(int id)
+	{
+		NavMan.NavigateTo($"/sucursales-edit/{id}"); //MODIFICACION DE SUCURSAL
+	}
+
+	async Task EliminarSucursal(int id)
+	{
+		await SucursalService.DeleteSucursal(id); //BAJA DE SUCURSAL
+		sucrusales = await SucursalService.ReadAllSucursales(); //ACTUALIZO LA TABLA
+	}
+
+}
+
