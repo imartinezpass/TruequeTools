@@ -27,7 +27,7 @@ namespace TruequeTools.Models
 
         [Required(ErrorMessage = "Debe ingresar una sucrusal de preferencia")]
         [Display(Name = "Sucrusal")]
-        public string Sucursal { get; set; } = "";
+        public int SucursalId { get; set; } = 1;
 
 	    [Required(ErrorMessage = "Debe ingresar su correo electronico")]
         [EmailAddress(ErrorMessage = "Debe ingresar un correo electronico valido")]

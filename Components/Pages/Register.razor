@@ -46,14 +46,14 @@
                 <ValidationMessage For="() => Modelo.FechaNacimiento" class="text-danger" />
             </div>
             <div class="form-floating mb-3">
-                <InputSelect @bind-Value="@Modelo.Sucursal" class="form-control" autocomplete="sucursal" aria-required="true" placeholder="" maxlength="50">
+                <InputSelect @bind-Value="@Modelo.SucursalId" class="form-control" autocomplete="sucursal" aria-required="true" placeholder="" maxlength="50">
                     @foreach (var suc in sucrusales)
                     {
-                        <option value="@suc.Nombre">@suc.Nombre</option>
+                        <option value="@suc.Id">@suc.Nombre</option>
                     }
                 </InputSelect>
                 <label for="sucursal">Sucursal</label>
-                <ValidationMessage For="() => Modelo.Sucursal" class="text-danger" />
+                <ValidationMessage For="() => Modelo.SucursalId" class="text-danger" />
             </div>
             <div class="form-floating mb-3">
                 <InputText @bind-Value="Modelo.Correo" class="form-control" autocomplete="correo" aria-required="true" placeholder="name@example.com" maxlength="50" />
@@ -104,18 +104,17 @@
             MensajeError = "Error: El correo electrónico ya se encuentra registrado.";
             return;
         }
-       
+
 
         var usuario = new Usuario();
 
         usuario.Nombre = Modelo.Nombre;
         usuario.Apellido = Modelo.Apellido;
-        usuario.FechaNacimiento = Modelo.FechaNacimiento;
-        usuario.SucursalId = 1; //TEST
         usuario.Email = Modelo.Correo;
         usuario.Contraseña = Modelo.Contraseña;
-        usuario.Rol = "User";
-
+        usuario.FechaNacimiento = Modelo.FechaNacimiento;
+        usuario.SucursalId = Modelo.SucursalId;
+       
         await UsuariosService.RegisterUsuario(usuario);
         NavMan.NavigateTo("/");
 
