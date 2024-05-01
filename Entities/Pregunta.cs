@@ -12,7 +12,7 @@ namespace TruequeTools.Entities
 
     [Table("comentarios")]
 
-    public class Comentario
+    public class Pregunta
     {
 
         //ID UNIVOCO
@@ -28,14 +28,14 @@ namespace TruequeTools.Entities
         [MaxLength(255)]
         public string? Texto { get; set; }
 
-        //RELACION CON LA TABLA COMENTARIOS
-
-        [Column("respuestaId")]
-        public int? RespuestaId { get; set; }
-
-        //ATRIBUTOS NO SQL
-
+        [Column("respuesta")]
+        [MaxLength(255)]
         public string? Respuesta { get; set; }
+
+        //CLAVE EXTERNA PUBLICACION
+
+        [Column("publicacionId")]
+        public int PublicacionId { get; set; }
 
     }
 

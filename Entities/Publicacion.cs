@@ -44,27 +44,22 @@ namespace TruequeTools.Entities
         /*[Column("usuarioId")]
         public int UsuarioId { get; set; }*/
 
-        //RELACION CON LA TABLA SUCURSALES
+        //CLAVE EXTERNA SUCURSAL
 
         [Column("sucursalId")]
         public int SucursalId { get; set; }
 
-        //RELACION CON LA TABLA PRODUCTOS
+        //CLAVE EXTERNA PRODUCTO
 
         [Column("productoId")]
         public int ProductoId { get; set; }
-
-        //RELACION CON LA TABLA COMENTARIOS
-
-        [Column("comentariosId")]
-        public int ComentariosId { get; set; } 
 
         //ATRIBUTOS NO SQL
 
         public Usuario? Usuario { get; set; }
         public Sucursal? Sucursal { get; set; }
         public Producto? Producto { get; set; }
-        public List<Comentario>? Comentarios { get; set; }
+        public List<Pregunta>? Preguntas { get; set; }
 
     }
 

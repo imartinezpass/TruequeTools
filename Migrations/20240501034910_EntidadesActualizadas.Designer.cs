@@ -12,7 +12,7 @@ using TruequeTools.Data;
 namespace TruequeTools.Migrations
 {
     [DbContext(typeof(TruequeToolsDataContext))]
-    [Migration("20240501024729_EntidadesActualizadas")]
+    [Migration("20240501034910_EntidadesActualizadas")]
     partial class EntidadesActualizadas
     {
         /// <inheritdoc />
@@ -61,7 +61,7 @@ namespace TruequeTools.Migrations
                         });
                 });
 
-            modelBuilder.Entity("TruequeTools.Entities.Comentario", b =>
+            modelBuilder.Entity("TruequeTools.Entities.Pregunta", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -70,15 +70,14 @@ namespace TruequeTools.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("PublicacionId")
-                        .HasColumnType("int");
+                    b.Property<int>("PublicacionId")
+                        .HasColumnType("int")
+                        .HasColumnName("publicacionId");
 
                     b.Property<string>("Respuesta")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("RespuestaId")
-                        .HasColumnType("int")
-                        .HasColumnName("respuestaId");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("respuesta");
 
                     b.Property<string>("Texto")
                         .HasMaxLength(255)
@@ -135,10 +134,6 @@ namespace TruequeTools.Migrations
                         .HasColumnName("id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ComentariosId")
-                        .HasColumnType("int")
-                        .HasColumnName("comentariosId");
 
                     b.Property<DateOnly>("FechaPublicacion")
                         .HasColumnType("date")
@@ -265,11 +260,13 @@ namespace TruequeTools.Migrations
                     b.ToTable("usuarios");
                 });
 
-            modelBuilder.Entity("TruequeTools.Entities.Comentario", b =>
+            modelBuilder.Entity("TruequeTools.Entities.Pregunta", b =>
                 {
                     b.HasOne("TruequeTools.Entities.Publicacion", null)
-                        .WithMany("Comentarios")
-                        .HasForeignKey("PublicacionId");
+                        .WithMany("Preguntas")
+                        .HasForeignKey("PublicacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("TruequeTools.Entities.Producto", b =>
@@ -321,7 +318,7 @@ namespace TruequeTools.Migrations
 
             modelBuilder.Entity("TruequeTools.Entities.Publicacion", b =>
                 {
-                    b.Navigation("Comentarios");
+                    b.Navigation("Preguntas");
                 });
 #pragma warning restore 612, 618
         }

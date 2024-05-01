@@ -37,7 +37,7 @@ namespace TruequeTools.Entities
         [MaxLength(255)]
         public string? Foto { get; set; }
 
-        //RELACION CON LA TABLA CATEGORIAS
+        //CLAVE EXTERNA CATEGORIA
 
         [Column("categoriaId")]
         public int CategoriaId { get; set; }
