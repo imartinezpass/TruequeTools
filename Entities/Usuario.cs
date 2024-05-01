@@ -48,7 +48,7 @@ namespace TruequeTools.Entities
         [Column("rol")]
         public string? Rol { get; set; } = "User";
 
-        //CLAVE EXTERNA SUCURSAL
+        //CLAVE EXTERNA USUARIO -> SUCURSAL
 
         [Column("sucursalId")]
         public int SucursalId { get; set; }
@@ -56,6 +56,7 @@ namespace TruequeTools.Entities
         //ATRIBUTOS NO SQL
 
         public Sucursal? Sucursal { get; set; }
+        public ICollection<Publicacion>? Publicaciones { get; set; }
 
     }
 

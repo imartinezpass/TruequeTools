@@ -157,8 +157,9 @@ namespace TruequeTools.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("titulo");
 
-                    b.Property<int?>("UsuarioId")
-                        .HasColumnType("int");
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int")
+                        .HasColumnName("usuarioId");
 
                     b.HasKey("Id");
 
@@ -259,11 +260,13 @@ namespace TruequeTools.Migrations
 
             modelBuilder.Entity("TruequeTools.Entities.Pregunta", b =>
                 {
-                    b.HasOne("TruequeTools.Entities.Publicacion", null)
+                    b.HasOne("TruequeTools.Entities.Publicacion", "Publicacion")
                         .WithMany("Preguntas")
                         .HasForeignKey("PublicacionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Publicacion");
                 });
 
             modelBuilder.Entity("TruequeTools.Entities.Producto", b =>
@@ -271,7 +274,7 @@ namespace TruequeTools.Migrations
                     b.HasOne("TruequeTools.Entities.Categoria", "Categoria")
                         .WithMany()
                         .HasForeignKey("CategoriaId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Categoria");
@@ -288,12 +291,14 @@ namespace TruequeTools.Migrations
                     b.HasOne("TruequeTools.Entities.Sucursal", "Sucursal")
                         .WithMany()
                         .HasForeignKey("SucursalId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("TruequeTools.Entities.Usuario", "Usuario")
-                        .WithMany()
-                        .HasForeignKey("UsuarioId");
+                        .WithMany("Publicaciones")
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Producto");
 
@@ -307,7 +312,7 @@ namespace TruequeTools.Migrations
                     b.HasOne("TruequeTools.Entities.Sucursal", "Sucursal")
                         .WithMany()
                         .HasForeignKey("SucursalId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Sucursal");
@@ -316,6 +321,11 @@ namespace TruequeTools.Migrations
             modelBuilder.Entity("TruequeTools.Entities.Publicacion", b =>
                 {
                     b.Navigation("Preguntas");
+                });
+
+            modelBuilder.Entity("TruequeTools.Entities.Usuario", b =>
+                {
+                    b.Navigation("Publicaciones");
                 });
 #pragma warning restore 612, 618
         }

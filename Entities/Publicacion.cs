@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 /*
@@ -41,8 +43,8 @@ namespace TruequeTools.Entities
 
         //RELACION CON LA TABLA USUARIOS
 
-        /*[Column("usuarioId")]
-        public int UsuarioId { get; set; }*/
+        [Column("usuarioId")]
+        public int UsuarioId { get; set; }
 
         //CLAVE EXTERNA SUCURSAL
 
