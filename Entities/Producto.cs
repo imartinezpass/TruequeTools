@@ -33,9 +33,9 @@ namespace TruequeTools.Entities
         [MinLength(20)]
         public string? Descripcion { get; set; }
 
-        [Column("foto")]
+        [Column("fotoUrl")]
         [MaxLength(255)]
-        public string? Foto { get; set; }
+        public string? FotoUrl { get; set; }
 
         //CLAVE EXTERNA CATEGORIA
 

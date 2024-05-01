@@ -12,8 +12,8 @@ using TruequeTools.Data;
 namespace TruequeTools.Migrations
 {
     [DbContext(typeof(TruequeToolsDataContext))]
-    [Migration("20240501144443_EntidadesActualizadasV2")]
-    partial class EntidadesActualizadasV2
+    [Migration("20240501180311_EntidadesActualizadasV3")]
+    partial class EntidadesActualizadasV3
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -109,10 +109,10 @@ namespace TruequeTools.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("descripcion");
 
-                    b.Property<string>("Foto")
+                    b.Property<string>("FotoUrl")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
-                        .HasColumnName("foto");
+                        .HasColumnName("fotoUrl");
 
                     b.Property<string>("Nombre")
                         .HasMaxLength(50)

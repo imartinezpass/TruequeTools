@@ -106,10 +106,10 @@ namespace TruequeTools.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("descripcion");
 
-                    b.Property<string>("Foto")
+                    b.Property<string>("FotoUrl")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)")
-                        .HasColumnName("foto");
+                        .HasColumnName("fotoUrl");
 
                     b.Property<string>("Nombre")
                         .HasMaxLength(50)

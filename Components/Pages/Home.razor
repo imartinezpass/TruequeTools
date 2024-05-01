@@ -30,7 +30,7 @@
 
             <div class="col-md-4 mb-3">
                 <div class="card">
-                    <img class="card-img-top" src="/carousel-1.jpg" alt="Card image cap">
+                    <img class="card-img-top" src=@GetFotoProducto(publi.Producto.FotoUrl) alt="Foto del Producto">
                     <div class="card-body">
                         <h5 class="card-title">@publi.Titulo</h5>
                         <p class="card-text">@publi.Producto.Descripcion</p>
@@ -81,6 +81,18 @@ else
         showSpinner = false; // Desactiva el spinner
         StateHasChanged(); // Notifica a Blazor que debe actualizar la interfaz de usuario
 
+    }
+
+    public string GetFotoProducto(string nombre)
+    {
+        if (string.IsNullOrEmpty(nombre))
+        {
+            return "images/blank.svg";
+        }
+        else
+        {
+            return "images/" + nombre;
+        }
     }
 
 }
