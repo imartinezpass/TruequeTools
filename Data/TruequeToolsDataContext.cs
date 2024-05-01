@@ -26,8 +26,26 @@ namespace TruequeTools.Data
         public DbSet<Producto> Productos { get; set; }
         public DbSet<Publicacion> Publicaciones { get; set; }
         public DbSet<Sucursal> Sucursales { get; set; }
-		public DbSet<Usuario> Usuarios { get; set; }
-		
-	}
+        public DbSet<Usuario> Usuarios { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            //DEFINE LAS 3 CATEGORIAS AL CREAR LA BASE DE DATOS
+            modelBuilder.Entity<Categoria>().HasData(
+                new Categoria { Id = 1, Nombre = "$0 a $5.000" },
+                new Categoria { Id = 2, Nombre = "$5.000 a $10.000" },
+                new Categoria { Id = 3, Nombre = "Mas de $10.000" }
+                );
+
+            //DEFINE LA SUCURSAL CENTRAL
+            modelBuilder.Entity<Sucursal>().HasData(
+                new Sucursal { Id = 1, Nombre = "Central", Direccion = "Calle 13 2550", Localidad = "La Plata" }
+                );
+
+        }
+
+    }
 
 }

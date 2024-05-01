@@ -1,4 +1,7 @@
-﻿/*
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+/*
  
 Esta clase establece la entidad "Usuario" y sus atributos
  
@@ -7,22 +10,52 @@ Esta clase establece la entidad "Usuario" y sus atributos
 namespace TruequeTools.Entities
 {
 
+    [Table("usuarios")]
+
     public class Usuario
     {
 
         //ID UNIVOCO
+
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Column("id")]
         public int Id { get; set; }
 
         //DATOS INGRESADOS POR EL USUARIO
-        public string? Nombre { get; set; }
-        public string? Apellido { get; set; }
-        public string? Email { get; set; }
-        public string? Contraseña { get; set; }
-        public DateOnly FechaNacimiento { get; set; }
-        public string? Sucursal { get; set; } //ESTO DEBERIA APUNTAR AL ID DE SUCURSAL
 
-        //MEDATDATA
-        public string? Rol { get; set; }
+        [Column("nombre")]
+        [MaxLength(50)]
+        public string? Nombre { get; set; }
+
+        [Column("apellido")]
+        [MaxLength(50)]
+        public string? Apellido { get; set; }
+
+        [Column("email")]
+        [MaxLength(50)]
+        public string? Email { get; set; }
+
+        [Column("contraseña")]
+        [MaxLength(50)]
+        public string? Contraseña { get; set; }
+
+        [Column("fechaNacimiento")]
+        public DateOnly FechaNacimiento { get; set; }
+
+        //METADATA
+
+        [Column("rol")]
+        public string? Rol { get; set; } = "User";
+
+        //RELACION CON LA TABLA SUCURSALES
+
+        [Column("sucursalId")]
+        public int SucursalId { get; set; }
+
+        //ATRIBUTOS NO SQL
+
+        public Sucursal? Sucursal { get; set; }
 
     }
 
