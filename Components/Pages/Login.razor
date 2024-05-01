@@ -40,6 +40,7 @@
 </div>
 
 @code {
+
 	[CascadingParameter]
 	public HttpContext? HttpContext { get; set; }
 
@@ -50,6 +51,7 @@
 
 	private async Task AutenticarUsuario()
 	{
+
 		var cuenta = appDbContext.Usuarios.Where(x => x.Email == Modelo.Correo).FirstOrDefault();
 		if(cuenta is null || cuenta.Contraseña != Modelo.Contraseña)
 		{
@@ -67,6 +69,7 @@
 		var principal = new ClaimsPrincipal(identity);
 		await HttpContext.SignInAsync(principal);
 		NavMan.NavigateTo("/");
+
 	}
 
 }
