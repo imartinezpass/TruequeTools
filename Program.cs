@@ -27,6 +27,9 @@ builder.Services.AddDbContext<TruequeToolsDataContext>(options => options.UseSql
 builder.Services.AddScoped<InterfazServiciosSucursal, ServiciosSucursal>();
 builder.Services.AddScoped<InterfazServiciosUsuario, ServiciosUsuario>();
 //**********NACHEX CODE ENDS********** CRUD - AGREGAR SOLO SERVICIOS
+builder.Services.AddScoped<InterfazServiciosCategoria, ServiciosCategoria>();
+builder.Services.AddScoped<InterfazServiciosProducto, ServiciosProducto>();
+builder.Services.AddScoped<InterfazServiciosPublicacion, ServiciosPublicacion>();
 
 var app = builder.Build();
 
@@ -39,12 +42,12 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseStaticFiles();
-app.UseAntiforgery();
 
 //**********NACHEX CODE BEGINS********** AUTH - NO TOCAR
 app.UseAuthentication();
 app.UseAuthorization();
 //**********NACHEX CODE ENDS********** AUTH - NO TOCAR
+app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
 	.AddInteractiveServerRenderMode();
