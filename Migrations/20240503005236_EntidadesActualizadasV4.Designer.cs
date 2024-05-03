@@ -12,8 +12,8 @@ using TruequeTools.Data;
 namespace TruequeTools.Migrations
 {
     [DbContext(typeof(TruequeToolsDataContext))]
-    [Migration("20240501180311_EntidadesActualizadasV3")]
-    partial class EntidadesActualizadasV3
+    [Migration("20240503005236_EntidadesActualizadasV4")]
+    partial class EntidadesActualizadasV4
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -88,7 +88,7 @@ namespace TruequeTools.Migrations
 
                     b.HasIndex("PublicacionId");
 
-                    b.ToTable("comentarios");
+                    b.ToTable("preguntas");
                 });
 
             modelBuilder.Entity("TruequeTools.Entities.Producto", b =>
