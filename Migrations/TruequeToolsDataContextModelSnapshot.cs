@@ -85,7 +85,7 @@ namespace TruequeTools.Migrations
 
                     b.HasIndex("PublicacionId");
 
-                    b.ToTable("comentarios");
+                    b.ToTable("preguntas");
                 });
 
             modelBuilder.Entity("TruequeTools.Entities.Producto", b =>

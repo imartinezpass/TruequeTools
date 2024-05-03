@@ -16,6 +16,9 @@
 @inject InterfazServiciosCategoria CategoriaService
 @inject InterfazServiciosPublicacion PublicacionService
 
+@*DE NACHO: aca hay que poner esto con todos los roles que pueden ver esta pagina sino cualquier persona no autenticada puede entrar*@
+@attribute [Authorize(Roles = "User")] 
+
 <h1>Crear Publicación</h1>
 
 <head>
@@ -82,14 +85,9 @@
 
         </EditForm>
 
-
-
-       
     </div>
+
 </body>
-
-
-
 
 @code {
     List<Sucursal> sucursales = new List<Sucursal>();

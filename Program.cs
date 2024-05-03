@@ -24,12 +24,13 @@ builder.Services.AddCascadingAuthenticationState();
 
 //**********NACHEX CODE BEGINS********** CRUD - AGREGAR SOLO SERVICIOS
 builder.Services.AddDbContext<TruequeToolsDataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("TruequeToolsDbConnection")));
-builder.Services.AddScoped<InterfazServiciosSucursal, ServiciosSucursal>();
-builder.Services.AddScoped<InterfazServiciosUsuario, ServiciosUsuario>();
-//**********NACHEX CODE ENDS********** CRUD - AGREGAR SOLO SERVICIOS
 builder.Services.AddScoped<InterfazServiciosCategoria, ServiciosCategoria>();
 builder.Services.AddScoped<InterfazServiciosProducto, ServiciosProducto>();
 builder.Services.AddScoped<InterfazServiciosPublicacion, ServiciosPublicacion>();
+builder.Services.AddScoped<InterfazServiciosSucursal, ServiciosSucursal>();
+builder.Services.AddScoped<InterfazServiciosUsuario, ServiciosUsuario>();
+//builder.Services.AddScoped<InterfazServiciosPregunta, ServiciosPregunta>(); //CUANDO ESTE IMPLEMENTADA LA INTERFAZ DE LOS SERVICIOS DE LA ENTIDAD PREGUNTA
+//**********NACHEX CODE ENDS********** CRUD - AGREGAR SOLO SERVICIOS
 
 var app = builder.Build();
 
@@ -46,8 +47,8 @@ app.UseStaticFiles();
 //**********NACHEX CODE BEGINS********** AUTH - NO TOCAR
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseAntiforgery(); //Lo movio may, dejar aca para probar
 //**********NACHEX CODE ENDS********** AUTH - NO TOCAR
-app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
 	.AddInteractiveServerRenderMode();

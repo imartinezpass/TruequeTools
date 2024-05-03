@@ -10,7 +10,7 @@ Esta clase establece la entidad "Comentario" y sus atributos
 namespace TruequeTools.Entities
 {
 
-    [Table("comentarios")]
+    [Table("preguntas")]
 
     public class Pregunta
     {
