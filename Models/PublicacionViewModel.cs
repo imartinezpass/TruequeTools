@@ -1,8 +1,15 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+/*
+  
+Esta clase establece los campos, restricciones y mensajes de error para el form de alta de publicacion
+Tambien realiza las verificaciones de input
+  
+ */
+
 namespace TruequeTools.Models
 {
-    public class CreatePublicacionViewModel
+    public class PublicacionViewModel
     {
         [Required(ErrorMessage = "Debe ingresar el nombre del producto")]
         [MinLength(4, ErrorMessage = "El nombre debe tener al menos 4 caracteres.")]

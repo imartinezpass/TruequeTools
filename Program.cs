@@ -29,7 +29,7 @@ builder.Services.AddScoped<InterfazServiciosProducto, ServiciosProducto>();
 builder.Services.AddScoped<InterfazServiciosPublicacion, ServiciosPublicacion>();
 builder.Services.AddScoped<InterfazServiciosSucursal, ServiciosSucursal>();
 builder.Services.AddScoped<InterfazServiciosUsuario, ServiciosUsuario>();
-//builder.Services.AddScoped<InterfazServiciosPregunta, ServiciosPregunta>(); //CUANDO ESTE IMPLEMENTADA LA INTERFAZ DE LOS SERVICIOS DE LA ENTIDAD PREGUNTA
+builder.Services.AddScoped<InterfazServiciosPregunta, ServiciosPregunta>();
 //**********NACHEX CODE ENDS********** CRUD - AGREGAR SOLO SERVICIOS
 
 var app = builder.Build();
@@ -47,7 +47,7 @@ app.UseStaticFiles();
 //**********NACHEX CODE BEGINS********** AUTH - NO TOCAR
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseAntiforgery(); //Lo movio may, dejar aca para probar
+app.UseAntiforgery();
 //**********NACHEX CODE ENDS********** AUTH - NO TOCAR
 
 app.MapRazorComponents<App>()

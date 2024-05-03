@@ -21,14 +21,16 @@ namespace TruequeTools.Data
 		
 		}
 
-        public DbSet<Categoria> Categorias { get; set; }
+		//VINCULO ENTRE LA BASE DE DATOS Y LAS ENTIDADES
+		public DbSet<Categoria> Categorias { get; set; } 
         public DbSet<Pregunta> Comentarios { get; set; }
         public DbSet<Producto> Productos { get; set; }
         public DbSet<Publicacion> Publicaciones { get; set; }
         public DbSet<Sucursal> Sucursales { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
+		//VINCULO ENTRE LA BASE DE DATOS Y LAS ENTIDADES
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+		protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
@@ -71,23 +73,29 @@ namespace TruequeTools.Data
                 .OnDelete(DeleteBehavior.Restrict);  // Establece la acción en la eliminación a "Restrict" (NO ACTION).
 
             modelBuilder.Entity<Pregunta>()
-                .HasOne(x => x.Publicacion)
-                .WithMany(p => p.Preguntas) // Aquí especificamos la propiedad de navegación inversa
+                .HasOne(x => x.Publicacion) // Configura la relación: una pregunta pertenece a una sola publicacion.
+				.WithMany(p => p.Preguntas) // Aquí especificamos la propiedad de navegación inversa
                 .HasForeignKey(x => x.PublicacionId); // Clave externa en la tabla Pregunta
 
+            //Genero la base de datos con categorias predefinidas
             modelBuilder.Entity<Categoria>().HasData(
                 new Categoria { Id = 1, Nombre = "$0 a $5.000" },
                 new Categoria { Id = 2, Nombre = "$5.000 a $10.000" },
                 new Categoria { Id = 3, Nombre = "Mas de $10.000" }
                 );
 
-            modelBuilder.Entity<Sucursal>().HasData(
-                new Sucursal { Id = 1, Nombre = "Central", Direccion = "Calle 13 2550", Localidad = "La Plata" }
+			//Genero la base de datos con una sucusal predefinida
+			modelBuilder.Entity<Sucursal>().HasData(
+                new Sucursal { Id = 1, Nombre = "Central", Direccion = "Calle 13 2500", Localidad = "La Plata" }
                 );
 
+			//Genero la base de datos con un usuario admin predefinido
+			modelBuilder.Entity<Usuario>().HasData(
+				new Usuario { Id = 1, Nombre = "Admin", Apellido = "Admin", Email = "admin@admin", Contraseña = "admin", FechaNacimiento = DateOnly.MinValue, Rol = "Admin", SucursalId = 1 }
+				);
 
-        }
+		}
 
-    }
+	}
 
 }

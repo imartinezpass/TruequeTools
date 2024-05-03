@@ -1,10 +1,22 @@
 ﻿using TruequeTools.Data;
+using Microsoft.EntityFrameworkCore;
 using TruequeTools.Entities;
+
+/*
+ 
+Esta clase implementa los servicios que establece la interfaz "InterfazServiciosPublicacion"
+
+Utiliza la clase "TruequeToolsDataContext" para comunicarse con la base de datos
+
+Ofrece servicios CRUD y LOCALES para la entidad "Publicacion"
+ 
+ */
 
 namespace TruequeTools.Services
 {
     public class ServiciosPublicacion : InterfazServiciosPublicacion
     {
+
         private readonly TruequeToolsDataContext contexto;
 
         public ServiciosPublicacion(TruequeToolsDataContext context)
@@ -18,5 +30,7 @@ namespace TruequeTools.Services
             contexto.Publicaciones.Add(publicacion);
             await contexto.SaveChangesAsync();
         }
+
     }
+
 }

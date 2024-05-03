@@ -2,11 +2,12 @@
 
 @using TruequeTools.Entities
 
-@inject InterfazServiciosSucursal SucursalService
 @inject NavigationManager NavMan
+@inject InterfazServiciosSucursal SucursalService
 
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
-@attribute [Authorize(Roles="Admin")]
+
+@attribute [Authorize(Roles = "Admin")]
 
 <PageTitle>Sucursales</PageTitle>
 
