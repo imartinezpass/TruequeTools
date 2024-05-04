@@ -14,15 +14,10 @@ Ofrece servicios CRUD y LOCALES para la entidad "Usuario"
 
 namespace TruequeTools.Services
 {
-    public class ServiciosUsuario : InterfazServiciosUsuario
+    public class ServiciosUsuario(TruequeToolsDataContext context) : IServiciosUsuario
     {
 
-        private readonly TruequeToolsDataContext contexto;
-
-        public ServiciosUsuario(TruequeToolsDataContext context)
-        {
-            contexto = context;
-        }
+        private readonly TruequeToolsDataContext contexto = context;
 
         //RECIBE UN USUARIO COMO PARAMETRO Y LO AGREGA A LA BASE DE DATOS
         public async Task RegisterUsuario(Usuario usuario)

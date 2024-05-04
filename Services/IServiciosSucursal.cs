@@ -8,7 +8,7 @@ Esta clase define los servicios que ofrece la entidad "Sucursal"
 
 namespace TruequeTools.Services
 {
-    public interface InterfazServiciosSucursal
+    public interface IServiciosSucursal
 	{
 		public Task<List<Sucursal>> ReadAllSucursales(); //Read All
 		public Task CreateSucursal(Sucursal sucursal); //Create

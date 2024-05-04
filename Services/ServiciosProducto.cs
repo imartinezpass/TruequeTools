@@ -14,15 +14,10 @@ Ofrece servicios CRUD y LOCALES para la entidad "Producto"
 
 namespace TruequeTools.Services
 {
-    public class ServiciosProducto : InterfazServiciosProducto
+    public class ServiciosProducto(TruequeToolsDataContext context) : IServiciosProducto
     {
 
-        private readonly TruequeToolsDataContext contexto;
-
-        public ServiciosProducto(TruequeToolsDataContext context)
-        {
-            contexto = context;
-        }
+        private readonly TruequeToolsDataContext contexto = context;
 
         //RECIBE UN PRODUCTO COMO PARAMETRO Y LO AGREGA A LA BASE DE DATOS
         public async Task CreateProducto(Producto producto)

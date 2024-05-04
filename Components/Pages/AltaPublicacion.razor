@@ -11,10 +11,10 @@
 
 @inject TruequeToolsDataContext appDbContext
 @inject NavigationManager NavMan
-@inject InterfazServiciosProducto ProductoService
-@inject InterfazServiciosSucursal SucursalService
-@inject InterfazServiciosCategoria CategoriaService
-@inject InterfazServiciosPublicacion PublicacionService
+@inject IServiciosProducto ProductoService
+@inject IServiciosSucursal SucursalService
+@inject IServiciosCategoria CategoriaService
+@inject IServiciosPublicacion PublicacionService
 
 @attribute [Authorize(Roles = "Admin,User")] 
 

@@ -14,15 +14,10 @@ Ofrece servicios CRUD y LOCALES para la entidad "Publicacion"
 
 namespace TruequeTools.Services
 {
-    public class ServiciosPublicacion : InterfazServiciosPublicacion
+    public class ServiciosPublicacion(TruequeToolsDataContext context) : IServiciosPublicacion
     {
 
-        private readonly TruequeToolsDataContext contexto;
-
-        public ServiciosPublicacion(TruequeToolsDataContext context)
-        {
-            contexto = context;
-        }
+        private readonly TruequeToolsDataContext contexto = context;
 
         //RECIBE UNA PUBLICACION COMO PARAMETRO Y LO AGREGA A LA BASE DE DATOS
         public async Task<int> CreatePublicacion(Publicacion publicacion)

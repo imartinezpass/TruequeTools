@@ -14,15 +14,10 @@ Ofrece servicios CRUD y LOCALES para la entidad "Categoria"
 
 namespace TruequeTools.Services
 {
-    public class ServiciosCategoria : InterfazServiciosCategoria
+    public class ServiciosCategoria(TruequeToolsDataContext context) : IServiciosCategoria
     {
 
-        private readonly TruequeToolsDataContext contexto;
-
-        public ServiciosCategoria(TruequeToolsDataContext context)
-        {
-            contexto = context;
-        }
+        private readonly TruequeToolsDataContext contexto = context;
 
         //DEVUELVE UNA LISTA CON TODAS LAS CATEGORIAS
         public async Task<List<Categoria>> ReadAllCategorias()

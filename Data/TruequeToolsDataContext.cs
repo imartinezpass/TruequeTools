@@ -14,16 +14,11 @@ Luego se debe actualizar la base de datos con: Update-Database
 
 namespace TruequeTools.Data
 {
-    public class TruequeToolsDataContext : DbContext
+    public class TruequeToolsDataContext(DbContextOptions<TruequeToolsDataContext> options) : DbContext(options)
 	{
 
-		public TruequeToolsDataContext(DbContextOptions<TruequeToolsDataContext> options) : base(options)
-		{
-		
-		}
-
-		//VINCULO ENTRE LA BASE DE DATOS Y LAS ENTIDADES
-		public DbSet<Categoria> Categorias { get; set; } 
+        //VINCULO ENTRE LA BASE DE DATOS Y LAS ENTIDADES
+        public DbSet<Categoria> Categorias { get; set; } 
         public DbSet<Pregunta> Comentarios { get; set; }
         public DbSet<Producto> Productos { get; set; }
         public DbSet<Publicacion> Publicaciones { get; set; }
