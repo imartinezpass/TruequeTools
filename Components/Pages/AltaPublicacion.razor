@@ -60,6 +60,7 @@
                 </div>
                 <div class="form-floating mb-3">
                     <InputSelect @bind-Value="@Modelo.CategoriaId" class="form-control" autocomplete="categoria" aria-required="true" placeholder="" maxlength="50">
+                        <option value=0>Seleccione una categoría</option>
                         @foreach (var cat in categorias)
                         {
                             <option value="@cat.Id">@cat.Nombre</option>
@@ -81,17 +82,25 @@
 
     List<Sucursal> sucursales = new List<Sucursal>();
     List<Categoria> categorias = new List<Categoria>();
+    int sucursalPreferida;
 
     protected override async Task OnInitializedAsync()
     {
         sucursales = await SucursalService.ReadAllSucursales(); //LECTURA DE TODAS LAS SUCURSALES
         categorias = await CategoriaService.ReadAllCategorias(); //LECTURA DE TODAS LAS CATEGORIAS
+        sucursalPreferida = int.Parse(@HttpContext.User.FindFirst("IdSucursal").Value);
     }
 
     private String? MensajeError;
 
     [SupplyParameterFromForm]
     private PublicacionViewModel Modelo { get; set; } = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        Modelo.SucursalId = sucursalPreferida; // Configurar el modelo de vista con la sucursal preferida del usuario
+    }
 
     public async Task CargarPublicacion(EditContext editContext)
     {

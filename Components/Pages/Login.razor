@@ -64,6 +64,7 @@
 			new Claim(ClaimTypes.Name, cuenta.Nombre),
 			new Claim(ClaimTypes.Role, cuenta.Rol),
 			new Claim("IdUsuario", cuenta.Id.ToString()), //Guardo el Id del usuario al iniciar sesion para dar de alta publicaciones
+			new Claim("IdSucursal", cuenta.SucursalId.ToString())
 		};
 
 		var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

@@ -9,7 +9,7 @@ Tambien realiza las verificaciones de input
 
 namespace TruequeTools.Models
 {
-    public class PublicacionViewModel
+    public class PublicacionViewModel()
     {
         [Required(ErrorMessage = "Debe ingresar el nombre del producto")]
         [MinLength(4, ErrorMessage = "El nombre debe tener al menos 4 caracteres.")]
@@ -23,8 +23,8 @@ namespace TruequeTools.Models
         [Display(Name = "Sucursal")]
         public int SucursalId { get; set; } = 1;
 
-        [Required(ErrorMessage = "Debe seleccionar una catgoría")]
+        [Range(1, 3, ErrorMessage = "Seleccione una categoria valida")]
         [Display(Name = "Categoria")]
-        public int CategoriaId { get; set; } = 1;
+        public int CategoriaId { get; set; } = 0;
     }
 }
