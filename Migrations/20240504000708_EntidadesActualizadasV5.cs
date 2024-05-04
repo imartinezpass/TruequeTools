@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TruequeTools.Migrations
 {
     /// <inheritdoc />
-    public partial class EntidadesActualizadasV4 : Migration
+    public partial class EntidadesActualizadasV5 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -39,28 +39,6 @@ namespace TruequeTools.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_sucursales", x => x.id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "productos",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    nombre = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    descripcion = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    fotoUrl = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    categoriaId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_productos", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_productos_categorias_categoriaId",
-                        column: x => x.categoriaId,
-                        principalTable: "categorias",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -99,18 +77,11 @@ namespace TruequeTools.Migrations
                     isOculta = table.Column<bool>(type: "bit", nullable: false),
                     fechaPublicacion = table.Column<DateOnly>(type: "date", nullable: false),
                     usuarioId = table.Column<int>(type: "int", nullable: false),
-                    sucursalId = table.Column<int>(type: "int", nullable: false),
-                    productoId = table.Column<int>(type: "int", nullable: false)
+                    sucursalId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_publicaciones", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_publicaciones_productos_productoId",
-                        column: x => x.productoId,
-                        principalTable: "productos",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_publicaciones_sucursales_sucursalId",
                         column: x => x.sucursalId,
@@ -146,6 +117,35 @@ namespace TruequeTools.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "productos",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    nombre = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    descripcion = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    fotoUrl = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
+                    categoriaId = table.Column<int>(type: "int", nullable: false),
+                    publicacionId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_productos", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_productos_categorias_categoriaId",
+                        column: x => x.categoriaId,
+                        principalTable: "categorias",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_productos_publicaciones_publicacionId",
+                        column: x => x.publicacionId,
+                        principalTable: "publicaciones",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "categorias",
                 columns: new[] { "id", "nombre" },
@@ -159,7 +159,12 @@ namespace TruequeTools.Migrations
             migrationBuilder.InsertData(
                 table: "sucursales",
                 columns: new[] { "id", "direccion", "localidad", "nombre" },
-                values: new object[] { 1, "Calle 13 2550", "La Plata", "Central" });
+                values: new object[] { 1, "Calle 13 2500", "La Plata", "Central" });
+
+            migrationBuilder.InsertData(
+                table: "usuarios",
+                columns: new[] { "id", "apellido", "contraseña", "email", "fechaNacimiento", "nombre", "rol", "sucursalId" },
+                values: new object[] { 1, "Admin", "admin", "admin@admin", new DateOnly(1, 1, 1), "Admin", "Admin", 1 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_preguntas_publicacionId",
@@ -172,9 +177,10 @@ namespace TruequeTools.Migrations
                 column: "categoriaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_publicaciones_productoId",
-                table: "publicaciones",
-                column: "productoId");
+                name: "IX_productos_publicacionId",
+                table: "productos",
+                column: "publicacionId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_publicaciones_sucursalId",
@@ -199,16 +205,16 @@ namespace TruequeTools.Migrations
                 name: "preguntas");
 
             migrationBuilder.DropTable(
-                name: "publicaciones");
-
-            migrationBuilder.DropTable(
                 name: "productos");
 
             migrationBuilder.DropTable(
-                name: "usuarios");
+                name: "categorias");
 
             migrationBuilder.DropTable(
-                name: "categorias");
+                name: "publicaciones");
+
+            migrationBuilder.DropTable(
+                name: "usuarios");
 
             migrationBuilder.DropTable(
                 name: "sucursales");

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography.Xml;
 using TruequeTools.Entities;
 
 /*
@@ -28,74 +29,88 @@ namespace TruequeTools.Data
         public DbSet<Publicacion> Publicaciones { get; set; }
         public DbSet<Sucursal> Sucursales { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
-		//VINCULO ENTRE LA BASE DE DATOS Y LAS ENTIDADES
+        //VINCULO ENTRE LA BASE DE DATOS Y LAS ENTIDADES
 
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
+            // Configuración de la relación entre Usuario y Sucursal
             modelBuilder.Entity<Usuario>()
-                .HasOne(x => x.Sucursal)  // Configura la relación: un usuario pertenece a una única sucursal.
-                .WithMany()  // No especificamos WithOne() aquí ya que la relación es uno a uno o muchos a uno.
-                .HasForeignKey(x => x.SucursalId)  // Clave externa en la tabla usuarios que referencia la tabla sucursales.
-                .OnDelete(DeleteBehavior.Restrict);  // Establece la acción en la eliminación a "Restrict" (NO ACTION).
+                .HasOne(x => x.Sucursal)  // Un usuario pertenece a una única sucursal
+                .WithMany()  // No especificamos WithOne() ya que la relación es uno a uno o muchos a uno
+                .HasForeignKey(x => x.SucursalId)  // Clave externa en la tabla Usuarios que referencia la tabla Sucursales
+                .OnDelete(DeleteBehavior.Restrict);  // Establece la acción en la eliminación a "Restrict" (NO ACTION)
 
+            // Configuración de la relación entre Usuario y Publicaciones
             modelBuilder.Entity<Usuario>()
-                .HasMany(x => x.Publicaciones) // Configura la relación: un usuario puede tener muchas publicaciones.
-                .WithOne(x => x.Usuario) // Configura la relación inversa: cada publicación pertenece a un único usuario.
-                .HasForeignKey(x => x.UsuarioId); // Clave externa en la tabla Publicacion.
+                .HasMany(x => x.Publicaciones) // Un usuario puede tener muchas publicaciones
+                .WithOne(x => x.Usuario) // Cada publicación pertenece a un único usuario
+                .HasForeignKey(x => x.UsuarioId); // Clave externa en la tabla Publicaciones
 
+            // Configuración de la relación entre Publicación y Sucursal
             modelBuilder.Entity<Publicacion>()
-                .HasOne(x => x.Sucursal)  // Configura la relación: una publicación pertenece a una única sucursal.
-                .WithMany()  // No especificamos WithOne() aquí ya que la relación es uno a uno o muchos a uno.
-                .HasForeignKey(x => x.SucursalId)  // Clave externa en la tabla publicaciones que referencia la tabla sucursales.
-                .OnDelete(DeleteBehavior.Restrict);  // Establece la acción en la eliminación a "Restrict" (NO ACTION).
+                .HasOne(x => x.Sucursal)  // Una publicación pertenece a una única sucursal
+                .WithMany()  // No especificamos WithOne() ya que la relación es uno a uno o muchos a uno
+                .HasForeignKey(x => x.SucursalId)  // Clave externa en la tabla Publicaciones que referencia la tabla Sucursales
+                .OnDelete(DeleteBehavior.Restrict);  // Establece la acción en la eliminación a "Restrict" (NO ACTION)
 
+            // Configuración de la relación entre Publicación y Usuario
             modelBuilder.Entity<Publicacion>()
-                .HasOne(x => x.Usuario)
-                .WithMany(u => u.Publicaciones) // Aquí especificamos la propiedad de navegación inversa
-                .HasForeignKey(x => x.UsuarioId); // Clave externa en la tabla Publicacion
+                .HasOne(x => x.Usuario)  // Una publicación pertenece a un único usuario
+                .WithMany(u => u.Publicaciones) // Cada usuario puede tener múltiples publicaciones
+                .HasForeignKey(x => x.UsuarioId); // Clave externa en la tabla Publicaciones
 
+            // Configuración de la relación entre Publicación y Producto
             modelBuilder.Entity<Publicacion>()
-                .HasOne(x => x.Producto)  // Configura la relación: una publicación tiene un único producto asociado.
-                .WithMany()  // No especificamos WithOne() aquí ya que la relación es uno a uno o muchos a uno.
-                .HasForeignKey(x => x.ProductoId);  // Clave externa en la tabla Publicacion.
+                .HasOne(p => p.Producto)  // Una publicación tiene un producto asociado
+                .WithOne(w => w.Publicacion)  // Un producto está asociado a una única publicación
+                .HasForeignKey<Producto>(p => p.PublicacionId);  // Clave externa en la tabla Productos que referencia la tabla Publicaciones
 
+            // Configuración de la relación entre Publicación y Preguntas
             modelBuilder.Entity<Publicacion>()
-                .HasMany(x => x.Preguntas) // Configura la relación: una publicación puede tener muchas preguntas.
-                .WithOne(x => x.Publicacion) // Configura la relación inversa: cada pregunta pertenece a una única publicación.
-                .HasForeignKey(p => p.PublicacionId); // Clave externa en la tabla Pregunta.
+                .HasMany(x => x.Preguntas) // Una publicación puede tener muchas preguntas
+                .WithOne(x => x.Publicacion) // Cada pregunta pertenece a una única publicación
+                .HasForeignKey(p => p.PublicacionId); // Clave externa en la tabla Preguntas
 
+            // Configuración de la relación entre Producto y Publicación
             modelBuilder.Entity<Producto>()
-                .HasOne(p => p.Categoria)  // Configura la relación: un producto pertenece a una sola categoría.
-                .WithMany()  // No especificamos WithOne() aquí ya que la relación es uno a uno o muchos a uno.
-                .HasForeignKey(p => p.CategoriaId)  // Clave externa en la tabla productos que referencia la tabla categorías.
-                .OnDelete(DeleteBehavior.Restrict);  // Establece la acción en la eliminación a "Restrict" (NO ACTION).
+                .HasOne(p => p.Publicacion)  // Un producto está asociado a una única publicación
+                .WithOne(w => w.Producto)  // No especificamos WithOne() ya que la relación es uno a uno o muchos a uno
+                .HasForeignKey<Producto>(p => p.PublicacionId);  // Clave externa en la tabla Productos que referencia la tabla Publicaciones
 
+            // Configuración de la relación entre Producto y Categoría
+            modelBuilder.Entity<Producto>()
+                .HasOne(p => p.Categoria)  // Un producto pertenece a una sola categoría
+                .WithMany()  // No especificamos WithOne() ya que la relación es uno a uno o muchos a uno
+                .HasForeignKey(p => p.CategoriaId)  // Clave externa en la tabla Productos que referencia la tabla Categorías
+                .OnDelete(DeleteBehavior.Restrict);  // Establece la acción en la eliminación a "Restrict" (NO ACTION)
+
+            // Configuración de la relación entre Pregunta y Publicación
             modelBuilder.Entity<Pregunta>()
-                .HasOne(x => x.Publicacion) // Configura la relación: una pregunta pertenece a una sola publicacion.
-				.WithMany(p => p.Preguntas) // Aquí especificamos la propiedad de navegación inversa
-                .HasForeignKey(x => x.PublicacionId); // Clave externa en la tabla Pregunta
+                .HasOne(p => p.Publicacion)  // Una pregunta pertenece a una sola publicación
+                .WithMany(p => p.Preguntas)  // Cada publicación puede tener muchas preguntas
+                .HasForeignKey(p => p.PublicacionId);  // Clave externa en la tabla Preguntas
 
-            //Genero la base de datos con categorias predefinidas
+            // Genera la base de datos con categorías predefinidas
             modelBuilder.Entity<Categoria>().HasData(
                 new Categoria { Id = 1, Nombre = "$0 a $5.000" },
                 new Categoria { Id = 2, Nombre = "$5.000 a $10.000" },
                 new Categoria { Id = 3, Nombre = "Mas de $10.000" }
-                );
+            );
 
-			//Genero la base de datos con una sucusal predefinida
-			modelBuilder.Entity<Sucursal>().HasData(
+            // Genera la base de datos con una sucursal predefinida
+            modelBuilder.Entity<Sucursal>().HasData(
                 new Sucursal { Id = 1, Nombre = "Central", Direccion = "Calle 13 2500", Localidad = "La Plata" }
-                );
+            );
 
-			//Genero la base de datos con un usuario admin predefinido
-			modelBuilder.Entity<Usuario>().HasData(
-				new Usuario { Id = 1, Nombre = "Admin", Apellido = "Admin", Email = "admin@admin", Contraseña = "admin", FechaNacimiento = DateOnly.MinValue, Rol = "Admin", SucursalId = 1 }
-				);
+            // Genera la base de datos con un usuario admin predefinido
+            modelBuilder.Entity<Usuario>().HasData(
+                new Usuario { Id = 1, Nombre = "Admin", Apellido = "Admin", Email = "admin@admin", Contraseña = "admin", FechaNacimiento = DateOnly.MinValue, Rol = "Admin", SucursalId = 1 }
+            );
 
-		}
+        }
 
-	}
+    }
 
 }

@@ -12,8 +12,8 @@ using TruequeTools.Data;
 namespace TruequeTools.Migrations
 {
     [DbContext(typeof(TruequeToolsDataContext))]
-    [Migration("20240503005236_EntidadesActualizadasV4")]
-    partial class EntidadesActualizadasV4
+    [Migration("20240504000708_EntidadesActualizadasV5")]
+    partial class EntidadesActualizadasV5
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -119,9 +119,16 @@ namespace TruequeTools.Migrations
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("nombre");
 
+                    b.Property<int>("PublicacionId")
+                        .HasColumnType("int")
+                        .HasColumnName("publicacionId");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CategoriaId");
+
+                    b.HasIndex("PublicacionId")
+                        .IsUnique();
 
                     b.ToTable("productos");
                 });
@@ -147,10 +154,6 @@ namespace TruequeTools.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("isPremium");
 
-                    b.Property<int>("ProductoId")
-                        .HasColumnType("int")
-                        .HasColumnName("productoId");
-
                     b.Property<int>("SucursalId")
                         .HasColumnType("int")
                         .HasColumnName("sucursalId");
@@ -165,8 +168,6 @@ namespace TruequeTools.Migrations
                         .HasColumnName("usuarioId");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ProductoId");
 
                     b.HasIndex("SucursalId");
 
@@ -207,7 +208,7 @@ namespace TruequeTools.Migrations
                         new
                         {
                             Id = 1,
-                            Direccion = "Calle 13 2550",
+                            Direccion = "Calle 13 2500",
                             Localidad = "La Plata",
                             Nombre = "Central"
                         });
@@ -259,6 +260,19 @@ namespace TruequeTools.Migrations
                     b.HasIndex("SucursalId");
 
                     b.ToTable("usuarios");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Apellido = "Admin",
+                            Contraseña = "admin",
+                            Email = "admin@admin",
+                            FechaNacimiento = new DateOnly(1, 1, 1),
+                            Nombre = "Admin",
+                            Rol = "Admin",
+                            SucursalId = 1
+                        });
                 });
 
             modelBuilder.Entity("TruequeTools.Entities.Pregunta", b =>
@@ -280,17 +294,19 @@ namespace TruequeTools.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("TruequeTools.Entities.Publicacion", "Publicacion")
+                        .WithOne("Producto")
+                        .HasForeignKey("TruequeTools.Entities.Producto", "PublicacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Categoria");
+
+                    b.Navigation("Publicacion");
                 });
 
             modelBuilder.Entity("TruequeTools.Entities.Publicacion", b =>
                 {
-                    b.HasOne("TruequeTools.Entities.Producto", "Producto")
-                        .WithMany()
-                        .HasForeignKey("ProductoId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("TruequeTools.Entities.Sucursal", "Sucursal")
                         .WithMany()
                         .HasForeignKey("SucursalId")
@@ -302,8 +318,6 @@ namespace TruequeTools.Migrations
                         .HasForeignKey("UsuarioId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Producto");
 
                     b.Navigation("Sucursal");
 
@@ -324,6 +338,8 @@ namespace TruequeTools.Migrations
             modelBuilder.Entity("TruequeTools.Entities.Publicacion", b =>
                 {
                     b.Navigation("Preguntas");
+
+                    b.Navigation("Producto");
                 });
 
             modelBuilder.Entity("TruequeTools.Entities.Usuario", b =>

@@ -42,9 +42,15 @@ namespace TruequeTools.Entities
         [Column("categoriaId")]
         public int CategoriaId { get; set; }
 
+        //CLAVE EXTERNA PRODUCTO
+
+        [Column("publicacionId")]
+        public int PublicacionId { get; set; }
+
         //ATRIBUTOS NO SQL
 
         public Categoria? Categoria { get; set; }
+        public Publicacion? Publicacion { get; set; }
 
     }
 

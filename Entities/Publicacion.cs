@@ -49,11 +49,6 @@ namespace TruequeTools.Entities
         [Column("sucursalId")]
         public int SucursalId { get; set; }
 
-        //CLAVE EXTERNA PRODUCTO
-
-        [Column("productoId")]
-        public int ProductoId { get; set; }
-
         //ATRIBUTOS NO SQL
 
         public Usuario? Usuario { get; set; }
