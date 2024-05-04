@@ -10,7 +10,7 @@ namespace TruequeTools.Services
 {
     public interface InterfazServiciosPublicacion
     {
-        public Task CreatePublicacion(Publicacion publicacion); //Create
+        public Task<int> CreatePublicacion(Publicacion publicacion); //Create
 
     }
 }

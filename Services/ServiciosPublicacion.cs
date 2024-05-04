@@ -25,10 +25,11 @@ namespace TruequeTools.Services
         }
 
         //RECIBE UNA PUBLICACION COMO PARAMETRO Y LO AGREGA A LA BASE DE DATOS
-        public async Task CreatePublicacion(Publicacion publicacion)
+        public async Task<int> CreatePublicacion(Publicacion publicacion)
         {
             contexto.Publicaciones.Add(publicacion);
             await contexto.SaveChangesAsync();
+            return publicacion.Id;
         }
 
     }

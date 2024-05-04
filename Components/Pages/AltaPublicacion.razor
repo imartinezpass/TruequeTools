@@ -76,6 +76,8 @@
 </div>
 
 @code {
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
 
     List<Sucursal> sucursales = new List<Sucursal>();
     List<Categoria> categorias = new List<Categoria>();
@@ -94,19 +96,22 @@
     public async Task CargarPublicacion(EditContext editContext)
     {
         var publicacion = new Publicacion();
+
+        publicacion.UsuarioId = int.Parse(@HttpContext.User.FindFirst("IdUsuario").Value);
+        publicacion.Titulo = Modelo.Nombre; 
+        publicacion.SucursalId = Modelo.SucursalId;
+
+        var publicacionId = await PublicacionService.CreatePublicacion(publicacion);
+
         var producto = new Producto();
 
+        producto.PublicacionId = publicacionId;
         producto.Nombre = Modelo.Nombre;
         producto.Descripcion = Modelo.Descripcion;
         producto.FotoUrl = "prueba1.jpg";
         producto.CategoriaId = Modelo.CategoriaId;
-
-        //publicacion.Titulo = Modelo.Nombre;
-        //publicacion.UsuarioId = User.Identity.Id;
-        //publicacion.ProductoId = producto.Id;
-
+        
         await ProductoService.CreateProducto(producto);
-        //await PublicacionService.CreatePublicacion(publicacion);
         NavMan.NavigateTo("/");
 
     }
