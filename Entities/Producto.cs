@@ -35,7 +35,7 @@ namespace TruequeTools.Entities
 
         [Column("fotoUrl")]
         [MaxLength(255)]
-        public string FotoUrl { get; set; } = "blank.svg";
+        public string? FotoUrl { get; set; }
 
         //CLAVE EXTERNA CATEGORIA
 
@@ -49,8 +49,8 @@ namespace TruequeTools.Entities
 
         //ATRIBUTOS NO SQL
 
-        public Categoria Categoria { get; set; } = new Categoria();
-        public Publicacion Publicacion { get; set; } = new Publicacion();
+        public Categoria? Categoria { get; set; }
+        public Publicacion? Publicacion { get; set; }
 
     }
 

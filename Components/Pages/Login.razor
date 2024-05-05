@@ -69,17 +69,8 @@
 
 		var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 		var principal = new ClaimsPrincipal(identity);
-
-		if(HttpContext != null)
-		{
-			await HttpContext.SignInAsync(principal);
-			NavMan.NavigateTo("/");
-		}
-		else
-		{
-			MensajeError = "Error: El contexto Http es inexistente";
-			return;
-		}
+		await HttpContext.SignInAsync(principal);
+		NavMan.NavigateTo("/");
 
 	}
 
