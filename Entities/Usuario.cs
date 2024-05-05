@@ -26,27 +26,28 @@ namespace TruequeTools.Entities
 
         [Column("nombre")]
         [MaxLength(50)]
-        public string? Nombre { get; set; }
+        public required string Nombre { get; set; }
 
         [Column("apellido")]
         [MaxLength(50)]
-        public string? Apellido { get; set; }
+        public required string Apellido { get; set; }
 
         [Column("email")]
         [MaxLength(50)]
-        public string? Email { get; set; }
+        public required string Email { get; set; }
 
         [Column("contraseña")]
         [MaxLength(50)]
-        public string? Contraseña { get; set; }
+        public required string Contraseña { get; set; }
 
         [Column("fechaNacimiento")]
-        public DateOnly FechaNacimiento { get; set; }
+        public required DateOnly FechaNacimiento { get; set; }
 
         //METADATA
 
         [Column("rol")]
-        public string? Rol { get; set; } = "User";
+        [MaxLength(50)]
+        public string Rol { get; set; } = "User";
 
         //CLAVE EXTERNA USUARIO -> SUCURSAL
 
