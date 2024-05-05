@@ -14,10 +14,10 @@ Ofrece servicios CRUD y LOCALES para la entidad "Pregunta"
 
 namespace TruequeTools.Services
 {
-	public class ServiciosPregunta(TruequeToolsDataContext context) : IServiciosPregunta
+	public class ServiciosPregunta(/*TruequeToolsDataContext context*/) : IServiciosPregunta
 	{
 
-        private readonly TruequeToolsDataContext contexto = context;
+        //private readonly TruequeToolsDataContext contexto = context;
 
         //IMPLEMENTACION DE SERVICIOS DE LA ENTIDAD PREGUNTA
 

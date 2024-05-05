@@ -36,7 +36,6 @@ namespace TruequeTools.Services
 		//RECIBE UN ID Y DEVUELVE LA SUCURSAL CORRESPONDIENTE A DICHO ID
 		public async Task<Sucursal> ReadSucursalById(int id)
 		{
-			#pragma warning disable CS8603 // Deshabilito el error "Possible null reference return" ya que la sucursal se sabe que existe
             var sucursal = await contexto.Sucursales.FindAsync(id);
 			return sucursal;
 		}
