@@ -26,7 +26,7 @@ namespace TruequeTools.Entities
 
         [Column("nombre")]
         [MaxLength(50)]
-        public string? Nombre { get; set; }
+        public string Nombre { get; set; } = "Nombre";
 
         [Column("apellido")]
         [MaxLength(50)]
@@ -46,7 +46,7 @@ namespace TruequeTools.Entities
         //METADATA
 
         [Column("rol")]
-        public string? Rol { get; set; } = "User";
+        public string Rol { get; set; } = "User";
 
         //CLAVE EXTERNA USUARIO -> SUCURSAL
 

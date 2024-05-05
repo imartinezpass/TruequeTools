@@ -37,7 +37,14 @@ namespace TruequeTools.Services
 		public async Task<Sucursal> ReadSucursalById(int id)
 		{
             var sucursal = await contexto.Sucursales.FindAsync(id);
-			return sucursal;
+			if (sucursal != null)
+			{
+				return sucursal;
+			}
+			else
+			{
+				return new Sucursal { Nombre = "Sucursal", Direccion = "Direccion", Localidad="Localidad"};
+			}
 		}
 
 		//RECIBE UNA SUCURSAL Y UN ID - ACTUALIZA LA SUCURSAL EXISTENTE O CREA UNA NUEVA
