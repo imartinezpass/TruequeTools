@@ -32,7 +32,7 @@
 	{
 
 		await base.OnInitializedAsync();
-		if (HttpContext.User.Identity.IsAuthenticated)
+		if (HttpContext != null &&  HttpContext.User.Identity != null && HttpContext.User.Identity.IsAuthenticated)
 		{
 			await HttpContext.SignOutAsync();
 			NavMan.NavigateTo("/salir", true);

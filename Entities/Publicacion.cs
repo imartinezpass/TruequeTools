@@ -52,8 +52,8 @@ namespace TruequeTools.Entities
         //ATRIBUTOS NO SQL
 
         public Usuario? Usuario { get; set; }
-        public Sucursal? Sucursal { get; set; }
-        public Producto? Producto { get; set; }
+        public Sucursal Sucursal { get; set; } = new();
+        public Producto Producto { get; set; } = new();
         public List<Pregunta>? Preguntas { get; set; }
 
     }

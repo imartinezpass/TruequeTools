@@ -27,7 +27,7 @@
 
             context.Entry(publi).Reference(p => p.Producto).Load(); //Traigo los datos del producto asociado con la publicacion
             context.Entry(publi).Reference(p => p.Sucursal).Load(); //Traigo los datos de la sucursal asociada con la publicacion
-            context.Entry(publi.Producto).Reference(p => p.Categoria).Load(); //Traigo los datos de la Categoria asociada al Producto asociado con la Publicacion
+            context.Entry(publi).Reference(p => p.Producto.Categoria).Load(); //Traigo los datos de la Categoria asociada al Producto asociado con la Publicacion
 
             <div class="col-md-4 mb-3">
                 <div class="card">

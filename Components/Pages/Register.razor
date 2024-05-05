@@ -105,16 +105,16 @@
             return;
         }
 
+        var usuario = new Usuario
+        {
+            Nombre = Modelo.Nombre,
+            Apellido = Modelo.Apellido,
+            Email = Modelo.Correo,
+            Contraseña = Modelo.Contraseña,
+            FechaNacimiento = Modelo.FechaNacimiento,
+            SucursalId = Modelo.SucursalId
+        };
 
-        var usuario = new Usuario();
-
-        usuario.Nombre = Modelo.Nombre;
-        usuario.Apellido = Modelo.Apellido;
-        usuario.Email = Modelo.Correo;
-        usuario.Contraseña = Modelo.Contraseña;
-        usuario.FechaNacimiento = Modelo.FechaNacimiento;
-        usuario.SucursalId = Modelo.SucursalId;
-       
         await UsuariosService.RegisterUsuario(usuario);
         NavMan.NavigateTo("/");
 
