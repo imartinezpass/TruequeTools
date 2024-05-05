@@ -88,7 +88,6 @@
     {
         sucursales = await SucursalService.ReadAllSucursales(); //LECTURA DE TODAS LAS SUCURSALES
         categorias = await CategoriaService.ReadAllCategorias(); //LECTURA DE TODAS LAS CATEGORIAS
-        #pragma warning disable CS8602 // La linea de abajo tira "Null reference" sino...
         sucursalPreferida = int.Parse(@HttpContext.User.FindFirst("IdSucursal").Value);
     }
 
@@ -107,22 +106,20 @@
     {
         var publicacion = new Publicacion();
 
-        #pragma warning disable CS8602 // La linea de abajo tira "Null reference" sino...
         publicacion.UsuarioId = int.Parse(@HttpContext.User.FindFirst("IdUsuario").Value);
         publicacion.Titulo = Modelo.Nombre; 
         publicacion.SucursalId = Modelo.SucursalId;
 
         var publicacionId = await PublicacionService.CreatePublicacion(publicacion);
 
-        var producto = new Producto
-        {
-            PublicacionId = publicacionId,
-            Nombre = Modelo.Nombre,
-            Descripcion = Modelo.Descripcion,
-            FotoUrl = "prueba1.jpg",
-            CategoriaId = Modelo.CategoriaId
-        };
+        var producto = new Producto();
 
+        producto.PublicacionId = publicacionId;
+        producto.Nombre = Modelo.Nombre;
+        producto.Descripcion = Modelo.Descripcion;
+        producto.FotoUrl = "prueba1.jpg";
+        producto.CategoriaId = Modelo.CategoriaId;
+        
         await ProductoService.CreateProducto(producto);
         NavMan.NavigateTo("/");
 

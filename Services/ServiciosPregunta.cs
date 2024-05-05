@@ -17,10 +17,7 @@ namespace TruequeTools.Services
 	public class ServiciosPregunta(TruequeToolsDataContext context) : IServiciosPregunta
 	{
 
-
-        #pragma warning disable IDE0052 // Remove unread private members
         private readonly TruequeToolsDataContext contexto = context;
-
 
         //IMPLEMENTACION DE SERVICIOS DE LA ENTIDAD PREGUNTA
 
