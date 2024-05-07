@@ -1,0 +1,44 @@
+<!-- ComentariosComponent.razor -->
+@foreach (var comentario in ListaComentarios)
+{
+    <div>
+        <p>@comentario.Contenido</p>
+        @if (comentario.Respuestas != null && comentario.Respuestas.Any())
+        {
+            <ul>
+                @foreach (var respuesta in comentario.Respuestas)
+                {
+                    <li>@respuesta.Contenido</li>
+                }
+            </ul>
+        }
+        <button @onclick="() => MostrarFormularioRespuesta(comentario.Id)">Responder</button>
+    </div>
+}
+
+<!-- Formulario de respuesta -->
+@if (MostrarFormulario)
+{
+    <input type="text" @bind="NuevoComentario.Contenido" />
+    <button @onclick="EnviarRespuesta">Enviar</button>
+}
+
+@code {
+    List<Comentario> ListaComentarios = new List<Comentario>();
+    Comentario NuevoComentario = new Comentario();
+    bool MostrarFormulario = false;
+
+    void MostrarFormularioRespuesta(int comentarioId)
+    {
+        NuevoComentario.ComentarioPadreId = comentarioId;
+        MostrarFormulario = true;
+    }
+
+    void EnviarRespuesta()
+    {
+        // Guardar NuevoComentario en la base de datos
+        // Actualizar ListaComentarios
+        // Limpiar formulario
+        MostrarFormulario = false;
+    }
+}
