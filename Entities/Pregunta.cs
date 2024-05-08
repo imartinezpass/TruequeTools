@@ -39,13 +39,7 @@ namespace TruequeTools.Entities
 
         //ATRIBUTOS NO SQL
 
-        public DateTime Fecha { get; set; }
-
         public Publicacion? Publicacion { get; set; }
-
-        public int? IdPreguntaPadre { get; set; }
-
-
 
     }
 

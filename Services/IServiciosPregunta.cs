@@ -10,7 +10,7 @@ namespace TruequeTools.Services
 {
 	public interface IServiciosPregunta
 	{
-        public Task<int> CreatePregunta(Pregunta pregunta); //Create
-    }
+		//DECLARACION DE SERVICIOS DE LA ENTIDAD PREGUNTA
+	}
 
 }
