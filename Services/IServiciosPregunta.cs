@@ -10,7 +10,7 @@ namespace TruequeTools.Services
 {
 	public interface IServiciosPregunta
 	{
-		//DECLARACION DE SERVICIOS DE LA ENTIDAD PREGUNTA
+		public Task<List<Pregunta>> ReadPreguntasByPublicacionId(int id); //Read
 	}
 
 }

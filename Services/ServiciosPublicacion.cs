@@ -27,6 +27,24 @@ namespace TruequeTools.Services
             return publicacion.Id;
         }
 
-    }
+		public async Task<Publicacion> ReadPublicacionById(int id)
+		{
+
+			IQueryable<Publicacion> query = contexto.Publicaciones.Where(p => p.Id == id);
+
+			var publicacion = await query.FirstOrDefaultAsync();
+
+            if(publicacion != null)
+            {
+                return publicacion;
+			}
+            else
+            {
+				return new Publicacion();
+			}
+
+		}
+
+	}
 
 }

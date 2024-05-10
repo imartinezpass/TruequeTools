@@ -19,7 +19,7 @@ namespace TruequeTools.Data
 
         //VINCULO ENTRE LA BASE DE DATOS Y LAS ENTIDADES
         public DbSet<Categoria> Categorias { get; set; } 
-        public DbSet<Pregunta> Comentarios { get; set; }
+        public DbSet<Pregunta> Preguntas { get; set; }
         public DbSet<Producto> Productos { get; set; }
         public DbSet<Publicacion> Publicaciones { get; set; }
         public DbSet<Sucursal> Sucursales { get; set; }

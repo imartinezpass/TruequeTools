@@ -5,6 +5,7 @@
 @using TruequeTools.Entities
 
 @inject TruequeToolsDataContext context
+@inject NavigationManager NavMan
 
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
 
@@ -41,7 +42,7 @@
                         <li class="list-group-item">Categoria @publi.Producto.Categoria.Nombre</li> @*TIENE QUE TRAER EL NOMBRE DE LA CATEGORIA CON ESTE ID*@
                     </ul>
                     <div class="card-body">
-                        <a href="#" class="card-link">Ver Publicacion</a>
+                        <a class="card-link" @onclick="@(() => VerPublicacion(publi.Id))">Ver Publicacion</a>
                     </div>
                 </div>
             </div>
@@ -73,12 +74,17 @@ else
 
     private bool showSpinner = true;
 
+    void VerPublicacion(int id)
+    {
+        NavMan.NavigateTo($"/publicacion/{id}");
+    }
+
     protected override async Task OnInitializedAsync()
     {
 
         publicaciones = await context.Publicaciones.Take(3).ToListAsync(); //Traigo las primeras 3 publicaciones
         
-        await Task.Delay(5000); // Espera 5 segundos y muestra el spinner durante ese tiempo
+        await Task.Delay(2000); // Espera 2 segundos y muestra el spinner durante ese tiempo
         showSpinner = false; // Desactiva el spinner
         StateHasChanged(); // Notifica a Blazor que debe actualizar la interfaz de usuario
 
