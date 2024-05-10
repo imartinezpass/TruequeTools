@@ -82,7 +82,7 @@ else
     protected override async Task OnInitializedAsync()
     {
 
-        publicaciones = await context.Publicaciones.Take(3).ToListAsync(); //Traigo las primeras 3 publicaciones
+        publicaciones = await context.Publicaciones.Take(12).ToListAsync(); //Traigo las primeras 3 publicaciones
         
         await Task.Delay(2000); // Espera 2 segundos y muestra el spinner durante ese tiempo
         showSpinner = false; // Desactiva el spinner

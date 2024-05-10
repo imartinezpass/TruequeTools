@@ -37,7 +37,7 @@
 					context.Entry(PublicacionActual.Producto).Reference(p => p.Categoria).Load();
 
 					<li class="list-group-item"><h3>@PublicacionActual.Titulo</h3></li>
-					<li class="list-group-item"><img src="/images/@PublicacionActual.Producto.FotoUrl" class="rounded mx-auto d-block" style="width: 200px; height: 150px;"></li>
+					<li class="list-group-item"><img src=@GetFotoProducto(PublicacionActual.Producto.FotoUrl) class="rounded mx-auto d-block" style="width: 200px; height: 150px;"></li>
 					<li class="list-group-item">@PublicacionActual.Producto.Descripcion</li>
 					<li class="list-group-item">Publicado el @PublicacionActual.FechaPublicacion por: @PublicacionActual.Usuario.Email</li>
 					<li class="list-group-item">Sucursal de intercambio: @PublicacionActual.Sucursal.Nombre</li>
@@ -111,6 +111,18 @@
 		PublicacionActual = await PublicacionService.ReadPublicacionById(Id);
 		await Task.Delay(1000);
 		cargando = false;
+	}
+
+	public string GetFotoProducto(string nombre)
+	{
+		if (string.IsNullOrEmpty(nombre))
+		{
+			return "images/blank.svg";
+		}
+		else
+		{
+			return "images/" + nombre;
+		}
 	}
 
 }
