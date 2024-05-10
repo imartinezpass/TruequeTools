@@ -25,7 +25,7 @@
                 <Authorized>
                     @if(context.User.Identity != null)
                     {
-                        <t>Bienvenido de nuevo, <b>@context.User.FindFirst("IdUsuario")?.Value - @context.User.Identity.Name</b></t>
+                        <t>Bienvenido de nuevo, <b>@context.User.Identity.Name</b></t>
                     }
                     else
                     {
