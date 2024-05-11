@@ -1,0 +1,61 @@
+﻿@page "/imagen"
+
+@rendermode InteractiveServer
+
+<h3>Imagen</h3>
+
+<InputFile OnChange="FileUploaded" />
+
+<h2>Archivo seleccionado</h2>
+<div>
+	<div>Nombre del archivo: @FileName</div>
+	<div>Tamaño del archivo: @FileSize.ToString() bytes</div>
+	<div>Tipo de archivo: @FileType</div>
+	<div>Última modificación: @LastModified</div>
+</div>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+	<div>Error: @ErrorMessage</div>
+}
+
+@code {
+
+	public string FileName { get; set; } = "";
+	public long FileSize { get; set; }
+	public string FileType { get; set; } = "";
+	public DateTimeOffset LastModified { get; set; }
+
+	const int MAX_SIZE = 5000 * 1024;
+	public string ErrorMessage { get; set; } = "";
+
+	public async Task FileUploaded(InputFileChangeEventArgs e)
+	{
+		var browserFile = e.File;
+
+		if (browserFile != null)
+		{
+			FileName = browserFile.Name;
+			FileSize = browserFile.Size;
+			FileType = browserFile.ContentType;
+			LastModified = browserFile.LastModified;
+		}
+
+		try
+		{
+			var fileStream = browserFile.OpenReadStream(MAX_SIZE);
+
+			var fileName = Guid.NewGuid().ToString() + Path.GetExtension(browserFile.Name);
+			var filePath = Path.Combine("wwwroot", "images", fileName);
+
+			using (var stream = new FileStream(filePath, FileMode.Create))
+			{
+				await fileStream.CopyToAsync(stream);
+			}
+		}
+		catch (Exception ex)
+		{
+			ErrorMessage = ex.Message;
+		}
+	}
+}
