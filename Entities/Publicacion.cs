@@ -55,7 +55,8 @@ namespace TruequeTools.Entities
         public Sucursal? Sucursal { get; set; }
         public Producto? Producto { get; set; }
         public List<Pregunta>? Preguntas { get; set; }
+		public List<Oferta>? Ofertas { get; set; }
 
-    }
+	}
 
 }

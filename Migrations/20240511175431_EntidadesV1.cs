@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TruequeTools.Migrations
 {
     /// <inheritdoc />
-    public partial class EntidadesActualizadasV6 : Migration
+    public partial class EntidadesV1 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -97,6 +97,33 @@ namespace TruequeTools.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ofertas",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    comentario = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
+                    usuarioId = table.Column<int>(type: "int", nullable: false),
+                    publicacionId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ofertas", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_ofertas_publicaciones_publicacionId",
+                        column: x => x.publicacionId,
+                        principalTable: "publicaciones",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ofertas_usuarios_usuarioId",
+                        column: x => x.usuarioId,
+                        principalTable: "usuarios",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "preguntas",
                 columns: table => new
                 {
@@ -104,7 +131,8 @@ namespace TruequeTools.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     texto = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
                     respuesta = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: true),
-                    publicacionId = table.Column<int>(type: "int", nullable: false)
+                    publicacionId = table.Column<int>(type: "int", nullable: false),
+                    usuarioId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -115,6 +143,12 @@ namespace TruequeTools.Migrations
                         principalTable: "publicaciones",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_preguntas_usuarios_usuarioId",
+                        column: x => x.usuarioId,
+                        principalTable: "usuarios",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -167,9 +201,24 @@ namespace TruequeTools.Migrations
                 values: new object[] { 1, "Admin", "admin", "admin@admin", new DateOnly(1, 1, 1), "Admin", "Admin", 1 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_ofertas_publicacionId",
+                table: "ofertas",
+                column: "publicacionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ofertas_usuarioId",
+                table: "ofertas",
+                column: "usuarioId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_preguntas_publicacionId",
                 table: "preguntas",
                 column: "publicacionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_preguntas_usuarioId",
+                table: "preguntas",
+                column: "usuarioId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_productos_categoriaId",
@@ -201,6 +250,9 @@ namespace TruequeTools.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "ofertas");
+
             migrationBuilder.DropTable(
                 name: "preguntas");
 

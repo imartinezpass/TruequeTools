@@ -57,7 +57,9 @@ namespace TruequeTools.Entities
 
         public Sucursal? Sucursal { get; set; }
         public ICollection<Publicacion>? Publicaciones { get; set; }
+		public ICollection<Oferta>? Ofertas { get; set; }
+		public ICollection<Pregunta>? Preguntas { get; set; }
 
-    }
+	}
 
 }

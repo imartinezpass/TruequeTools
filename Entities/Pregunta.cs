@@ -37,9 +37,15 @@ namespace TruequeTools.Entities
         [Column("publicacionId")]
         public int PublicacionId { get; set; }
 
-        //ATRIBUTOS NO SQL
+		//CLAVE EXTERNA PUBLICACION
 
-        public Publicacion? Publicacion { get; set; }
+		[Column("usuarioId")]
+		public int UsuarioId { get; set; }
+
+		//ATRIBUTOS NO SQL
+
+		public Publicacion? Publicacion { get; set; }
+        public Usuario? Usuario { get; set; }
 
     }
 

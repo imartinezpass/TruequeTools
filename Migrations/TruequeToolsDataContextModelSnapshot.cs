@@ -58,6 +58,37 @@ namespace TruequeTools.Migrations
                         });
                 });
 
+            modelBuilder.Entity("TruequeTools.Entities.Oferta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Comentario")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("comentario");
+
+                    b.Property<int>("PublicacionId")
+                        .HasColumnType("int")
+                        .HasColumnName("publicacionId");
+
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int")
+                        .HasColumnName("usuarioId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PublicacionId");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("ofertas");
+                });
+
             modelBuilder.Entity("TruequeTools.Entities.Pregunta", b =>
                 {
                     b.Property<int>("Id")
@@ -81,9 +112,15 @@ namespace TruequeTools.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasColumnName("texto");
 
+                    b.Property<int>("UsuarioId")
+                        .HasColumnType("int")
+                        .HasColumnName("usuarioId");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PublicacionId");
+
+                    b.HasIndex("UsuarioId");
 
                     b.ToTable("preguntas");
                 });
@@ -274,6 +311,25 @@ namespace TruequeTools.Migrations
                         });
                 });
 
+            modelBuilder.Entity("TruequeTools.Entities.Oferta", b =>
+                {
+                    b.HasOne("TruequeTools.Entities.Publicacion", "Publicacion")
+                        .WithMany("Ofertas")
+                        .HasForeignKey("PublicacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TruequeTools.Entities.Usuario", "Usuario")
+                        .WithMany("Ofertas")
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Publicacion");
+
+                    b.Navigation("Usuario");
+                });
+
             modelBuilder.Entity("TruequeTools.Entities.Pregunta", b =>
                 {
                     b.HasOne("TruequeTools.Entities.Publicacion", "Publicacion")
@@ -282,7 +338,15 @@ namespace TruequeTools.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("TruequeTools.Entities.Usuario", "Usuario")
+                        .WithMany("Preguntas")
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Publicacion");
+
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("TruequeTools.Entities.Producto", b =>
@@ -336,6 +400,8 @@ namespace TruequeTools.Migrations
 
             modelBuilder.Entity("TruequeTools.Entities.Publicacion", b =>
                 {
+                    b.Navigation("Ofertas");
+
                     b.Navigation("Preguntas");
 
                     b.Navigation("Producto");
@@ -343,6 +409,10 @@ namespace TruequeTools.Migrations
 
             modelBuilder.Entity("TruequeTools.Entities.Usuario", b =>
                 {
+                    b.Navigation("Ofertas");
+
+                    b.Navigation("Preguntas");
+
                     b.Navigation("Publicaciones");
                 });
 #pragma warning restore 612, 618
