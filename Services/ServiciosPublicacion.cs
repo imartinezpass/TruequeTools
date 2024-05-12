@@ -1,6 +1,7 @@
 ﻿using TruequeTools.Data;
 using Microsoft.EntityFrameworkCore;
 using TruequeTools.Entities;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 /*
  
@@ -27,24 +28,38 @@ namespace TruequeTools.Services
             return publicacion.Id;
         }
 
-		public async Task<Publicacion> ReadPublicacionById(int id)
-		{
+        public async Task<Publicacion> ReadPublicacionById(int id)
+        {
 
-			IQueryable<Publicacion> query = contexto.Publicaciones.Where(p => p.Id == id);
+            IQueryable<Publicacion> query = contexto.Publicaciones.Where(p => p.Id == id);
 
-			var publicacion = await query.FirstOrDefaultAsync();
+            var publicacion = await query.FirstOrDefaultAsync();
 
-            if(publicacion != null)
+            if (publicacion != null)
             {
                 return publicacion;
-			}
+            }
             else
             {
-				return new Publicacion();
-			}
+                return new Publicacion();
+            }
+        }
 
-		}
+        public async Task<List<Publicacion>> ReadPublicacionesByNombre(string titulo)
+        {
+            var result = await contexto.Publicaciones.Where(publicacion => publicacion.Titulo == titulo).ToListAsync();
+            return result;
+        }
 
-	}
+        public async Task<List<Publicacion>> ReadAllPublicaciones()
+        {
+            var result = await contexto.Publicaciones.ToListAsync();
+            return result;
 
-}
+        }
+
+
+    }
+
+ }
+

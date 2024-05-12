@@ -12,6 +12,8 @@ namespace TruequeTools.Services
     {
         public Task<int> CreatePublicacion(Publicacion publicacion); //Create
 		public Task<Publicacion> ReadPublicacionById(int id); //Read
+        public Task<List<Publicacion>> ReadPublicacionesByNombre(string titulo); //Read
+        public Task<List<Publicacion>> ReadAllPublicaciones(); //Read
 
-	}
+    }
 }

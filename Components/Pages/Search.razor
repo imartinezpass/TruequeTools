@@ -1,9 +1,98 @@
 ﻿@page "/search"
 
+@using Microsoft.EntityFrameworkCore
+@using TruequeTools.Data
+@using TruequeTools.Entities
+@using Microsoft.AspNetCore.Mvc;
+@using System.Linq;
+
+@inject TruequeToolsDataContext context
+@inject NavigationManager NavMan
+@inject IServiciosPublicacion PublicacionService
+
 @attribute [Authorize(Roles = "Admin,User")]
+
+@rendermode @(new InteractiveServerRenderMode(prerender:false))
 
 <h3>Search</h3>
 
+<form method="get" @onsubmit="BuscarPublicaciones">
+    <input type="text" @bind="searchString" name="searchString" placeholder="Buscar...">
+    <button type="submit">Buscar</button>
+</form>
+
+@if (busquedaRealizada)
+{
+    @if (publicaciones != null && publicaciones.Any())
+{
+
+        <div class="row" style="margin:5rem">
+            @foreach (var publi in publicaciones)
+            {
+
+                context.Entry(publi).Reference(p => p.Producto).Load(); //Traigo los datos del producto asociado con la publicacion
+                context.Entry(publi).Reference(p => p.Sucursal).Load(); //Traigo los datos de la sucursal asociada con la publicacion
+                context.Entry(publi.Producto).Reference(p => p.Categoria).Load(); //Traigo los datos de la Categoria asociada al Producto asociado con la Publicacion
+
+                <div class="col-md-4 mb-3">
+                    <div class="card">
+                        <img class="card-img-top" src=@GetFotoProducto(publi.Producto.FotoUrl) alt="Foto del Producto">
+                        <div class="card-body">
+                            <h5 class="card-title">@publi.Titulo</h5>
+                            <p class="card-text">@publi.Producto.Descripcion</p>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item">Sucursal: @publi.Sucursal.Nombre</li>
+                            <li class="list-group-item">Categoria: @publi.Producto.Categoria.Nombre</li> @*TIENE QUE TRAER EL NOMBRE DE LA CATEGORIA CON ESTE ID*@
+                        </ul>
+                        <div class="card-body">
+                         <a class="btn btn-secondary" @onclick="@(() => VerPublicacion(publi.Id))">Ver Publicacion</a>
+                        </div>
+                  </div>
+               </div>
+            }
+      </div>
+    }
+    else
+    {
+        <p>No se encontraron resultados.</p>
+    }
+}
+
+
 @code {
+    string searchString;
+    bool busquedaRealizada = false;
+    List<Publicacion> publicaciones = new List<Publicacion>();
+
+    void VerPublicacion(int id)
+    {
+        NavMan.NavigateTo($"/publicacion/{id}");
+    }
+
+    protected async Task BuscarPublicaciones()
+    {
+        if(String.IsNullOrEmpty(searchString)){
+            publicaciones = await PublicacionService.ReadAllPublicaciones();
+        }
+        else
+        {
+            publicaciones = await PublicacionService.ReadPublicacionesByNombre(searchString);
+        }
+        busquedaRealizada = true;
+        StateHasChanged();
+    }
+
+    public string GetFotoProducto(string nombre)
+    {
+        if (string.IsNullOrEmpty(nombre))
+        {
+            return "images/blank.svg";
+        }
+        else
+        {
+            return "images/" + nombre;
+        }
+    }
 
 }
