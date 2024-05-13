@@ -19,7 +19,6 @@
 
 <form method="get" @onsubmit="BuscarPublicaciones">
     <input type="text" @bind="searchString" name="searchString" placeholder="Buscar...">
-    <button type="submit">Buscar</button>
     <select @bind="selectedFilter">
         <option value=0>Filtrar por categoria</option>
         @foreach (var cat in categorias)
@@ -27,6 +26,7 @@
             <option value="@cat.Id">@cat.Nombre</option>
         }
     </select>
+    <button type="submit">Buscar</button>
 </form>
 
 @if (busquedaRealizada)
@@ -51,7 +51,7 @@
                         </div>
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item">Sucursal: @publi.Sucursal.Nombre</li>
-                            <li class="list-group-item">Categoria: @publi.Producto.Categoria.Nombre</li> @*TIENE QUE TRAER EL NOMBRE DE LA CATEGORIA CON ESTE ID*@
+                            <li class="list-group-item">Categoria: @publi.Producto.Categoria.Nombre</li>
                         </ul>
                         <div class="card-body">
                          <a class="btn btn-secondary" @onclick="@(() => VerPublicacion(publi.Id))">Ver Publicacion</a>
