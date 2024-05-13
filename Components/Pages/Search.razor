@@ -9,6 +9,7 @@
 @inject TruequeToolsDataContext context
 @inject NavigationManager NavMan
 @inject IServiciosPublicacion PublicacionService
+@inject IServiciosCategoria CategoriaService
 
 @attribute [Authorize(Roles = "Admin,User")]
 
@@ -19,6 +20,13 @@
 <form method="get" @onsubmit="BuscarPublicaciones">
     <input type="text" @bind="searchString" name="searchString" placeholder="Buscar...">
     <button type="submit">Buscar</button>
+    <select @bind="selectedFilter">
+        <option value=0>Filtrar por categoria</option>
+        @foreach (var cat in categorias)
+        {
+            <option value="@cat.Id">@cat.Nombre</option>
+        }
+    </select>
 </form>
 
 @if (busquedaRealizada)
@@ -62,8 +70,15 @@
 
 @code {
     string searchString;
+    int selectedFilter;
     bool busquedaRealizada = false;
     List<Publicacion> publicaciones = new List<Publicacion>();
+    List<Categoria> categorias = new List<Categoria>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        categorias = await CategoriaService.ReadAllCategorias(); //LECTURA DE TODAS LAS CATEGORIAS
+    }
 
     void VerPublicacion(int id)
     {
@@ -78,6 +93,18 @@
         else
         {
             publicaciones = await PublicacionService.ReadPublicacionesByNombre(searchString);
+        }
+        if (selectedFilter != 0)
+        {
+            foreach (var publicacion in publicaciones)
+            {
+                // Cargar los datos del producto asociado con la publicación
+                context.Entry(publicacion).Reference(p => p.Producto).Load();
+            }
+            
+            publicaciones = publicaciones
+            .Where(publicacion => publicacion.Producto != null && publicacion.Producto.CategoriaId == selectedFilter)
+            .ToList();
         }
         busquedaRealizada = true;
         StateHasChanged();
