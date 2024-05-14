@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 /Migrations/20240504005514_EntidadesActualizadasV6.cs
 /Migrations/20240504005514_EntidadesActualizadasV6.Designer.cs
+/Migrations/20240512232655_nombre_migracion1.cs
+/Migrations/20240512232655_nombre_migracion1.Designer.cs

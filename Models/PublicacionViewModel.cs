@@ -26,5 +26,7 @@ namespace TruequeTools.Models
         [Range(1, 3, ErrorMessage = "Seleccione una categoria valida")]
         [Display(Name = "Categoria")]
         public int CategoriaId { get; set; } = 0;
+
+        public string FotoUrl { get; set; } = "images/prueba1.jpg";
     }
 }

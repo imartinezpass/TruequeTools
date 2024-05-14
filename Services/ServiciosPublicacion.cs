@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TruequeTools.Data;
 using TruequeTools.Entities;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 /*
  
@@ -42,15 +43,18 @@ namespace TruequeTools.Services
             {
                 return new Publicacion();
             }
-
         }
-        // martin: tuve que agregar esto para resolver una oferta por una publicacion que no existe
-        public async Task<List<Publicacion>> ReadAllPublicaciones()
+
+        public async Task<List<Publicacion>> ReadPublicacionesByNombre(string titulo)
         {
-            var result = await contexto.Publicaciones.ToListAsync();
+            var result = await contexto.Publicaciones.Where(publicacion => publicacion.Titulo == titulo).ToListAsync();
             return result;
         }
 
     }
 
+
 }
+
+ }
+
