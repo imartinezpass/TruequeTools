@@ -1,4 +1,5 @@
-﻿@page "/alta-publicacion"
+﻿@rendermode InteractiveServer
+@page "/alta-publicacion"
 
 @using Microsoft.AspNetCore.Identity
 @using System.ComponentModel.DataAnnotations
@@ -8,6 +9,7 @@
 @using Microsoft.Extensions.Logging
 @using TruequeTools.Data
 @using TruequeTools.Entities
+@using Microsoft.AspNetCore.Components.Authorization
 
 @inject TruequeToolsDataContext appDbContext
 @inject NavigationManager NavMan
@@ -15,8 +17,11 @@
 @inject IServiciosSucursal SucursalService
 @inject IServiciosCategoria CategoriaService
 @inject IServiciosPublicacion PublicacionService
+@inject IJSRuntime JS
+@inject UserService UserService
 
-@attribute [Authorize(Roles = "Admin,User")] 
+
+@attribute [Authorize(Roles = "Admin,User")]
 
 <PageTitle>Publicar</PageTitle>
 
@@ -34,51 +39,67 @@
                     </div>
                 }
                 <div class="image-container mb-3">
-                    <input type="file" accept="image/*" id="imagenInput">
-                    <img id="imagenPreview" class="image-preview" src="#" alt="Vista previa de la imagen">
+                    <p class="mb-3 mx-auto d-block">Imagen</p>
+                    <InputFile @ref="inputFile" OnChange="ShowPreview" />
+                    <img style="margin-top:10px" class="img-fluid img-thumbnail rounded mx-auto d-block" @ref="previewImageElem" />
+
                 </div>
                 <div class="caontainerRelleno">
-                <div class="form-floating mb-3">
-                    <InputText @bind-Value="Modelo.Nombre" class="form-control" autocomplete="off" aria-required="true" placeholder="Nombre del producto" maxlength="50" />
-                    <label for="nombre">Nombre del producto</label>
-                    <ValidationMessage For="() => Modelo.Nombre" class="text-danger" />
-                </div>
-                <div class="form-floating mb-3">
-                    <InputText @bind-Value="Modelo.Descripcion" class="form-control" autocomplete="off" aria-required="true" placeholder="Descripcion del producto" maxlength="200" />
-                    <label for="descripcion">Descripcion del producto</label>
-                    <ValidationMessage For="() => Modelo.Descripcion" class="text-danger" />
-                </div>
-                <div class="form-floating mb-3">
-                    <InputSelect @bind-Value="@Modelo.SucursalId" class="form-control" autocomplete="sucursal" aria-required="true" placeholder="" maxlength="50">
-                        @foreach (var suc in sucursales)
-                        {
-                            <option value="@suc.Id">@suc.Nombre</option>
-                        }
-                    </InputSelect>
-                    <label for="sucursal">Sucursal</label>
-                    <ValidationMessage For="() => Modelo.SucursalId" class="text-danger" />
-                </div>
-                <div class="form-floating mb-3">
-                    <InputSelect @bind-Value="@Modelo.CategoriaId" class="form-control" autocomplete="categoria" aria-required="true" placeholder="" maxlength="50">
-                        <option value=0>Seleccione una categoría</option>
-                        @foreach (var cat in categorias)
-                        {
-                            <option value="@cat.Id">@cat.Nombre</option>
-                        }
-                    </InputSelect>
-                    <label for="categoria">Categoria</label>
-                    <ValidationMessage For="() => Modelo.CategoriaId" class="text-danger" />
-                </div>
-                <button type="submit" class="w-100 btn btn-lg btn-primary">Crear Publicacion</button>
+                    <div class="form-floating mb-3">
+                        <InputText @bind-Value="Modelo.Nombre" class="form-control" autocomplete="off" aria-required="true" placeholder="Nombre del producto" maxlength="50" />
+                        <label for="nombre">Nombre del producto</label>
+                        <ValidationMessage For="() => Modelo.Nombre" class="text-danger" />
+                    </div>
+                    <div class="form-floating mb-3">
+                        <InputText @bind-Value="Modelo.Descripcion" class="form-control" autocomplete="off" aria-required="true" placeholder="Descripcion del producto" maxlength="200" />
+                        <label for="descripcion">Descripcion del producto</label>
+                        <ValidationMessage For="() => Modelo.Descripcion" class="text-danger" />
+                    </div>
+                    <div class="form-floating mb-3">
+                        <InputSelect @bind-Value="@Modelo.SucursalId" class="form-control" autocomplete="sucursal" aria-required="true" placeholder="" maxlength="50">
+                            @foreach (var suc in sucursales)
+                            {
+                                <option value="@suc.Id">@suc.Nombre</option>
+                            }
+                        </InputSelect>
+                        <label for="sucursal">Sucursal</label>
+                        <ValidationMessage For="() => Modelo.SucursalId" class="text-danger" />
+                    </div>
+                    <div class="form-floating mb-3">
+                        <InputSelect @bind-Value="@Modelo.CategoriaId" class="form-control" autocomplete="categoria" aria-required="true" placeholder="" maxlength="50">
+                            <option value=0>Seleccione una categoría</option>
+                            @foreach (var cat in categorias)
+                            {
+                                <option value="@cat.Id">@cat.Nombre</option>
+                            }
+                        </InputSelect>
+                        <label for="categoria">Categoria</label>
+                        <ValidationMessage For="() => Modelo.CategoriaId" class="text-danger" />
+                    </div>
+                    <button type="submit" class="w-100 btn btn-lg btn-primary">Crear Publicacion</button>
                 </div>
             </EditForm>
         </div>
     </div>
 </div>
+<script>
+    window.previewImage = (inputElem, imgElem) => {
+        const url = URL.createObjectURL(inputElem.files[0]);
+        imgElem.addEventListener('load', () => URL.revokeObjectURL(url), { once: true });
+        imgElem.src = url;
+    }
+</script>
 
 @code {
+    // código para hacer la preview de la imágen, funciona con javascript
+    private InputFile? inputFile;
+    private ElementReference previewImageElem;
+    private async Task ShowPreview() => await JS.InvokeVoidAsync(
+        "previewImage", inputFile!.Element, previewImageElem);
+    //
 
-    [CascadingParameter]
+    [CascadingParameter] // esto se debería de sacar ya que no funciona con el rendermode InteractiveServer;
+                         // se resuelve con el servicio UserService
     public HttpContext? HttpContext { get; set; }
 
     List<Sucursal> sucursales = new List<Sucursal>();
@@ -89,7 +110,9 @@
     {
         sucursales = await SucursalService.ReadAllSucursales(); //LECTURA DE TODAS LAS SUCURSALES
         categorias = await CategoriaService.ReadAllCategorias(); //LECTURA DE TODAS LAS CATEGORIAS
-        sucursalPreferida = int.Parse(@HttpContext.User.FindFirst("IdSucursal").Value);
+        await UserService.InitializeAsync(); // obtengo los datos del usuario en sesión
+        sucursalPreferida = int.Parse(UserService.Current.FindFirst("IdSucursal").Value);
+        //sucursalPreferida = int.Parse(@HttpContext.User.FindFirst("IdSucursal").Value);
     }
 
     private String? MensajeError;
@@ -107,8 +130,8 @@
     {
         var publicacion = new Publicacion();
 
-        publicacion.UsuarioId = int.Parse(@HttpContext.User.FindFirst("IdUsuario").Value);
-        publicacion.Titulo = Modelo.Nombre; 
+        publicacion.UsuarioId = int.Parse(@UserService.Current.FindFirst("IdUsuario").Value); // weno acá ya lo cambié...
+        publicacion.Titulo = Modelo.Nombre;
         publicacion.SucursalId = Modelo.SucursalId;
 
         var publicacionId = await PublicacionService.CreatePublicacion(publicacion);
@@ -120,7 +143,7 @@
         producto.Descripcion = Modelo.Descripcion;
         //producto.FotoUrl = "prueba1.jpg";
         producto.CategoriaId = Modelo.CategoriaId;
-        
+
         await ProductoService.CreateProducto(producto);
         NavMan.NavigateTo("/");
 
