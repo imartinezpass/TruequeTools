@@ -13,7 +13,7 @@
 
 <div style="text-align:center">
 
-    <h1 style="margin:20px">Bienvenido a <span class="text-main-color">Trueque Tools</span></h1>
+    <h1 style="margin:20px">Bienvenido a <span class="text-danger">Trueque Tools</span></h1>
 
     <h3 style="margin:40px">En esta plataforma podras intercambiar productos con otros usuarios en tu zona</h3>
 
@@ -28,24 +28,18 @@
 
             context.Entry(publi).Reference(p => p.Producto).Load(); //Traigo los datos del producto asociado con la publicacion
             context.Entry(publi).Reference(p => p.Sucursal).Load(); //Traigo los datos de la sucursal asociada con la publicacion
-            context.Entry(publi.Producto!).Reference(p => p.Categoria).Load(); //Traigo los datos de la Categoria asociada al Producto asociado con la Publicacion
+            context.Entry(publi.Producto).Reference(p => p.Categoria).Load(); //Traigo los datos de la Categoria asociada al Producto asociado con la Publicacion
 
-            <div class="col-md-3 mb-3">
-                <div class="card" style="margin:1rem">
-                    @if (@publi.Producto!.FotoUrl == null)
-                    {
-                        <img class="card-img-top-svg" src=images/blank.svg alt="Foto del Producto">
-                    }
-                    else
-                    {
-                        <img class="card-img-top" src=images/@publi.Producto.FotoUrl alt="Foto del Producto">
-                    }
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <img class="card-img-top" src=@GetFotoProducto(publi.Producto.FotoUrl) alt="Foto del Producto">
                     <div class="card-body">
-                        <h4 style="margin:0">@publi.Titulo</h4>
+                        <h5 class="card-title">@publi.Titulo</h5>
+                        <p class="card-text">@publi.Producto.Descripcion</p>
                     </div>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Sucursal: @publi.Sucursal!.Nombre</li>
-                        <li class="list-group-item">Categoria: @publi.Producto.Categoria!.Nombre</li> @*TIENE QUE TRAER EL NOMBRE DE LA CATEGORIA CON ESTE ID*@
+                        <li class="list-group-item">Sucursal: @publi.Sucursal.Nombre</li>
+                        <li class="list-group-item">Categoria: @publi.Producto.Categoria.Nombre</li> @*TIENE QUE TRAER EL NOMBRE DE LA CATEGORIA CON ESTE ID*@
                     </ul>
                     <div class="card-body">
                         <a class="btn btn-secondary" @onclick="@(() => VerPublicacion(publi.Id))">Ver Publicacion</a>
@@ -90,10 +84,22 @@ else
 
         publicaciones = await context.Publicaciones.Take(12).ToListAsync(); //Traigo las primeras 3 publicaciones
         
-        await Task.Delay(500); // Espera 0.5 segundos y muestra el spinner durante ese tiempo
+        await Task.Delay(2000); // Espera 2 segundos y muestra el spinner durante ese tiempo
         showSpinner = false; // Desactiva el spinner
         StateHasChanged(); // Notifica a Blazor que debe actualizar la interfaz de usuario
 
+    }
+
+    public string GetFotoProducto(string nombre)
+    {
+        if (string.IsNullOrEmpty(nombre))
+        {
+            return "images/blank.svg";
+        }
+        else
+        {
+            return "images/" + nombre;
+        }
     }
 
 }
