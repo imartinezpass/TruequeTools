@@ -28,6 +28,11 @@ namespace TruequeTools.Services
             return publicacion.Id;
         }
 
+        public Task<List<Publicacion>> ReadAllPublicaciones()
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<Publicacion> ReadPublicacionById(int id)
         {
 
@@ -53,8 +58,4 @@ namespace TruequeTools.Services
 
     }
 
-
 }
-
- }
-
