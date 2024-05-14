@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography.Xml;
 using TruequeTools.Entities;
 
 /*
@@ -15,30 +14,31 @@ Luego se debe actualizar la base de datos con: Update-Database
 namespace TruequeTools.Data
 {
     public class TruequeToolsDataContext(DbContextOptions<TruequeToolsDataContext> options) : DbContext(options)
-	{
+    {
 
         //VINCULO ENTRE LA BASE DE DATOS Y LAS ENTIDADES
-        public DbSet<Categoria> Categorias { get; set; } 
+        public DbSet<Categoria> Categorias { get; set; }
         public DbSet<Pregunta> Preguntas { get; set; }
         public DbSet<Producto> Productos { get; set; }
         public DbSet<Publicacion> Publicaciones { get; set; }
         public DbSet<Sucursal> Sucursales { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<Oferta> Ofertas { get; set; }
         //VINCULO ENTRE LA BASE DE DATOS Y LAS ENTIDADES
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-			modelBuilder.Entity<Oferta>()
-			   .HasOne(x => x.Publicacion) 
-			   .WithMany(u => u.Ofertas)
-			   .HasForeignKey(x => x.PublicacionId);
+            modelBuilder.Entity<Oferta>()
+               .HasOne(x => x.Publicacion)
+               .WithMany(u => u.Ofertas)
+               .HasForeignKey(x => x.PublicacionId);
 
-			modelBuilder.Entity<Oferta>()
-			   .HasOne(x => x.Usuario)
-			   .WithMany(u => u.Ofertas)
-			   .HasForeignKey(x => x.UsuarioId)
+            modelBuilder.Entity<Oferta>()
+               .HasOne(x => x.Usuario)
+               .WithMany(u => u.Ofertas)
+               .HasForeignKey(x => x.UsuarioId)
                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Publicacion>()
@@ -46,17 +46,17 @@ namespace TruequeTools.Data
                 .WithOne(x => x.Publicacion)
                 .HasForeignKey(x => x.PublicacionId);
 
-			modelBuilder.Entity<Usuario>()
-			   .HasMany(x => x.Ofertas) 
-			   .WithOne(x => x.Usuario) 
-			   .HasForeignKey(x => x.UsuarioId);
+            modelBuilder.Entity<Usuario>()
+               .HasMany(x => x.Ofertas)
+               .WithOne(x => x.Usuario)
+               .HasForeignKey(x => x.UsuarioId);
 
-			//*****************
+            //*****************
 
-			modelBuilder.Entity<Usuario>()
-			   .HasMany(x => x.Preguntas)
-			   .WithOne(x => x.Usuario)
-			   .HasForeignKey(x => x.UsuarioId);
+            modelBuilder.Entity<Usuario>()
+               .HasMany(x => x.Preguntas)
+               .WithOne(x => x.Usuario)
+               .HasForeignKey(x => x.UsuarioId);
 
             modelBuilder.Entity<Pregunta>()
                .HasOne(x => x.Usuario)
@@ -64,10 +64,10 @@ namespace TruequeTools.Data
                .HasForeignKey(x => x.UsuarioId)
                .OnDelete(DeleteBehavior.Restrict);
 
-			//*****
+            //*****
 
-			// Configuración de la relación entre Usuario y Sucursal
-			modelBuilder.Entity<Usuario>()
+            // Configuración de la relación entre Usuario y Sucursal
+            modelBuilder.Entity<Usuario>()
                 .HasOne(x => x.Sucursal)  // Un usuario pertenece a una única sucursal
                 .WithMany()  // No especificamos WithOne() ya que la relación es uno a uno o muchos a uno
                 .HasForeignKey(x => x.SucursalId)  // Clave externa en la tabla Usuarios que referencia la tabla Sucursales

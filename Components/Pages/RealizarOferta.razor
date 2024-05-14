@@ -1,0 +1,114 @@
+﻿@rendermode InteractiveServer
+@page "/realizar-oferta/{PublicacionId:int?}"
+
+@using Microsoft.AspNetCore.Identity
+@using System.ComponentModel.DataAnnotations
+@using System.Text
+@using System.Text.Encodings.Web
+@using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.Extensions.Logging
+@using TruequeTools.Data
+@using TruequeTools.Entities
+@using Microsoft.AspNetCore.Components.Authorization
+
+@inject TruequeToolsDataContext appDbContext
+@inject NavigationManager NavMan
+@inject IServiciosOferta OfertaService
+@inject IServiciosSucursal SucursalService
+@inject IServiciosCategoria CategoriaService
+@inject IServiciosPublicacion PublicacionService
+@inject IJSRuntime JS
+@inject UserService UserService
+
+@attribute [Authorize(Roles = "Admin,User")]
+<PageTitle>
+    Realizar oferta
+</PageTitle>
+
+<div class="row">
+    <div class="col-lg-4 offset-lg-4 pt-4 pb-4 border">
+        <h2 style="text-align:center">Oferta de intercambio a publicacion @PublicacionId</h2>
+        <div class="container">
+            <EditForm Model="@Modelo" OnValidSubmit="CargarOferta" FormName="CargarOfertaForm">
+                <DataAnnotationsValidator />
+
+                <div class="image-container mb-3">
+                    <p class="mb-3 mx-auto d-block">Imagen</p>
+                    <InputFile @ref="inputFile" OnChange="ShowPreview" />
+                    <img style="margin-top:10px" class="img-fluid img-thumbnail rounded mx-auto d-block" @ref="previewImageElem" />
+                </div>
+                <div class="containerRelleno">
+                    <div class="form-floating mb-3">
+                        <InputText @bind-Value="Modelo.ProductoNombre" class="form-control" autocomplete="off" aria-required="true" placeholder="Nombre del producto" maxlength="50" />
+                        <label for="nombre">Nombre del producto</label>
+                        <ValidationMessage For="() => Modelo.ProductoNombre" class="text-danger" />
+                    </div>
+                    <div class="form-floating mb-3">
+                        <InputText @bind-Value="Modelo.ProductoDescripcion" class="form-control" autocomplete="off" aria-required="true" placeholder="Nombre del producto" maxlength="50" />
+                        <label for="nombre">Descripción del producto</label>
+                        <ValidationMessage For="() => Modelo.ProductoDescripcion" class="text-danger" />
+                    </div>
+                    <button type="submit" class="w-100 btn btn-lg btn-primary">Realizar Oferta</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+<script>
+    window.previewImage = (inputElem, imgElem) => {
+        const url = URL.createObjectURL(inputElem.files[0]);
+        imgElem.addEventListener('load', () => URL.revokeObjectURL(url), { once: true });
+        imgElem.src = url;
+    }
+</script>
+
+@code {
+    [SupplyParameterFromForm]
+    private OfertaViewModel Modelo { get; set; } = new();
+    private String? MensajeError;
+    [Parameter] public int? PublicacionId { get; set; }
+    List<Publicacion> publicaciones = new List<Publicacion>();
+
+    // código para hacer la preview de la imágen, funciona con javascript
+    private InputFile? inputFile;
+    private ElementReference previewImageElem;
+    private async Task ShowPreview() => await JS.InvokeVoidAsync(
+        "previewImage", inputFile!.Element, previewImageElem);
+    //
+
+    protected override void OnParametersSet()
+    {
+        if (PublicacionId == null)
+        {
+            NavMan.NavigateTo("/");
+        }
+        else
+        {
+            if (publicaciones.Where(p => p.Id == PublicacionId).ToList().Count == 0) // el hpta del nacho te devuelve una publicacion nueva incluso si el id no existe
+            {
+                NavMan.NavigateTo("/");
+            }
+        }
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UserService.InitializeAsync();
+        publicaciones = await PublicacionService.ReadAllPublicaciones();
+    }
+
+    public async Task CargarOferta(EditContext editContext)
+    {
+        var oferta = new Oferta();
+        oferta.UsuarioId = int.Parse(@UserService!.Current!.FindFirst("IdUsuario")!.Value);
+        oferta.ProductoNombre = Modelo.ProductoNombre;
+        oferta.ProductoDescripcion = Modelo.ProductoDescripcion;
+        oferta.PublicacionId = (int)PublicacionId!; // esto nunca dará problemas por el OnParametersSet()
+                                                    // oferta.ProductoFotoUrl =
+
+        await OfertaService.CreateOferta(oferta);
+        NavMan.NavigateTo("/");
+
+    }
+}

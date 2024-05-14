@@ -1,5 +1,5 @@
-﻿using TruequeTools.Data;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using TruequeTools.Data;
 using TruequeTools.Entities;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -51,15 +51,10 @@ namespace TruequeTools.Services
             return result;
         }
 
-        public async Task<List<Publicacion>> ReadAllPublicaciones()
-        {
-            var result = await contexto.Publicaciones.ToListAsync();
-            return result;
-
-        }
-
-
     }
+
+
+}
 
  }
 

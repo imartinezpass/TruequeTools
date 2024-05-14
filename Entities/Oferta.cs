@@ -23,14 +23,14 @@ namespace TruequeTools.Entities
         public int Id { get; set; }
 
         //DATOS INGRESADOS POR EL USUARIO
+        [Column("productoNombre")]
+        [MaxLength(50)]
+        public string? ProductoNombre { get; set; }
 
         [Column("productoDescripcion")]
         [MaxLength(50)]
         public string? ProductoDescripcion { get; set; }
 
-        [Column("productoNombre")]
-        [MaxLength(50)]
-        public string? ProductoNombre { get; set; }
 
         [Column("productoFotoUrl")]
         [MaxLength(255)]
