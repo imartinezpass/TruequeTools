@@ -18,7 +18,7 @@
 @inject IServiciosCategoria CategoriaService
 @inject IServiciosPublicacion PublicacionService
 @inject IJSRuntime JS
-@inject UserService UserService
+@inject ServiciosUsuarioAutentificado UserService
 
 @attribute [Authorize(Roles = "Admin,User")]
 <PageTitle>
@@ -31,7 +31,6 @@
         <div class="container">
             <EditForm Model="@Modelo" OnValidSubmit="CargarOferta" FormName="CargarOfertaForm">
                 <DataAnnotationsValidator />
-
                 <div class="image-container mb-3">
                     <p class="mb-3 mx-auto d-block">Imagen</p>
                     <InputFile @ref="inputFile" OnChange="ShowPreview" />
@@ -69,12 +68,19 @@
     [Parameter] public int? PublicacionId { get; set; }
     List<Publicacion> publicaciones = new List<Publicacion>();
 
-    // código para hacer la preview de la imágen, funciona con javascript
+    // código de la imágen, funciona con javascript
     private InputFile? inputFile;
+    private IBrowserFile? imagenAGuardar;
+    const int imgMaxsize = 5000 * 1024;
     private ElementReference previewImageElem;
-    private async Task ShowPreview() => await JS.InvokeVoidAsync(
-        "previewImage", inputFile!.Element, previewImageElem);
+
+    private async Task ShowPreview(InputFileChangeEventArgs e)
+    {
+        imagenAGuardar = e.File;
+        await JS.InvokeVoidAsync("previewImage", inputFile!.Element, previewImageElem);
+    }
     //
+
 
     protected override void OnParametersSet()
     {
@@ -105,10 +111,19 @@
         oferta.ProductoNombre = Modelo.ProductoNombre;
         oferta.ProductoDescripcion = Modelo.ProductoDescripcion;
         oferta.PublicacionId = (int)PublicacionId!; // esto nunca dará problemas por el OnParametersSet()
-                                                    // oferta.ProductoFotoUrl =
+        if (imagenAGuardar != null) // guardo img en disco
+        {
+            var fileStream = imagenAGuardar?.OpenReadStream(imgMaxsize);
+            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imagenAGuardar?.Name);
+            var filePath = Path.Combine("wwwroot", "images", fileName);
 
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await fileStream!.CopyToAsync(stream);
+            }
+            oferta.ProductoFotoUrl = fileName;
+        }
         await OfertaService.CreateOferta(oferta);
-        NavMan.NavigateTo("/");
-
+        NavMan.NavigateTo("/publicacion/" + PublicacionId);
     }
 }

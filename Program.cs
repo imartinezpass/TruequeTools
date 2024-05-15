@@ -32,7 +32,7 @@ builder.Services.AddScoped<IServiciosUsuario, ServiciosUsuario>();
 builder.Services.AddScoped<IServiciosPregunta, ServiciosPregunta>();
 //martin
 builder.Services.AddScoped<IServiciosOferta, ServiciosOferta>();
-builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<ServiciosUsuarioAutentificado>();
 //martin - fin
 //**********NACHEX CODE ENDS********** CRUD - AGREGAR SOLO SERVICIOS
 
