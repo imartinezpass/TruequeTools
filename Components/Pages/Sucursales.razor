@@ -37,7 +37,6 @@
 								<th>Direccion</th>
 								<th>Localidad</th>
 								<th style="min-width: 120px;"></th> <!-- Utiliza min-width para asegurar un ancho mínimo -->
-								<th style="min-width: 120px;"></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -48,13 +47,21 @@
 									<td>@suc.Nombre</td>
 									<td>@suc.Direccion</td>
 									<td>@suc.Localidad</td>
-									<td style="text-align: right;"><button class="btn btn-secondary" @onclick="@(() => EditarSucursal(suc.Id))">Editar</button></td>
-									<td style="text-align: right;"><button class="btn btn-danger" @onclick="@(() => EliminarSucursal(suc.Id))">Eliminar</button></td>
+									<td style="text-align: right;">
+										<div class="d-flex justify-content-end">
+											<div class="btn-group" style="margin-right: 1rem;">
+												<button class="btn btn-secondary rounded" style="margin-right: 0.5rem;" @onclick="@(() => EditarSucursal(suc.Id))">Editar</button>
+												<button class="btn btn-danger rounded" @onclick="@(() => EliminarSucursal(suc.Id))">Eliminar</button>
+											</div>
+										</div>
+									</td>
 								</tr>
+
 							}
 						</tbody>
 					</table>
 				</div>
+
 			}
 		</div>
 		<button class="w-30 btn btn-lg btn-dark d-block mx-auto text-center" @onclick="CrearSucursal">Nueva Sucursal</button>

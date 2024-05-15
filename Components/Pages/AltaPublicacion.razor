@@ -70,9 +70,13 @@
                 <label for="categoria">Categoria</label>
                 <ValidationMessage For="() => Modelo.CategoriaId" class="text-danger" />
             </div>
-            <div class="form-floating mb-3">      
+            <hr />
+            <h5>Foto del producto (opcional)</h5>
+            <div class="form-floating mb-3">
                 <InputFile @ref="inputFile" OnChange="ShowPreview" />
-                <img style="margin-top:10px" class="img-fluid img-thumbnail rounded mx-auto d-block" @ref="previewImageElem" />
+            </div>
+            <div class="form-floating mb-3">
+                <img class="img-fluid img-thumbnail rounded mx-auto d-block w-100" @ref="previewImageElem" />
             </div>
             <button type="submit" class="w-100 btn btn-lg btn-dark">Crear Publicacion</button>
         </EditForm>  
@@ -88,28 +92,26 @@
 </script>
 
 @code {
-    // código para hacer la preview de la imágen, funciona con javascript
+
+    //código para hacer la preview de la imágen, funciona con javascript
     private InputFile? inputFile;
     private ElementReference previewImageElem;
     private async Task ShowPreview() => await JS.InvokeVoidAsync(
         "previewImage", inputFile!.Element, previewImageElem);
-    //
+    //código para hacer la preview de la imágen, funciona con javascript
 
-    [CascadingParameter] // esto se debería de sacar ya que no funciona con el rendermode InteractiveServer;
-                         // se resuelve con el servicio UserService
     public HttpContext? HttpContext { get; set; }
 
     List<Sucursal> sucursales = new List<Sucursal>();
     List<Categoria> categorias = new List<Categoria>();
-    int sucursalPreferida;
+    int sucursalPreferidaId;
 
     protected override async Task OnInitializedAsync()
     {
         sucursales = await SucursalService.ReadAllSucursales(); //LECTURA DE TODAS LAS SUCURSALES
         categorias = await CategoriaService.ReadAllCategorias(); //LECTURA DE TODAS LAS CATEGORIAS
         await UserService.InitializeAsync(); // obtengo los datos del usuario en sesión
-        sucursalPreferida = int.Parse(UserService.Current.FindFirst("IdSucursal").Value);
-        //sucursalPreferida = int.Parse(@HttpContext.User.FindFirst("IdSucursal").Value);
+        sucursalPreferidaId = int.Parse(UserService.Current.FindFirst("IdSucursal")!.Value);
     }
 
     private String? MensajeError;
@@ -120,14 +122,14 @@
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
-        Modelo.SucursalId = sucursalPreferida; // Configurar el modelo de vista con la sucursal preferida del usuario
+        Modelo.SucursalId = sucursalPreferidaId; // Configurar el modelo de vista con la sucursal preferida del usuario
     }
 
     public async Task CargarPublicacion(EditContext editContext)
     {
         var publicacion = new Publicacion();
 
-        publicacion.UsuarioId = int.Parse(@UserService.Current.FindFirst("IdUsuario").Value); // weno acá ya lo cambié...
+        publicacion.UsuarioId = int.Parse(@UserService.Current.FindFirst("IdUsuario")!.Value); // weno acá ya lo cambié...
         publicacion.Titulo = Modelo.Nombre;
         publicacion.SucursalId = Modelo.SucursalId;
 
