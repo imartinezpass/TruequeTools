@@ -19,9 +19,12 @@ namespace TruequeTools.Services
 
         private readonly TruequeToolsDataContext contexto = context;
 
+		//DEVUELVE UNA LISTA CON TODAS LAS PREGUNTAS DE LA PUBLICACION QUE SE PASA COMO PARAMETRO
 		public async Task<List<Pregunta>> ReadPreguntasByPublicacionId(int id)
 		{
 			return await contexto.Preguntas.Where(p => p.PublicacionId == id).ToListAsync();
 		}
+
 	}
+
 }

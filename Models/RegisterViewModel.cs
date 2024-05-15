@@ -9,10 +9,8 @@ Tambien realiza las verificaciones de input
 
 namespace TruequeTools.Models
 {
-
     public class RegisterViewModel
     {
-
         [Required(ErrorMessage = "Debe ingresar su nombre")]
         [Display(Name = "Nombre")]
         public string Nombre { get; set; } = "";
@@ -45,7 +43,5 @@ namespace TruequeTools.Models
         [Display(Name = "Confirmar Contraseña")]
         [Compare("Contraseña", ErrorMessage = "Las contraseñas no coinciden.")]
         public string ConfirmarContraseña { get; set; } = "";
-
     }
-
 }

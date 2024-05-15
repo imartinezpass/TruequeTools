@@ -42,7 +42,7 @@ namespace TruequeTools.Entities
         [Column("categoriaId")]
         public int CategoriaId { get; set; }
 
-        //CLAVE EXTERNA PRODUCTO
+        //CLAVE EXTERNA PUBLICACION
 
         [Column("publicacionId")]
         public int PublicacionId { get; set; }

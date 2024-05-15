@@ -37,7 +37,7 @@ namespace TruequeTools.Entities
         [Column("publicacionId")]
         public int PublicacionId { get; set; }
 
-		//CLAVE EXTERNA PUBLICACION
+		//CLAVE EXTERNA USUARIO
 
 		[Column("usuarioId")]
 		public int UsuarioId { get; set; }

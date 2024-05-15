@@ -39,7 +39,7 @@ namespace TruequeTools.Entities
         [Column("fechaPublicacion")]
         public DateOnly FechaPublicacion { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
-        //RELACION CON LA TABLA USUARIOS
+        //CLAVE EXTERNA USUARIO
 
         [Column("usuarioId")]
         public int UsuarioId { get; set; }

@@ -10,7 +10,6 @@ namespace TruequeTools.Services
 {
     public interface IServiciosProducto
     {
-        public Task CreateProducto(Producto producto); //Create
+        public Task CreateProducto(Producto producto);
     }
-
 }

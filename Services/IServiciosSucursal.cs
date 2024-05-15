@@ -10,11 +10,10 @@ namespace TruequeTools.Services
 {
     public interface IServiciosSucursal
 	{
-		public Task<List<Sucursal>> ReadAllSucursales(); //Read All
-		public Task CreateSucursal(Sucursal sucursal); //Create
-		public Task<Sucursal> ReadSucursalById(int id); //Read
-		public Task UpdateSucursal(Sucursal sucursal, int id); //Update
-		public Task DeleteSucursal(int id); //Delete
+		public Task<List<Sucursal>> ReadAllSucursales();
+		public Task CreateSucursal(Sucursal sucursal);
+		public Task<Sucursal> ReadSucursalById(int id);
+		public Task UpdateSucursal(Sucursal sucursal, int id);
+		public Task DeleteSucursal(int id);
 	}
-
 }

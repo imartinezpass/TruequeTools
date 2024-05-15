@@ -10,7 +10,7 @@ namespace TruequeTools.Services
 {
     public interface IServiciosUsuario
     {
-        public Task RegisterUsuario(Usuario usuario); //Create
-        public Task<bool> SeEncuentraRegistrado(string email); //Read
+        public Task RegisterUsuario(Usuario usuario);
+        public Task<bool> SeEncuentraRegistrado(string email);
     }
 }

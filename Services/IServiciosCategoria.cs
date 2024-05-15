@@ -10,7 +10,6 @@ namespace TruequeTools.Services
 {
     public interface IServiciosCategoria
     {
-        public Task<List<Categoria>> ReadAllCategorias(); //Read
+        public Task<List<Categoria>> ReadAllCategorias();
     }
-
 }

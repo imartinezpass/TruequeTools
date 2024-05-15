@@ -21,41 +21,40 @@
 @inject ServiciosUsuarioAutentificado UserService
 
 @attribute [Authorize(Roles = "Admin,User")]
-<PageTitle>
-    Realizar oferta
-</PageTitle>
+
+<PageTitle>Realizar oferta</PageTitle>
 
 <div class="row">
     <div class="col-lg-4 offset-lg-4 pt-4 pb-4 border">
-        <h2 style="text-align:center">Realizar Oferta</h2>
-        <div class="container">
-            <EditForm Model="@Modelo" OnValidSubmit="CargarOferta" FormName="CargarOfertaForm">
-                <DataAnnotationsValidator />
-                <h2 style="text-align:center">Ofertar a la publicacion N°@PublicacionId</h2>
-                <hr />
-                <div class="containerRelleno">
-                    <div class="form-floating mb-3">
-                        <InputText @bind-Value="Modelo.ProductoNombre" class="form-control" autocomplete="off" aria-required="true" placeholder="Nombre del producto" maxlength="50" />
-                        <label for="nombre">Nombre del producto</label>
-                        <ValidationMessage For="() => Modelo.ProductoNombre" class="text-danger" />
-                    </div>
-                    <div class="form-floating mb-3">
-                        <InputText @bind-Value="Modelo.ProductoDescripcion" class="form-control" autocomplete="off" aria-required="true" placeholder="Nombre del producto" maxlength="50" />
-                        <label for="nombre">Descripción del producto</label>
-                        <ValidationMessage For="() => Modelo.ProductoDescripcion" class="text-danger" />
-                    </div>
-                     <hr />
-                    <h5>Foto del producto (opcional)</h5>
-                    <div class="image-container mb-3">
-                    <InputFile @ref="inputFile" OnChange="ShowPreview" />
-                    <img style="margin-top:10px" class="img-fluid img-thumbnail rounded mx-auto d-block" @ref="previewImageElem" />
-                </div>
-                    <button type="submit" class="w-100 btn btn-lg btn-dark">Realizar Oferta</button>
-                </div>
-            </EditForm>
-        </div>
+        <h1 style="text-align:center">Ofertar</h1>
+        <EditForm Model="@Modelo" OnValidSubmit="CargarOferta" FormName="CargarOfertaForm">
+            <DataAnnotationsValidator />
+            <h2 style="text-align:center">Realizar oferta a la publicacion N°@PublicacionId</h2>
+            <hr />
+            <ValidationSummary class="text-danger" role="alert" />
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Modelo.ProductoNombre" class="form-control" autocomplete="off" aria-required="true" placeholder="Nombre del producto" maxlength="50" />
+                <label for="nombre">Nombre del producto</label>
+                <ValidationMessage For="() => Modelo.ProductoNombre" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Modelo.ProductoDescripcion" class="form-control" autocomplete="off" aria-required="true" placeholder="Nombre del producto" maxlength="50" />
+                <label for="nombre">Descripción del producto</label>
+                <ValidationMessage For="() => Modelo.ProductoDescripcion" class="text-danger" />
+            </div>
+            <hr />
+            <h5>Foto del producto (opcional)</h5>
+            <div class="form-floating mb-3">
+                <InputFile @ref="inputFile" OnChange="ShowPreview" />
+            </div>
+            <div class="form-floating mb-3">
+                <img class="img-fluid img-thumbnail rounded mx-auto d-block w-100" @ref="previewImageElem" />
+            </div>
+            <button type="submit" class="w-100 btn btn-lg btn-dark">Realizar Oferta</button>
+        </EditForm> 
     </div>
 </div>
+
 <script>
     window.previewImage = (inputElem, imgElem) => {
         const url = URL.createObjectURL(inputElem.files[0]);

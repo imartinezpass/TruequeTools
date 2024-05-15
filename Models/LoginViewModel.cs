@@ -9,10 +9,8 @@ Tambien realiza las verificaciones de input
 
 namespace TruequeTools.Models
 {
-
 	public class LoginViewModel
 	{
-
         [Required(ErrorMessage = "Debe ingresar su correo electronico")]
         [EmailAddress(ErrorMessage = "Debe ingresar un correo electronico valido")]
         [Display(Name = "Correo Electronico")]
@@ -22,7 +20,5 @@ namespace TruequeTools.Models
         [DataType(DataType.Password)]
         [Display(Name = "Contraseña")]
         public string Contraseña { get; set; } = "";
-
     }
-
 }

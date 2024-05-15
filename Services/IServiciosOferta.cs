@@ -1,5 +1,11 @@
 ﻿using TruequeTools.Entities;
 
+/*
+ 
+Esta clase define los servicios que ofrece la entidad "Oferta"
+
+ */
+
 namespace TruequeTools.Services
 {
     public interface IServiciosOferta

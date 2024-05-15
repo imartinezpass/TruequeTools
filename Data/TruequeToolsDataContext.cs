@@ -30,98 +30,100 @@ namespace TruequeTools.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            // Configuración de la relación entre Oferta y Publicacion
             modelBuilder.Entity<Oferta>()
                .HasOne(x => x.Publicacion)
                .WithMany(u => u.Ofertas)
                .HasForeignKey(x => x.PublicacionId);
 
+            // Configuración de la relación entre Oferta y Usuario
             modelBuilder.Entity<Oferta>()
                .HasOne(x => x.Usuario)
                .WithMany(u => u.Ofertas)
                .HasForeignKey(x => x.UsuarioId)
                .OnDelete(DeleteBehavior.Restrict);
 
+            // Configuración de la relación entre Publicacion y Oferta
             modelBuilder.Entity<Publicacion>()
                 .HasMany(x => x.Ofertas)
                 .WithOne(x => x.Publicacion)
                 .HasForeignKey(x => x.PublicacionId);
 
+            // Configuración de la relación entre Usuario y Oferta
             modelBuilder.Entity<Usuario>()
                .HasMany(x => x.Ofertas)
                .WithOne(x => x.Usuario)
                .HasForeignKey(x => x.UsuarioId);
 
-            //*****************
-
+            // Configuración de la relación entre Usuario y Pregunta
             modelBuilder.Entity<Usuario>()
                .HasMany(x => x.Preguntas)
                .WithOne(x => x.Usuario)
                .HasForeignKey(x => x.UsuarioId);
 
+            // Configuración de la relación entre Pregunta y Usuario
             modelBuilder.Entity<Pregunta>()
                .HasOne(x => x.Usuario)
                .WithMany(u => u.Preguntas)
                .HasForeignKey(x => x.UsuarioId)
                .OnDelete(DeleteBehavior.Restrict);
 
-            //*****
-
             // Configuración de la relación entre Usuario y Sucursal
             modelBuilder.Entity<Usuario>()
-                .HasOne(x => x.Sucursal)  // Un usuario pertenece a una única sucursal
-                .WithMany()  // No especificamos WithOne() ya que la relación es uno a uno o muchos a uno
-                .HasForeignKey(x => x.SucursalId)  // Clave externa en la tabla Usuarios que referencia la tabla Sucursales
-                .OnDelete(DeleteBehavior.Restrict);  // Establece la acción en la eliminación a "Restrict" (NO ACTION)
+                .HasOne(x => x.Sucursal)  
+                .WithMany()
+                .HasForeignKey(x => x.SucursalId)  
+                .OnDelete(DeleteBehavior.Restrict);  
 
-            // Configuración de la relación entre Usuario y Publicaciones
+            // Configuración de la relación entre Usuario y Publicacion
             modelBuilder.Entity<Usuario>()
-                .HasMany(x => x.Publicaciones) // Un usuario puede tener muchas publicaciones
-                .WithOne(x => x.Usuario) // Cada publicación pertenece a un único usuario
-                .HasForeignKey(x => x.UsuarioId); // Clave externa en la tabla Publicaciones
+                .HasMany(x => x.Publicaciones) 
+                .WithOne(x => x.Usuario) 
+                .HasForeignKey(x => x.UsuarioId);
 
-            // Configuración de la relación entre Publicación y Sucursal
+            // Configuración de la relación entre Publicacion y Sucursal
             modelBuilder.Entity<Publicacion>()
-                .HasOne(x => x.Sucursal)  // Una publicación pertenece a una única sucursal
-                .WithMany()  // No especificamos WithOne() ya que la relación es uno a uno o muchos a uno
-                .HasForeignKey(x => x.SucursalId)  // Clave externa en la tabla Publicaciones que referencia la tabla Sucursales
-                .OnDelete(DeleteBehavior.Restrict);  // Establece la acción en la eliminación a "Restrict" (NO ACTION)
+                .HasOne(x => x.Sucursal) 
+                .WithMany()  
+                .HasForeignKey(x => x.SucursalId) 
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // Configuración de la relación entre Publicación y Usuario
+            // Configuración de la relación entre Publicacion y Usuario
             modelBuilder.Entity<Publicacion>()
-                .HasOne(x => x.Usuario)  // Una publicación pertenece a un único usuario
-                .WithMany(u => u.Publicaciones) // Cada usuario puede tener múltiples publicaciones
-                .HasForeignKey(x => x.UsuarioId); // Clave externa en la tabla Publicaciones
+                .HasOne(x => x.Usuario)  
+                .WithMany(u => u.Publicaciones) 
+                .HasForeignKey(x => x.UsuarioId); 
 
-            // Configuración de la relación entre Publicación y Producto
+            // Configuración de la relación entre Publicacion y Producto
             modelBuilder.Entity<Publicacion>()
-                .HasOne(p => p.Producto)  // Una publicación tiene un producto asociado
-                .WithOne(w => w.Publicacion)  // Un producto está asociado a una única publicación
-                .HasForeignKey<Producto>(p => p.PublicacionId);  // Clave externa en la tabla Productos que referencia la tabla Publicaciones
+                .HasOne(p => p.Producto)  
+                .WithOne(w => w.Publicacion) 
+                .HasForeignKey<Producto>(p => p.PublicacionId);
 
-            // Configuración de la relación entre Publicación y Preguntas
+            // Configuración de la relación entre Publicacion y Pregunta
             modelBuilder.Entity<Publicacion>()
-                .HasMany(x => x.Preguntas) // Una publicación puede tener muchas preguntas
-                .WithOne(x => x.Publicacion) // Cada pregunta pertenece a una única publicación
-                .HasForeignKey(p => p.PublicacionId); // Clave externa en la tabla Preguntas
+                .HasMany(x => x.Preguntas) 
+                .WithOne(x => x.Publicacion)
+                .HasForeignKey(p => p.PublicacionId); 
 
-            // Configuración de la relación entre Producto y Publicación
+            // Configuración de la relación entre Producto y Publicacion
             modelBuilder.Entity<Producto>()
-                .HasOne(p => p.Publicacion)  // Un producto está asociado a una única publicación
-                .WithOne(w => w.Producto)  // No especificamos WithOne() ya que la relación es uno a uno o muchos a uno
-                .HasForeignKey<Producto>(p => p.PublicacionId);  // Clave externa en la tabla Productos que referencia la tabla Publicaciones
+                .HasOne(p => p.Publicacion)  
+                .WithOne(w => w.Producto) 
+                .HasForeignKey<Producto>(p => p.PublicacionId);  
 
-            // Configuración de la relación entre Producto y Categoría
+            // Configuración de la relación entre Producto y Categoria
             modelBuilder.Entity<Producto>()
-                .HasOne(p => p.Categoria)  // Un producto pertenece a una sola categoría
-                .WithMany()  // No especificamos WithOne() ya que la relación es uno a uno o muchos a uno
-                .HasForeignKey(p => p.CategoriaId)  // Clave externa en la tabla Productos que referencia la tabla Categorías
-                .OnDelete(DeleteBehavior.Restrict);  // Establece la acción en la eliminación a "Restrict" (NO ACTION)
+                .HasOne(p => p.Categoria)  
+                .WithMany()  
+                .HasForeignKey(p => p.CategoriaId)  
+                .OnDelete(DeleteBehavior.Restrict);  
 
-            // Configuración de la relación entre Pregunta y Publicación
+            // Configuración de la relación entre Pregunta y Publicacion
             modelBuilder.Entity<Pregunta>()
-                .HasOne(p => p.Publicacion)  // Una pregunta pertenece a una sola publicación
-                .WithMany(p => p.Preguntas)  // Cada publicación puede tener muchas preguntas
-                .HasForeignKey(p => p.PublicacionId);  // Clave externa en la tabla Preguntas
+                .HasOne(p => p.Publicacion)  
+                .WithMany(p => p.Preguntas)  
+                .HasForeignKey(p => p.PublicacionId); 
 
             // Genera la base de datos con categorías predefinidas
             modelBuilder.Entity<Categoria>().HasData(
