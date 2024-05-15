@@ -15,19 +15,30 @@
 
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
 
-<h3>Search</h3>
+<div class="row">
+    <div class="col-lg-4 offset-lg-4 pt-4 pb-4 border">
+        <h1 style="text-align:center">Buscar</h1>
+        <h2 style="text-align:center">Encontrar el producto ideal</h2>
+        <hr />
+        <form method="get" @onsubmit="BuscarPublicaciones">
+            <div class="form-floating mb-3">
+                <input type="text" @bind="searchString" name="searchString" placeholder="Buscar...">
+            </div>
+             <div class="form-floating mb-3">
+                <select @bind="selectedFilter">
+                    <option value=0>Filtrar por categoria</option>
+                    @foreach (var cat in categorias)
+                    {
+                        <option value="@cat.Id">@cat.Nombre</option>
+                    }
+                </select>
+             </div>
+            <button type="submit" class="w-100 btn btn-lg btn-dark">Buscar</button>  
+        </form>
+    </div>
+</div>
 
-<form method="get" @onsubmit="BuscarPublicaciones">
-    <input type="text" @bind="searchString" name="searchString" placeholder="Buscar...">
-    <select @bind="selectedFilter">
-        <option value=0>Filtrar por categoria</option>
-        @foreach (var cat in categorias)
-        {
-            <option value="@cat.Id">@cat.Nombre</option>
-        }
-    </select>
-    <button type="submit">Buscar</button>
-</form>
+
 
 @if (busquedaRealizada)
 {
