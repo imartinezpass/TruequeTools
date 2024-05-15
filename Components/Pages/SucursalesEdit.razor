@@ -9,34 +9,41 @@
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
 
 @attribute [Authorize(Roles = "Admin")]
-
-@if (Id is null)
-{
-	<PageTitle>Nueva Sucursal</PageTitle>
-	<h3>Dar de alta una nueva sucursal</h3>
-}
-else
-{
-	<PageTitle>Editar Sucursal "@SucursalActual.Nombre"</PageTitle>
-	<h3>Editar sucursal "@SucursalActual.Nombre"</h3>
-}
-
-<EditForm Model="SucursalActual" OnSubmit="HandleSubmit">
-	<div>
-		<label for="nombre">Nombre</label>
-		<InputText id="nombre" @bind-Value="SucursalActual.Nombre" class="form-control" />
-	</div>
-	<div>
-		<label for="direccion">Direccion</label>
-		<InputText id="direccion" @bind-Value="SucursalActual.Direccion" class="form-control" />
-	</div>
-	<div>
-		<label for="localidad">Localidad</label>
-		<InputText id="localidad" @bind-Value="SucursalActual.Localidad" class="form-control" />
-	</div>
-	<div style="margin-top: 10px;"></div>
-	<button type="submit" class="btn btn-dark">Guardar</button>
-</EditForm>
+	
+<div class="row">
+	<div class="col-lg-4 offset-lg-4 pt-4 pb-4 border">
+		<EditForm Model="SucursalActual" OnSubmit="HandleSubmit">
+			@if (Id is null)
+			{
+				<PageTitle>Nueva Sucursal</PageTitle>
+				<h1 style="text-align:center">Nueva Sucursal</h1>
+				<h2 style="text-align:center">Dar de alta una nueva sucursal</h2>
+			}
+			else
+			{
+				<PageTitle>Editar Sucursal "@SucursalActual.Nombre"</PageTitle>
+				<h1 style="text-align:center">Editar Sucursal</h1>
+				<h2 style="text-align:center">Modificar la sucursal: "@SucursalActual.Nombre"</h2>
+			}
+			<hr />
+			<div class="form-floating mb-3">
+				<InputText id="nombre" @bind-Value="SucursalActual.Nombre" class="form-control" placeholder="" />
+				<label for="nombre">Nombre</label>
+			</div>
+			<div class="form-floating mb-3">
+				<InputText id="direccion" @bind-Value="SucursalActual.Direccion" class="form-control" placeholder="" />
+				<label for="direccion">Direccion</label>
+			</div>
+			<div class="form-floating mb-3">
+				<InputText id="localidad" @bind-Value="SucursalActual.Localidad" class="form-control" placeholder="" />
+				<label for="localidad">Localidad</label>
+			</div>
+			<div class="form-floating mb-3">
+			</div>
+			<button type="submit" class="w-100 btn btn-lg btn-dark">Guardar</button>
+		</EditForm>
+	</div> 
+</div>
 
 @code {
 
