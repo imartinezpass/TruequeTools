@@ -17,7 +17,7 @@
 <PageTitle>Registrarse</PageTitle>
 
 <div class="row">
-    <div class="col-md-4 offset-lg-4 pt-4 pb-4 border">
+    <div class="col-lg-4 offset-lg-4 pt-4 pb-4 border">
         <h1 style="text-align:center">Registrarse</h1>
         <EditForm Model="@Modelo" OnValidSubmit="RegistrarUsuario" FormName="RegisterForm">
             <DataAnnotationsValidator />
@@ -70,7 +70,7 @@
                 <label for="confirmar-contraseña">Confirmar Contraseña</label>
                 <ValidationMessage For="() => Modelo.ConfirmarContraseña" class="text-danger" />
             </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Registrarse</button>
+            <button type="submit" class="w-100 btn btn-lg btn-dark">Registrarse</button>
         </EditForm>
     </div>
 </div>
