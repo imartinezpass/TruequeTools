@@ -31,10 +31,10 @@
             {
 
                 context.Entry(PublicacionActual).Reference(p => p.Usuario).Load();
-                context.Entry(PublicacionActual).Collection(p => p.Preguntas).Load();
+                context.Entry(PublicacionActual).Collection(p => p.Preguntas!).Load();
                 context.Entry(PublicacionActual).Reference(p => p.Sucursal).Load();
                 context.Entry(PublicacionActual).Reference(p => p.Producto).Load();
-                context.Entry(PublicacionActual.Producto).Reference(p => p.Categoria).Load();
+                context.Entry(PublicacionActual.Producto!).Reference(p => p.Categoria).Load();
 
                 <li class="list-group-item"><h3>@PublicacionActual.Titulo</h3></li>
                 <li class="list-group-item">
@@ -48,13 +48,13 @@
                     }
                 </li>
                 <li class="list-group-item">@PublicacionActual.Producto.Descripcion</li>
-                <li class="list-group-item">Publicado el @PublicacionActual.FechaPublicacion por: @PublicacionActual.Usuario.Email</li>
-                <li class="list-group-item">Sucursal de intercambio: @PublicacionActual.Sucursal.Nombre</li>
-                <li class="list-group-item">Categoría: @PublicacionActual.Producto.Categoria.Nombre</li>
+                <li class="list-group-item">Publicado el @PublicacionActual.FechaPublicacion por: @PublicacionActual.Usuario!.Email</li>
+                <li class="list-group-item">Sucursal de intercambio: @PublicacionActual.Sucursal!.Nombre</li>
+                <li class="list-group-item">Categoría: @PublicacionActual.Producto.Categoria!.Nombre</li>
                 <li class="list-group-item">
                     <div>
                         Preguntas
-                        @if (PublicacionActual.Preguntas.Count != 0)
+                        @if (PublicacionActual.Preguntas!.Count != 0)
                         {
                             @foreach (var pregunta in PublicacionActual.Preguntas)
                             {
