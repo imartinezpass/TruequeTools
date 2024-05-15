@@ -3,13 +3,13 @@ using System.Security.Claims;
 
 namespace TruequeTools.Services
 {
-    public class UserService
+    public class ServiciosUsuarioAutentificado
 
     {
         private readonly AuthenticationStateProvider _authenticationStateProvider;
         ClaimsPrincipal? _current = null;
 
-        public UserService(AuthenticationStateProvider authenticationStateProvider)
+        public ServiciosUsuarioAutentificado(AuthenticationStateProvider authenticationStateProvider)
 
         {
             _authenticationStateProvider = authenticationStateProvider;
@@ -32,6 +32,11 @@ namespace TruequeTools.Services
                 return;
             var authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
             _current = authState.User;
+        }
+
+        public void RemoveCurrent()
+        {
+            _current = null;
         }
 
     }

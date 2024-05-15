@@ -1,5 +1,7 @@
-﻿using TruequeTools.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using TruequeTools.Data;
 using TruequeTools.Entities;
+
 
 namespace TruequeTools.Services
 /*
@@ -19,6 +21,22 @@ Ofrece servicios CRUD y LOCALES para la entidad "Producto"
         {
             contexto.Ofertas.Add(oferta);
             await contexto.SaveChangesAsync();
+        }
+
+        public async Task<List<Oferta>> ReadAllOfertas()
+        {
+            var result = await contexto.Ofertas.ToListAsync();
+            return result;
+        }
+
+        public async Task<List<Oferta>> ReadAllOfertasCurrentUser(int userId)
+        {
+            var ofertas = await (from o in contexto.Ofertas
+                                 join p in contexto.Publicaciones on o.PublicacionId equals p.Id
+                                 join u in contexto.Usuarios on p.UsuarioId equals userId
+                                 select o
+                                 ).ToListAsync();
+            return ofertas;
         }
     }
 }

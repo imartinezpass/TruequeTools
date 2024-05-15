@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TruequeTools.Data;
 using TruequeTools.Entities;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 /*
  
@@ -28,9 +27,19 @@ namespace TruequeTools.Services
             return publicacion.Id;
         }
 
-        public Task<List<Publicacion>> ReadAllPublicaciones()
+        public async Task<List<Publicacion>> ReadAllPublicaciones()
         {
-            throw new NotImplementedException();
+            var result = await contexto.Publicaciones.ToListAsync();
+            return result;
+        }
+
+        public async Task<List<Publicacion>> ReadAllPublicacionesCurrentUser(int userId)
+        {
+            var publicaciones = await (from p in contexto.Publicaciones
+                                       join u in contexto.Usuarios on p.UsuarioId equals userId
+                                       select p
+                     ).ToListAsync();
+            return publicaciones;
         }
 
         public async Task<Publicacion> ReadPublicacionById(int id)
