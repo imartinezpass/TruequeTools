@@ -22,15 +22,14 @@
 @if (publicaciones != null && publicaciones.Any())
 {
 
-    <div class="row" style="margin:5rem">
+    <div class="row margin:1rem">
         @foreach (var publi in publicaciones)
         {
-
             context.Entry(publi).Reference(p => p.Producto).Load(); //Traigo los datos del producto asociado con la publicacion
             context.Entry(publi).Reference(p => p.Sucursal).Load(); //Traigo los datos de la sucursal asociada con la publicacion
             context.Entry(publi.Producto!).Reference(p => p.Categoria).Load(); //Traigo los datos de la Categoria asociada al Producto asociado con la Publicacion
 
-            <div class="col-md-3 mb-3">
+            <div class="col-lg-4 col-md-6 col-12 mb-3">
                 <div class="card" style="margin:1rem">
                     @if (@publi.Producto!.FotoUrl == null)
                     {
@@ -45,7 +44,7 @@
                     </div>
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item">Sucursal: @publi.Sucursal!.Nombre</li>
-                        <li class="list-group-item">Categoria: @publi.Producto.Categoria!.Nombre</li> @*TIENE QUE TRAER EL NOMBRE DE LA CATEGORIA CON ESTE ID*@
+                        <li class="list-group-item">Categoria: @publi.Producto.Categoria!.Nombre</li>
                     </ul>
                     <div class="card-body">
                         <a class="btn btn-secondary" @onclick="@(() => VerPublicacion(publi.Id))">Ver Publicacion</a>

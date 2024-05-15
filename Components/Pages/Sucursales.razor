@@ -11,41 +11,44 @@
 
 <PageTitle>Sucursales</PageTitle>
 
-<h3>Sucursales</h3>
-
 @if (sucrusales.Count == 0)
 {
 	<p><em>Cargando sucursales...</em></p>
 }
 else
 {
-	<table class="table">
-		<thead>
-			<tr>
-				<th>Id</th>
-				<th>Nombre</th>
-				<th>Direccion</th>
-				<th>Localidad</th>
-				<th style="width: 120px;"></th>
-				<th style="width: 120px;"></th>
-			</tr>
-		</thead>
-		<tbody>
-			@foreach (var suc in sucrusales)
-			{
-				<tr>
-					<td>@suc.Id</td>
-					<td>@suc.Nombre</td>
-					<td>@suc.Direccion</td>
-					<td>@suc.Localidad</td>
-					<td style="text-align: right;"><button class="btn btn-primary" @onclick="@(() => EditarSucursal(suc.Id))">Editar</button></td>
-					<td style="text-align: right;"><button class="btn btn-danger" @onclick="@(() => EliminarSucursal(suc.Id))">Eliminar</button></td>
-				</tr>
-			}
-		</tbody>
-	</table>
+	<div class="row">
+		<div class="col-12">
+			<h3>Sucursales</h3>
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Id</th>
+						<th>Nombre</th>
+						<th>Direccion</th>
+						<th>Localidad</th>
+						<th style="width: 120px;"></th>
+						<th style="width: 120px;"></th>
+					</tr>
+				</thead>
+				<tbody>
+					@foreach (var suc in sucrusales)
+					{
+						<tr>
+							<td>@suc.Id</td>
+							<td>@suc.Nombre</td>
+							<td>@suc.Direccion</td>
+							<td>@suc.Localidad</td>
+							<td style="text-align: right;"><button class="btn btn-secondary" @onclick="@(() => EditarSucursal(suc.Id))">Editar</button></td>
+							<td style="text-align: right;"><button class="btn btn-danger" @onclick="@(() => EliminarSucursal(suc.Id))">Eliminar</button></td>
+						</tr>
+					}
+				</tbody>
+			</table>
 
-	<button class="btn btn-success" @onclick="CrearSucursal">Nueva Sucursal</button>
+			<button class="btn btn-dark" @onclick="CrearSucursal">Nueva Sucursal</button>
+		</div>
+	</div>
 }
 
 @code {
