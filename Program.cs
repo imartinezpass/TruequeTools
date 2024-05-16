@@ -15,9 +15,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         options.Cookie.Name = "truequetools_auth_token";
         options.LoginPath = "/identificarse";
-        options.LogoutPath = "/salir";
         options.AccessDeniedPath = "/acceso-denegado";
-        options.Cookie.MaxAge = TimeSpan.FromMinutes(10);
+        options.Cookie.MaxAge = TimeSpan.FromMinutes(15);
     });
 builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
@@ -31,7 +30,6 @@ builder.Services.AddScoped<IServiciosSucursal, ServiciosSucursal>();
 builder.Services.AddScoped<IServiciosUsuario, ServiciosUsuario>();
 builder.Services.AddScoped<IServiciosPregunta, ServiciosPregunta>();
 builder.Services.AddScoped<IServiciosOferta, ServiciosOferta>();
-builder.Services.AddScoped<ServiciosUsuarioAutentificado>();
 //**********NACHEX CODE ENDS********** CRUD - AGREGAR SOLO SERVICIOS
 
 var app = builder.Build();

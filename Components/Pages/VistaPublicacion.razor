@@ -15,11 +15,8 @@
 @attribute [Authorize(Roles = "Admin,User")]
 
 <div>
-
     <ul class="list-group" style="padding-bottom:1.1rem">
-
         <li class="list-group-item"><h1>Publicacion N°@Id</h1></li>
-
         @if (cargando)
         {
             <li class="list-group-item"><h3>Cargando...</h3></li>
@@ -97,9 +94,7 @@
                 <li class="list-group-item"><h3>Error: no se encontró o no existe la publicacion seleccionada</h3></li>
             }
         }
-
     </ul>
-
 </div>
 
 @code {
@@ -118,21 +113,10 @@
         await Task.Delay(1000);
         cargando = false;
     }
-
-    public string GetFotoProducto(string nombre)
-    {
-        if (string.IsNullOrEmpty(nombre))
-        {
-            return "images/blank.svg";
-        }
-        else
-        {
-            return "images/" + nombre;
-        }
-    }
-    // martin
+  
     public void Ofertar()
     {
         NavMan.NavigateTo("/realizar-oferta/" + PublicacionActual.Id);
     }
+
 }

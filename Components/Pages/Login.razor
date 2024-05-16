@@ -63,12 +63,13 @@
 		{
 			new Claim(ClaimTypes.Name, cuenta.Nombre),
 			new Claim(ClaimTypes.Role, cuenta.Rol),
-			new Claim("IdUsuario", cuenta.Id.ToString()),
-			new Claim("IdSucursal", cuenta.SucursalId.ToString())
+			new Claim("UsuarioId", cuenta.Id.ToString()),
+			new Claim("SucursalId", cuenta.SucursalId.ToString())
 		};
 
 		var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 		var principal = new ClaimsPrincipal(identity);
+
 		if(HttpContext != null)
 		{
 			await HttpContext.SignInAsync(principal);

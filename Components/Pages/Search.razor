@@ -27,6 +27,7 @@
             </div>
             <div class="form-floating mb-3">
                 <InputSelect @bind-Value="selectedFilter" class="form-control" autocomplete="sucursal" aria-required="true" placeholder="" maxlength="50">
+                    <option value="0">No filtrar por categoria</option>
                     @foreach (var cat in categorias)
                     {
                         <option value="@cat.Id">@cat.Nombre</option>
@@ -109,14 +110,8 @@
         }
         if (selectedFilter != 0)
         {
-            foreach (var publicacion in publicaciones)
-            {
-                // Cargar los datos del producto asociado con la publicación
-                //context.Entry(publicacion).Reference(p => p.Producto).Load();
-            }
-            
             publicaciones = publicaciones
-            //.Where(publicacion => publicacion.Producto != null && publicacion.Producto.CategoriaId == selectedFilter)
+            .Where(publicacion => publicacion.Nombre != null && publicacion.CategoriaId == selectedFilter)
             .ToList();
         }
         busquedaRealizada = true;

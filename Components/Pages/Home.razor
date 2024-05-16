@@ -12,16 +12,12 @@
 <PageTitle>Inicio</PageTitle>
 
 <div style="text-align:center">
-
     <h1 style="margin:20px">Bienvenido a <span class="text-main-color">Trueque Tools</span></h1>
-
     <h3 style="margin:40px">En esta plataforma podras intercambiar productos con otros usuarios en tu zona</h3>
-
 </div>
 
 @if (publicaciones != null && publicaciones.Any())
 {
-
     <div class="row margin:1rem">
         @foreach (var publi in publicaciones)
         {
@@ -52,11 +48,9 @@
             </div>
         }
     </div>
-
 }
 else
 {
-
     @if (showSpinner)
     {
         <div class="d-flex justify-content-center">
@@ -69,7 +63,6 @@ else
     {
         <h6 style="text-align:center">no hay publicaciones para mostrar...</h6>
     }
-
 }
 
 @code {
@@ -85,13 +78,11 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-
-        publicaciones = await context.Publicaciones.Take(12).ToListAsync(); //Traigo las primeras 3 publicaciones
+        publicaciones = await context.Publicaciones.Take(12).ToListAsync(); //Traigo las primeras 12 publicaciones
         
         await Task.Delay(500); // Espera 0.5 segundos y muestra el spinner durante ese tiempo
         showSpinner = false; // Desactiva el spinner
         StateHasChanged(); // Notifica a Blazor que debe actualizar la interfaz de usuario
-
     }
 
 }

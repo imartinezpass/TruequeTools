@@ -6,17 +6,17 @@
 @using System.Text.Encodings.Web
 @using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.Extensions.Logging
+@using System.Security.Claims
 @using TruequeTools.Data
 @using TruequeTools.Entities
 @using Microsoft.AspNetCore.Components.Authorization
 
-@inject TruequeToolsDataContext appDbContext
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavMan
 @inject IServiciosSucursal SucursalService
 @inject IServiciosCategoria CategoriaService
 @inject IServiciosPublicacion PublicacionService
 @inject IJSRuntime JS
-@inject ServiciosUsuarioAutentificado UserService
 
 @rendermode InteractiveServer
 
@@ -70,7 +70,7 @@
                 <ValidationMessage For="() => Modelo.CategoriaId" class="text-danger" />
             </div>
             <hr />
-            <h5>Foto del producto (opcional)</h5>
+            <h5>Foto (opcional)</h5>
             <div class="form-floating mb-3">
                 <InputFile @ref="inputFile" OnChange="ShowPreview" />
             </div>
@@ -92,25 +92,25 @@
 
 @code {
 
-    //código para hacer la preview de la imágen, funciona con javascript
-    private InputFile? inputFile;
-    private ElementReference previewImageElem;
-    private async Task ShowPreview() => await JS.InvokeVoidAsync(
-        "previewImage", inputFile!.Element, previewImageElem);
-    //código para hacer la preview de la imágen, funciona con javascript
-
-    public HttpContext? HttpContext { get; set; }
+    private ClaimsPrincipal? user;
 
     List<Sucursal> sucursales = new List<Sucursal>();
     List<Categoria> categorias = new List<Categoria>();
     int sucursalPreferidaId;
 
+    //código para hacer la preview de la imágen, funciona con javascript
+    private InputFile? inputFile;
+    private ElementReference previewImageElem;
+    private async Task ShowPreview() => await JS.InvokeVoidAsync("previewImage", inputFile!.Element, previewImageElem);
+    //código para hacer la preview de la imágen, funciona con javascript
+
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        user = authState.User;
         sucursales = await SucursalService.ReadAllSucursales(); //LECTURA DE TODAS LAS SUCURSALES
         categorias = await CategoriaService.ReadAllCategorias(); //LECTURA DE TODAS LAS CATEGORIAS
-        await UserService.InitializeAsync(); // obtengo los datos del usuario en sesión
-        sucursalPreferidaId = int.Parse(UserService.Current.FindFirst("IdSucursal")!.Value);
+        sucursalPreferidaId = int.Parse(user!.FindFirst("SucursalId")!.Value);
     }
 
     private String? MensajeError;
@@ -128,16 +128,15 @@
     {
         var publicacion = new Publicacion();
 
-        publicacion.UsuarioId = int.Parse(@UserService.Current.FindFirst("IdUsuario")!.Value); // weno acá ya lo cambié...
         publicacion.Nombre = Modelo.Nombre;
-        publicacion.SucursalId = Modelo.SucursalId;
         publicacion.Descripcion = Modelo.Descripcion;
-        //producto.FotoUrl = "prueba1.jpg";
+        //producto.FotoUrl = "prueba1.jpg"; FALTA LA FOTO EN LA PUBLICACION !!!
         publicacion.CategoriaId = Modelo.CategoriaId;
+        publicacion.UsuarioId = int.Parse(user!.FindFirst("UsuarioId")!.Value);
+        publicacion.SucursalId = Modelo.SucursalId;
+       
+        await PublicacionService.CreatePublicacion(publicacion);
 
-        var publicacionId = await PublicacionService.CreatePublicacion(publicacion);
-
-        //await ProductoService.CreateProducto(producto);
         NavMan.NavigateTo("/");
 
     }
