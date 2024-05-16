@@ -24,11 +24,23 @@ namespace TruequeTools.Entities
 
         //DATOS INGRESADOS POR EL USUARIO
 
-        [Column("titulo")]
+        [Column("nombre")]
         [MaxLength(50)]
-        public string? Titulo { get; set; }
+        public string? Nombre { get; set; }
+
+        [Column("descripcion")]
+        [MaxLength(255)]
+        [MinLength(20)]
+        public string? Descripcion { get; set; }
+
+        [Column("fotoUrl")]
+        [MaxLength(255)]
+        public string? FotoUrl { get; set; }
 
         //METADATA
+
+        [Column("fechaPublicacion")]
+        public DateOnly FechaPublicacion { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
         [Column("isPremium")]
         public bool IsPremium { get; set; } = false;
@@ -36,27 +48,29 @@ namespace TruequeTools.Entities
         [Column("isOculta")]
         public bool IsOculta { get; set; } = false;
 
-        [Column("fechaPublicacion")]
-        public DateOnly FechaPublicacion { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+        //CLAVES EXTERNAS
 
-        //CLAVE EXTERNA USUARIO
+        [Column("categoriaId")]
+        public int CategoriaId { get; set; }
 
         [Column("usuarioId")]
         public int UsuarioId { get; set; }
 
-        //CLAVE EXTERNA SUCURSAL
-
         [Column("sucursalId")]
         public int SucursalId { get; set; }
 
-        //ATRIBUTOS NO SQL
+        //ATRIBUTOS NO SQL - FOREGIN KEY FIELDS
 
+        public Categoria? Categoria { get; set; }
         public Usuario? Usuario { get; set; }
         public Sucursal? Sucursal { get; set; }
-        public Producto? Producto { get; set; }
-        public List<Pregunta>? Preguntas { get; set; }
-		public List<Oferta>? Ofertas { get; set; }
 
-	}
+        //ATRIBUTOS NO SQL - REVERSE RELATIONSHIP FIELDS
+
+        public List<Pregunta>? Preguntas { get; set; }
+		public List<Oferta>? OfertasRealizadas { get; set; }
+        public List<Oferta>? OfertasRecibidas { get; set; }
+
+    }
 
 }

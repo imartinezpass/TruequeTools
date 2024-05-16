@@ -19,7 +19,6 @@ namespace TruequeTools.Data
         //VINCULO ENTRE LA BASE DE DATOS Y LAS ENTIDADES
         public DbSet<Categoria> Categorias { get; set; }
         public DbSet<Pregunta> Preguntas { get; set; }
-        public DbSet<Producto> Productos { get; set; }
         public DbSet<Publicacion> Publicaciones { get; set; }
         public DbSet<Sucursal> Sucursales { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
@@ -30,100 +29,95 @@ namespace TruequeTools.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configuración de la relación entre Oferta y Publicacion
-            modelBuilder.Entity<Oferta>()
-               .HasOne(x => x.Publicacion)
-               .WithMany(u => u.Ofertas)
-               .HasForeignKey(x => x.PublicacionId);
+            //ENTIDAD USUARIO
 
-            // Configuración de la relación entre Oferta y Usuario
-            modelBuilder.Entity<Oferta>()
-               .HasOne(x => x.Usuario)
-               .WithMany(u => u.Ofertas)
-               .HasForeignKey(x => x.UsuarioId)
-               .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<Usuario>() // Configuración de la relación entre Usuario y Sucursal
+                .HasOne(x => x.Sucursal)
+                .WithMany()
+                .HasForeignKey(x => x.SucursalId)
+                .OnDelete(DeleteBehavior.Restrict);
 
-            // Configuración de la relación entre Publicacion y Oferta
-            modelBuilder.Entity<Publicacion>()
-                .HasMany(x => x.Ofertas)
-                .WithOne(x => x.Publicacion)
-                .HasForeignKey(x => x.PublicacionId);
-
-            // Configuración de la relación entre Usuario y Oferta
-            modelBuilder.Entity<Usuario>()
+            modelBuilder.Entity<Usuario>()  // Configuración de la relación entre Usuario y Oferta
                .HasMany(x => x.Ofertas)
                .WithOne(x => x.Usuario)
                .HasForeignKey(x => x.UsuarioId);
 
-            // Configuración de la relación entre Usuario y Pregunta
-            modelBuilder.Entity<Usuario>()
+            modelBuilder.Entity<Usuario>() // Configuración de la relación entre Usuario y Pregunta
                .HasMany(x => x.Preguntas)
                .WithOne(x => x.Usuario)
                .HasForeignKey(x => x.UsuarioId);
 
-            // Configuración de la relación entre Pregunta y Usuario
-            modelBuilder.Entity<Pregunta>()
+            modelBuilder.Entity<Usuario>() // Configuración de la relación entre Usuario y Publicacion
+                .HasMany(x => x.Publicaciones)
+                .WithOne(x => x.Usuario)
+                .HasForeignKey(x => x.UsuarioId);
+
+            //ENTIDAD PREGUNTA
+
+            modelBuilder.Entity<Pregunta>() // Configuración de la relación entre Pregunta y Usuario
                .HasOne(x => x.Usuario)
                .WithMany(u => u.Preguntas)
                .HasForeignKey(x => x.UsuarioId)
                .OnDelete(DeleteBehavior.Restrict);
 
-            // Configuración de la relación entre Usuario y Sucursal
-            modelBuilder.Entity<Usuario>()
-                .HasOne(x => x.Sucursal)  
+            modelBuilder.Entity<Pregunta>() // Configuración de la relación entre Pregunta y Publicacion
+                .HasOne(p => p.Publicacion)
+                .WithMany(p => p.Preguntas)
+                .HasForeignKey(p => p.PublicacionId);
+
+            //ENTIDAD PUBLICACION
+
+            modelBuilder.Entity<Publicacion>() // Configuración de la relación entre Publicacion y Categoria
+                .HasOne(x => x.Categoria)
                 .WithMany()
-                .HasForeignKey(x => x.SucursalId)  
-                .OnDelete(DeleteBehavior.Restrict);  
-
-            // Configuración de la relación entre Usuario y Publicacion
-            modelBuilder.Entity<Usuario>()
-                .HasMany(x => x.Publicaciones) 
-                .WithOne(x => x.Usuario) 
-                .HasForeignKey(x => x.UsuarioId);
-
-            // Configuración de la relación entre Publicacion y Sucursal
-            modelBuilder.Entity<Publicacion>()
-                .HasOne(x => x.Sucursal) 
-                .WithMany()  
-                .HasForeignKey(x => x.SucursalId) 
+                .HasForeignKey(x => x.CategoriaId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Configuración de la relación entre Publicacion y Usuario
-            modelBuilder.Entity<Publicacion>()
-                .HasOne(x => x.Usuario)  
-                .WithMany(u => u.Publicaciones) 
-                .HasForeignKey(x => x.UsuarioId); 
+            modelBuilder.Entity<Publicacion>() // Configuración de la relación entre Publicacion y Sucursal
+               .HasOne(x => x.Sucursal)
+               .WithMany()
+               .HasForeignKey(x => x.SucursalId)
+               .OnDelete(DeleteBehavior.Restrict);
 
-            // Configuración de la relación entre Publicacion y Producto
-            modelBuilder.Entity<Publicacion>()
-                .HasOne(p => p.Producto)  
-                .WithOne(w => w.Publicacion) 
-                .HasForeignKey<Producto>(p => p.PublicacionId);
+            modelBuilder.Entity<Publicacion>()  // Configuración de la relación entre Publicacion y Usuario
+                .HasOne(x => x.Usuario)
+                .WithMany(u => u.Publicaciones)
+                .HasForeignKey(x => x.UsuarioId);
 
-            // Configuración de la relación entre Publicacion y Pregunta
-            modelBuilder.Entity<Publicacion>()
-                .HasMany(x => x.Preguntas) 
+            modelBuilder.Entity<Publicacion>() // Configuración de la relación entre Publicacion y Pregunta
+                .HasMany(x => x.Preguntas)
                 .WithOne(x => x.Publicacion)
-                .HasForeignKey(p => p.PublicacionId); 
+                .HasForeignKey(p => p.PublicacionId);
 
-            // Configuración de la relación entre Producto y Publicacion
-            modelBuilder.Entity<Producto>()
-                .HasOne(p => p.Publicacion)  
-                .WithOne(w => w.Producto) 
-                .HasForeignKey<Producto>(p => p.PublicacionId);  
+            modelBuilder.Entity<Publicacion>() // Configuración de la relación entre Publicacion y Oferta (sobre publicacion)
+                .HasMany(x => x.OfertasRealizadas)
+                .WithOne(x => x.PublicacionQueOferto)
+                .HasForeignKey(x => x.PublicacionQueOfertoId);
 
-            // Configuración de la relación entre Producto y Categoria
-            modelBuilder.Entity<Producto>()
-                .HasOne(p => p.Categoria)  
-                .WithMany()  
-                .HasForeignKey(p => p.CategoriaId)  
-                .OnDelete(DeleteBehavior.Restrict);  
+            modelBuilder.Entity<Publicacion>() // Configuración de la relación entre Publicacion y Oferta (hacia publicacion)
+                .HasMany(x => x.OfertasRecibidas)
+                .WithOne(x => x.PublicacionQueOfrezco)
+                .HasForeignKey(x => x.PublicacionQueOfrezcoId);
 
-            // Configuración de la relación entre Pregunta y Publicacion
-            modelBuilder.Entity<Pregunta>()
-                .HasOne(p => p.Publicacion)  
-                .WithMany(p => p.Preguntas)  
-                .HasForeignKey(p => p.PublicacionId); 
+            //ENTIDAD OFERTA
+
+            modelBuilder.Entity<Oferta>() // Configuración de la relación entre Oferta y Usuario
+               .HasOne(x => x.Usuario)
+               .WithMany(u => u.Ofertas)
+               .HasForeignKey(x => x.UsuarioId)
+               .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Oferta>() // Configuración de la relación entre Oferta y Publicacion (sobre publicacion)
+               .HasOne(x => x.PublicacionQueOferto)
+               .WithMany(u => u.OfertasRealizadas)
+               .HasForeignKey(x => x.PublicacionQueOfertoId)
+               .OnDelete(DeleteBehavior.Restrict); 
+
+            modelBuilder.Entity<Oferta>() // Configuración de la relación entre Oferta y Publicacion (hacia publicacion)
+               .HasOne(x => x.PublicacionQueOfrezco)
+               .WithMany(u => u.OfertasRecibidas)
+               .HasForeignKey(x => x.PublicacionQueOfrezcoId);
+
 
             // Genera la base de datos con categorías predefinidas
             modelBuilder.Entity<Categoria>().HasData(
@@ -134,12 +128,15 @@ namespace TruequeTools.Data
 
             // Genera la base de datos con una sucursal predefinida
             modelBuilder.Entity<Sucursal>().HasData(
-                new Sucursal { Id = 1, Nombre = "Central", Direccion = "Calle 13 2500", Localidad = "La Plata" }
+                new Sucursal { Id = 1, Nombre = "Central", Direccion = "Calle 13 y 38", Localidad = "La Plata" },
+                new Sucursal { Id = 2, Nombre = "Los Hornos", Direccion = "Calle 66 y 137", Localidad = "La Plata" },
+                new Sucursal { Id = 3, Nombre = "City Bell", Direccion = "Jorge Bell y Cantilo", Localidad = "La Plata" }
             );
 
             // Genera la base de datos con un usuario admin predefinido
             modelBuilder.Entity<Usuario>().HasData(
-                new Usuario { Id = 1, Nombre = "Admin", Apellido = "Admin", Email = "admin@admin", Contraseña = "admin", FechaNacimiento = DateOnly.MinValue, Rol = "Admin", SucursalId = 1 }
+                new Usuario { Id = 1, Nombre = "Admin", Apellido = "Admin", Email = "admin@admin", Contraseña = "admin", FechaNacimiento = DateOnly.MinValue, Rol = "Admin", SucursalId = 1 },
+                new Usuario { Id = 2, Nombre = "User", Apellido = "User", Email = "user@user", Contraseña = "user", FechaNacimiento = DateOnly.MinValue, Rol = "User", SucursalId = 1 }
             );
 
         }

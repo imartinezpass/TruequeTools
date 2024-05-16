@@ -32,19 +32,17 @@ namespace TruequeTools.Entities
         [MaxLength(255)]
         public string? Respuesta { get; set; }
 
-        //CLAVE EXTERNA PUBLICACION
+        //CLAVES EXTERNAS
 
         [Column("publicacionId")]
         public int PublicacionId { get; set; }
 
-		//CLAVE EXTERNA USUARIO
-
 		[Column("usuarioId")]
 		public int UsuarioId { get; set; }
 
-		//ATRIBUTOS NO SQL
+        //ATRIBUTOS NO SQL - FOREGIN KEY FIELDS
 
-		public Publicacion? Publicacion { get; set; }
+        public Publicacion? Publicacion { get; set; }
         public Usuario? Usuario { get; set; }
 
     }

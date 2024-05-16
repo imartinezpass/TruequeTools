@@ -26,7 +26,6 @@ builder.Services.AddCascadingAuthenticationState();
 //**********NACHEX CODE BEGINS********** CRUD - AGREGAR SOLO SERVICIOS
 builder.Services.AddDbContext<TruequeToolsDataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("TruequeToolsDbConnection")));
 builder.Services.AddScoped<IServiciosCategoria, ServiciosCategoria>();
-builder.Services.AddScoped<IServiciosProducto, ServiciosProducto>();
 builder.Services.AddScoped<IServiciosPublicacion, ServiciosPublicacion>();
 builder.Services.AddScoped<IServiciosSucursal, ServiciosSucursal>();
 builder.Services.AddScoped<IServiciosUsuario, ServiciosUsuario>();

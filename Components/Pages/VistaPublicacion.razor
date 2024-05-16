@@ -8,7 +8,6 @@
 @inject IServiciosUsuario UsuarioService
 @inject IServiciosPregunta PreguntaService
 @inject IServiciosSucursal SucursalService
-@inject IServiciosProducto ProductoService
 @inject NavigationManager NavMan
 
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
@@ -27,30 +26,29 @@
         }
         else
         {
-            @if (PublicacionActual.Titulo != null)
+            @if (PublicacionActual.Nombre != null)
             {
 
                 context.Entry(PublicacionActual).Reference(p => p.Usuario).Load();
                 context.Entry(PublicacionActual).Collection(p => p.Preguntas!).Load();
                 context.Entry(PublicacionActual).Reference(p => p.Sucursal).Load();
-                context.Entry(PublicacionActual).Reference(p => p.Producto).Load();
-                context.Entry(PublicacionActual.Producto!).Reference(p => p.Categoria).Load();
+                context.Entry(PublicacionActual).Reference(p => p.Categoria).Load();
 
-                <li class="list-group-item"><h3>@PublicacionActual.Titulo</h3></li>
+                <li class="list-group-item"><h3>@PublicacionActual.Nombre</h3></li>
                 <li class="list-group-item">
-                    @if (PublicacionActual.Producto!.FotoUrl == null)
+                    @if (PublicacionActual.FotoUrl == null)
                     {
                         <img class="card-img-top-svg" src=resources/blank.svg alt="Foto del Producto">
                     }
                     else
                     {
-                        <img class="card-img-top" src=images/@PublicacionActual.Producto.FotoUrl alt="Foto del Producto">
+                        <img class="card-img-top" src=images/@PublicacionActual.FotoUrl alt="Foto del Producto">
                     }
                 </li>
-                <li class="list-group-item">@PublicacionActual.Producto.Descripcion</li>
+                <li class="list-group-item">@PublicacionActual.Descripcion</li>
                 <li class="list-group-item">Publicado el @PublicacionActual.FechaPublicacion por: @PublicacionActual.Usuario!.Email</li>
                 <li class="list-group-item">Sucursal de intercambio: @PublicacionActual.Sucursal!.Nombre</li>
-                <li class="list-group-item">Categoría: @PublicacionActual.Producto.Categoria!.Nombre</li>
+                <li class="list-group-item">Categoría: @PublicacionActual.Categoria!.Nombre</li>
                 <li class="list-group-item">
                     <div>
                         Preguntas

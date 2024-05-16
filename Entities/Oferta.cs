@@ -22,34 +22,27 @@ namespace TruequeTools.Entities
         [Column("id")]
         public int Id { get; set; }
 
-        //DATOS INGRESADOS POR EL USUARIO
+        //METADATA
 
-        [Column("productoNombre")]
-        [MaxLength(50)]
-        public string? ProductoNombre { get; set; }
+        [Column("estado")]
+        public int Estado { get; set; }
 
-        [Column("productoDescripcion")]
-        [MaxLength(50)]
-        public string? ProductoDescripcion { get; set; }
-
-        [Column("productoFotoUrl")]
-        [MaxLength(255)]
-        public string? ProductoFotoUrl { get; set; }
-
-        //CLAVE EXTERNA USUARIO
+        //CLAVES EXTERNAS
 
         [Column("usuarioId")]
         public int UsuarioId { get; set; }
 
-        //CLAVE EXTERNA PUBLICACION
+        [Column("publicacionOfertadaId")]
+        public int PublicacionQueOfertoId { get; set; }
 
-        [Column("publicacionId")]
-        public int PublicacionId { get; set; }
+        [Column("publicacionOfrecidaId")]
+        public int PublicacionQueOfrezcoId { get; set; }
 
-        //ATRIBUTOS NO SQL
+        //ATRIBUTOS NO SQL - FOREGIN KEY FIELDS
 
         public Usuario? Usuario { get; set; }
-        public Publicacion? Publicacion { get; set; }
+        public Publicacion? PublicacionQueOferto { get; set; }
+        public Publicacion? PublicacionQueOfrezco { get; set; }
 
     }
 

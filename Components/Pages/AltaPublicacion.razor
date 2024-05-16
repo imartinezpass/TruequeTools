@@ -12,7 +12,6 @@
 
 @inject TruequeToolsDataContext appDbContext
 @inject NavigationManager NavMan
-@inject IServiciosProducto ProductoService
 @inject IServiciosSucursal SucursalService
 @inject IServiciosCategoria CategoriaService
 @inject IServiciosPublicacion PublicacionService
@@ -130,20 +129,15 @@
         var publicacion = new Publicacion();
 
         publicacion.UsuarioId = int.Parse(@UserService.Current.FindFirst("IdUsuario")!.Value); // weno acá ya lo cambié...
-        publicacion.Titulo = Modelo.Nombre;
+        publicacion.Nombre = Modelo.Nombre;
         publicacion.SucursalId = Modelo.SucursalId;
+        publicacion.Descripcion = Modelo.Descripcion;
+        //producto.FotoUrl = "prueba1.jpg";
+        publicacion.CategoriaId = Modelo.CategoriaId;
 
         var publicacionId = await PublicacionService.CreatePublicacion(publicacion);
 
-        var producto = new Producto();
-
-        producto.PublicacionId = publicacionId;
-        producto.Nombre = Modelo.Nombre;
-        producto.Descripcion = Modelo.Descripcion;
-        //producto.FotoUrl = "prueba1.jpg";
-        producto.CategoriaId = Modelo.CategoriaId;
-
-        await ProductoService.CreateProducto(producto);
+        //await ProductoService.CreateProducto(producto);
         NavMan.NavigateTo("/");
 
     }

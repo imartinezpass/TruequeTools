@@ -47,26 +47,25 @@
         <div class="row margin:1rem">
             @foreach (var publi in publicaciones)
             {
-                context.Entry(publi).Reference(p => p.Producto).Load(); //Traigo los datos del producto asociado con la publicacion
+                context.Entry(publi).Reference(p => p.Categoria).Load();
                 context.Entry(publi).Reference(p => p.Sucursal).Load(); //Traigo los datos de la sucursal asociada con la publicacion
-                context.Entry(publi.Producto!).Reference(p => p.Categoria).Load(); //Traigo los datos de la Categoria asociada al Producto asociado con la Publicacion
 
                 <div class="col-lg-4 col-md-6 col-12 mb-3">
                     <div class="card" style="margin:1rem">
-                        @if (@publi.Producto!.FotoUrl == null)
+                        @if (@publi.FotoUrl == null)
                         {
                             <img class="card-img-top-svg" src=resources/blank.svg alt="Foto del Producto">
                         }
                         else
                         {
-                            <img class="card-img-top" src=images/@publi.Producto.FotoUrl alt="Foto del Producto">
+                            <img class="card-img-top" src=images/@publi.FotoUrl alt="Foto del Producto">
                         }
                         <div class="card-body">
-                            <h4 style="margin:0">@publi.Titulo</h4>
+                            <h4 style="margin:0">@publi.Nombre</h4>
                         </div>
                         <ul class="list-group list-group-flush">
                             <li class="list-group-item">Sucursal: @publi.Sucursal!.Nombre</li>
-                            <li class="list-group-item">Categoria: @publi.Producto.Categoria!.Nombre</li>
+                            <li class="list-group-item">Categoria: @publi.Categoria!.Nombre</li>
                         </ul>
                         <div class="card-body">
                             <a class="btn btn-secondary" @onclick="@(() => VerPublicacion(publi.Id))">Ver Publicacion</a>
@@ -113,11 +112,11 @@
             foreach (var publicacion in publicaciones)
             {
                 // Cargar los datos del producto asociado con la publicación
-                context.Entry(publicacion).Reference(p => p.Producto).Load();
+                //context.Entry(publicacion).Reference(p => p.Producto).Load();
             }
             
             publicaciones = publicaciones
-            .Where(publicacion => publicacion.Producto != null && publicacion.Producto.CategoriaId == selectedFilter)
+            //.Where(publicacion => publicacion.Producto != null && publicacion.Producto.CategoriaId == selectedFilter)
             .ToList();
         }
         busquedaRealizada = true;

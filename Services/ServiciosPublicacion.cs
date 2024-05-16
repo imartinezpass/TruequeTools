@@ -60,7 +60,7 @@ namespace TruequeTools.Services
         //DEVUELVE UNA LISTA CON PUBLICACIONES QUE POSEAN EL STRING "unTitulo" EN EL TITULO DE LA PUBLCIACION
         public async Task<List<Publicacion>> ReadPublicacionesByNombre(string unTitulo)
         {
-            var result = await contexto.Publicaciones.Where(publicacion => publicacion.Titulo!.Contains(unTitulo)).ToListAsync();
+            var result = await contexto.Publicaciones.Where(publicacion => publicacion.Nombre!.Contains(unTitulo)).ToListAsync();
             return result;
         }
 

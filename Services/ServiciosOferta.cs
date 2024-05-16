@@ -34,10 +34,9 @@ namespace TruequeTools.Services
         }
 
         //DEVUELVE UNA LISTA CON TODAS LAS OFERTAS DEL USUARIO QUE SE PASA COMO PARAMETRO
-        public async Task<List<Oferta>> ReadAllOfertasCurrentUser(int userId)
+        public Task<List<Oferta>> ReadAllOfertasCurrentUser(int userId)
         {
-            var ofertas = await (from o in contexto.Ofertas join p in contexto.Publicaciones on o.PublicacionId equals p.Id join u in contexto.Usuarios on p.UsuarioId equals userId select o).ToListAsync();
-            return ofertas;
+            throw new NotImplementedException();
         }
 
     }

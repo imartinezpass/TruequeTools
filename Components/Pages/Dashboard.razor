@@ -47,17 +47,17 @@
                     {
                         <div class="alert alert-light col" role="alert">
                             <p>
-                                La publicación: <span style="font-weight:900">@dict.Key.Titulo</span> tiene <span style="font-weight:900">@dict.Value.Count</span> ofertas.
+                                La publicación: <span style="font-weight:900">@dict.Key.Nombre</span> tiene <span style="font-weight:900">@dict.Value.Count</span> ofertas.
                             </p>
                             @foreach (var oferta in dict.Value)
                             {
                                 <div class="card-body">
-                                    <h4 style="margin:0">@oferta.ProductoNombre</h4>
+                                    <h4 style="margin:0">"oferta.Nombre"</h4>
                                 </div>
                                 <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">Descripción: @oferta.ProductoDescripcion</li>
+                                    <li class="list-group-item">Descripción: "oferta.ProductoDescripcion"</li>
                                     <li class="list-group-item">
-                                        <img style="max-width:200px;max-height:200px" class="card-img-top img-thumbnail rounded mx-0 d-block" src=images/@oferta.ProductoFotoUrl alt="Foto del producto ofertado" />
+                                        <img style="max-width:200px;max-height:200px" class="card-img-top img-thumbnail rounded mx-0 d-block" src=images/"oferta.ProductoFotoUrl" alt="Foto del producto ofertado" />
                                     </li>
                                 </ul>
                             }
@@ -89,8 +89,8 @@
                 List<Oferta>? ofertasPublicacionActual;
                 foreach (var p in publicaciones)
                 {
-                    ofertasPublicacionActual = ofertas.Where(o => o.PublicacionId == p.Id).ToList();
-                    PublicacionYOfertas?.Add(p, ofertasPublicacionActual);
+                    //ofertasPublicacionActual = ofertas.Where(o => o.PublicacionId == p.Id).ToList();
+                    //PublicacionYOfertas?.Add(p, ofertasPublicacionActual);
                 }
             }
         }

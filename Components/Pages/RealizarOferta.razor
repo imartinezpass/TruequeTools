@@ -110,9 +110,9 @@
     {
         var oferta = new Oferta();
         oferta.UsuarioId = int.Parse(@UserService!.Current!.FindFirst("IdUsuario")!.Value);
-        oferta.ProductoNombre = Modelo.ProductoNombre;
-        oferta.ProductoDescripcion = Modelo.ProductoDescripcion;
-        oferta.PublicacionId = (int)PublicacionId!; // esto nunca dará problemas por el OnParametersSet()
+        //oferta.ProductoNombre = Modelo.ProductoNombre;
+        //oferta.ProductoDescripcion = Modelo.ProductoDescripcion;
+        //oferta.PublicacionId = (int)PublicacionId!; // esto nunca dará problemas por el OnParametersSet()
         if (imagenAGuardar != null) // guardo img en disco
         {
             var fileStream = imagenAGuardar?.OpenReadStream(imgMaxsize);
@@ -123,7 +123,7 @@
             {
                 await fileStream!.CopyToAsync(stream);
             }
-            oferta.ProductoFotoUrl = fileName;
+            //oferta.ProductoFotoUrl = fileName;
         }
         await OfertaService.CreateOferta(oferta);
         NavMan.NavigateTo("/publicacion/" + PublicacionId);

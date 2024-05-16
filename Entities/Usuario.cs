@@ -48,14 +48,17 @@ namespace TruequeTools.Entities
         [Column("rol")]
         public string Rol { get; set; } = "User";
 
-        //CLAVE EXTERNA SUCURSAL
+        //CLAVES EXTERNAS
 
         [Column("sucursalId")]
         public int SucursalId { get; set; }
 
-        //ATRIBUTOS NO SQL
+        //ATRIBUTOS NO SQL - FOREGIN KEY FIELDS
 
         public Sucursal? Sucursal { get; set; }
+
+        //ATRIBUTOS NO SQL - REVERSE RELATIONSHIP FIELDS
+
         public ICollection<Publicacion>? Publicaciones { get; set; }
 		public ICollection<Oferta>? Ofertas { get; set; }
 		public ICollection<Pregunta>? Preguntas { get; set; }
