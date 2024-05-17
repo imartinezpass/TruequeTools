@@ -1,11 +1,92 @@
 @using TruequeTools.Entities
 
-@inject NavigationManager NavMan
-@inject IServiciosSucursal SucursalService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IServiciosPregunta PreguntaService
+@inject IJSRuntime JS
 
-@rendermode @(new InteractiveServerRenderMode(prerender:false))
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Haz una pregunta a la publicacion @PublicacionId</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CerrarModal"></button>
+            </div>
+            <div class="modal-body">
+				@if(exito)
+				{
+					<div class="alert alert-success" role="alert">
+						Se registró tu pregunta !
+					</div>
+				}
+				else
+				{
+					<EditForm Model="@Modelo" OnValidSubmit="RealizarPregunta" FormName="PreguntaForm">
+						<DataAnnotationsValidator />
+						<ValidationSummary class="text-danger" role="alert" />
+						@if (!string.IsNullOrEmpty(MensajeError))
+						{
+							<div class="alert alert-danger mt-3" role="alert">
+								@MensajeError
+							</div>
+						}
+						<div class="form-floating mb-3">
+							<InputText @bind-Value="Modelo.Pregunta" class="form-control" autocomplete="nombre" aria-required="true" placeholder="" maxlength="100" />
+							<label for="nombre">Texto de la pregunta...</label>
+							<ValidationMessage For="() => Modelo.Pregunta" class="text-danger" />
+						</div>
+						<button type="submit" class="w-100 btn btn-lg btn-dark">Preguntar</button>
+					</EditForm>
+				}	
+            </div>
+        </div>
+    </div>
+</div>
 
-@attribute [Authorize(Roles = "Admin")]
+<script>
+	function refreshPage() {
+		location.reload();
+	}
+</script>
 
+@code{
 
+	[SupplyParameterFromForm]
+	private PreguntaViewModel Modelo { get; set; } = new();
+
+	[Parameter]
+	public int PublicacionId { get; set; }
+
+	string? MensajeError;
+	int UsuarioId;
+	bool exito = false;
+
+	protected override async Task OnInitializedAsync()
+	{
+		var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+		UsuarioId = int.Parse(authState.User!.FindFirst("UsuarioId")!.Value);
+	}
+
+	public async Task RealizarPregunta(EditContext editContext)
+	{
+		var pregunta = new Pregunta
+		{
+			Texto = Modelo.Pregunta,
+			UsuarioId = UsuarioId,
+			PublicacionId = PublicacionId
+		};
+
+		await PreguntaService.CreatePregunta(pregunta);
+		exito = true;
+	}
+
+	public async void CerrarModal()
+	{
+		if (exito)
+		{
+			await JS.InvokeVoidAsync("refreshPage");
+		}	
+	}
+
+}
 

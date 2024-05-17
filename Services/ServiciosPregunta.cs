@@ -19,6 +19,12 @@ namespace TruequeTools.Services
 
         private readonly TruequeToolsDataContext contexto = context;
 
+		public async Task CreatePregunta(Pregunta pregunta)
+		{	
+			contexto.Preguntas.Add(pregunta);
+			await contexto.SaveChangesAsync();
+		}
+
 		//DEVUELVE UNA LISTA CON TODAS LAS PREGUNTAS DE LA PUBLICACION QUE SE PASA COMO PARAMETRO
 		public async Task<List<Pregunta>> ReadPreguntasByPublicacionId(int id)
 		{

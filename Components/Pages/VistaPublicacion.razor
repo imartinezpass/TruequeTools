@@ -53,10 +53,18 @@
                         {
                             @foreach (var pregunta in PublicacionActual.Preguntas)
                             {
+                                context.Entry(pregunta).Reference(p => p.Usuario).Load();
                                 <div class="mb-2">
                                     <ul class="list-group">
-                                        <li class="list-group-item">@pregunta.Texto</li>
-                                        <li class="list-group-item">@pregunta.Respuesta</li>
+                                        <li class="list-group-item">@pregunta.Usuario!.Nombre pregunta: @pregunta.Texto</li>
+                                        @if (pregunta.Respuesta == null)
+                                        {
+                                            <li class="list-group-item">Esperando respuesta...</li>
+                                        }
+                                        else
+                                        {
+                                            <li class="list-group-item">@pregunta.Respuesta</li>
+                                        }
                                     </ul>
                                 </div>
                             }
@@ -79,7 +87,7 @@
                             <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5m-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5" />
                         </svg>
                     </button>
-                    <NavLink href="" class="btn btn-secondary">
+                    <NavLink class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                         Preguntar
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-patch-question" viewBox="0 0 16 16">
                             <path d="M8.05 9.6c.336 0 .504-.24.554-.627.04-.534.198-.815.847-1.26.673-.475 1.049-1.09 1.049-1.986 0-1.325-.92-2.227-2.262-2.227-1.02 0-1.792.492-2.1 1.29A1.7 1.7 0 0 0 6 5.48c0 .393.203.64.545.64.272 0 .455-.147.564-.51.158-.592.525-.915 1.074-.915.61 0 1.03.446 1.03 1.084 0 .563-.208.885-.822 1.325-.619.433-.926.914-.926 1.64v.111c0 .428.208.745.585.745" />
@@ -97,6 +105,8 @@
     </ul>
 </div>
 
+<Preguntar PublicacionId="Id"/>
+
 @code {
 
     [Parameter]
@@ -107,9 +117,6 @@
     public Publicacion PublicacionActual { get; set; } = new();
 
     protected override async Task OnParametersSetAsync()
-
-    preguntas = await Http.GetFromJsonAsync<List<Comentario>>("api/pregunta");6
-
     {
         cargando = true;
         PublicacionActual = await PublicacionService.ReadPublicacionById(Id);
@@ -122,10 +129,4 @@
         NavMan.NavigateTo("/ofertar/" + PublicacionActual.Id);       
     }
 
-    public void Preguntar(){
-        NavMan.NavigateTo("/Preguntar/" + PublicacionActual.Id);  6
-    }
-
-    
-            
 }
