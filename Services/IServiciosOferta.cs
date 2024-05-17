@@ -12,6 +12,6 @@ namespace TruequeTools.Services
     {
         public Task CreateOferta(Oferta oferta);
         public Task<List<Oferta>> ReadAllOfertas();
-        public Task<List<Oferta>> ReadAllOfertasCurrentUser(int userId);
+        public Task<List<Oferta>> ReadAllOfertasRealizadasCurrentUser(int userId);
     }
 }

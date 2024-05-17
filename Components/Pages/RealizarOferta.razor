@@ -1,129 +1,130 @@
-﻿@rendermode InteractiveServer
-@page "/realizar-oferta/{PublicacionId:int?}"
+﻿@page "/ofertar/{Id:int}"
 
-@using Microsoft.AspNetCore.Identity
-@using System.ComponentModel.DataAnnotations
-@using System.Text
-@using System.Text.Encodings.Web
-@using Microsoft.AspNetCore.WebUtilities
-@using Microsoft.Extensions.Logging
 @using TruequeTools.Data
 @using TruequeTools.Entities
-@using Microsoft.AspNetCore.Components.Authorization
 
-@inject TruequeToolsDataContext appDbContext
-@inject NavigationManager NavMan
-@inject IServiciosOferta OfertaService
-@inject IServiciosSucursal SucursalService
-@inject IServiciosCategoria CategoriaService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject TruequeToolsDataContext context
 @inject IServiciosPublicacion PublicacionService
-@inject IJSRuntime JS
+
+@rendermode @(new InteractiveServerRenderMode(prerender:false))
 
 @attribute [Authorize(Roles = "Admin,User")]
 
 <PageTitle>Realizar oferta</PageTitle>
 
-<div class="row">
-    <div class="col-lg-4 offset-lg-4 pt-4 pb-4 border">
-        <h1 style="text-align:center">Ofertar</h1>
-        <EditForm Model="@Modelo" OnValidSubmit="CargarOferta" FormName="CargarOfertaForm">
-            <DataAnnotationsValidator />
-            <h2 style="text-align:center">Realizar oferta a la publicacion N°@PublicacionId</h2>
-            <hr />
-            <ValidationSummary class="text-danger" role="alert" />
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="Modelo.ProductoNombre" class="form-control" autocomplete="off" aria-required="true" placeholder="Nombre del producto" maxlength="50" />
-                <label for="nombre">Nombre del producto</label>
-                <ValidationMessage For="() => Modelo.ProductoNombre" class="text-danger" />
-            </div>
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="Modelo.ProductoDescripcion" class="form-control" autocomplete="off" aria-required="true" placeholder="Nombre del producto" maxlength="50" />
-                <label for="nombre">Descripción del producto</label>
-                <ValidationMessage For="() => Modelo.ProductoDescripcion" class="text-danger" />
-            </div>
-            <hr />
-            <h5>Foto (opcional)</h5>
-            <div class="form-floating mb-3">
-                <InputFile @ref="inputFile" OnChange="ShowPreview" />
-            </div>
-            <div class="form-floating mb-3">
-                <img class="img-fluid img-thumbnail rounded mx-auto d-block w-100" @ref="previewImageElem" />
-            </div>
-            <button type="submit" class="w-100 btn btn-lg btn-dark">Realizar Oferta</button>
-        </EditForm> 
-    </div>
-</div>
-
-<script>
-    window.previewImage = (inputElem, imgElem) => {
-        const url = URL.createObjectURL(inputElem.files[0]);
-        imgElem.addEventListener('load', () => URL.revokeObjectURL(url), { once: true });
-        imgElem.src = url;
-    }
-</script>
-
-@code {
-    [SupplyParameterFromForm]
-    private OfertaViewModel Modelo { get; set; } = new();
-    private String? MensajeError;
-    [Parameter] public int? PublicacionId { get; set; }
-    List<Publicacion> publicaciones = new List<Publicacion>();
-
-    // código de la imágen, funciona con javascript
-    private InputFile? inputFile;
-    private IBrowserFile? imagenAGuardar;
-    const int imgMaxsize = 5000 * 1024;
-    private ElementReference previewImageElem;
-
-    private async Task ShowPreview(InputFileChangeEventArgs e)
-    {
-        imagenAGuardar = e.File;
-        await JS.InvokeVoidAsync("previewImage", inputFile!.Element, previewImageElem);
-    }
-    //
-
-
-    protected override void OnParametersSet()
-    {
-        if (PublicacionId == null)
+<div>
+    <ul class="list-group" style="padding-bottom:1.1rem">
+        <li class="list-group-item"><h1>Ofertar a la publicacion N°@Id</h1></li>
+        @if (cargando)
         {
-            NavMan.NavigateTo("/");
+            <li class="list-group-item"><h3>Cargando...</h3></li>
         }
         else
         {
-            if (publicaciones.Where(p => p.Id == PublicacionId).ToList().Count == 0) // el hpta del nacho te devuelve una publicacion nueva incluso si el id no existe
+            if (PublicacionActual.Nombre != null)
             {
-                NavMan.NavigateTo("/");
+                context.Entry(PublicacionActual).Reference(p => p.Sucursal).Load();
+                context.Entry(PublicacionActual).Reference(p => p.Usuario).Load();
+
+                if(PublicacionActual.UsuarioId == UserId)
+                {
+                    <li class="list-group-item"><h3>Error: no puedes ofertar a una publicacion propia</h3></li>
+                }
+                else
+                {
+                    <li class="list-group-item d-flex justify-content-center">
+                        <div class="card col-12 col-md-8 col-lg-3">
+                            @if (@PublicacionActual.FotoUrl == null)
+                            {
+                                <img class="card-img-top" src="resources/blank.svg" alt="Foto del Producto">
+                            }
+                            else
+                            {
+                                <img class="card-img-top" src="images/@PublicacionActual.FotoUrl" alt="Foto del Producto">
+                            }
+                            <div class="card-body">
+                                <h4 style="margin:0">@PublicacionActual.Nombre</h4>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">Sucursal: @PublicacionActual.Sucursal!.Nombre</li>
+                                <li class="list-group-item">Publicado por: @PublicacionActual.Usuario!.Nombre</li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="list-group-item">
+                        @if (MisPublicaciones.Count != 0)
+                        {
+                            <h5>Mis Productos</h5>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto </th>
+                                            <th>Descripcion</th>
+                                            <th style="min-width: 120px;"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var publi in MisPublicaciones) //MUESTRA TODAS LAS PUBLICACIONES CON UN BOTON PARA OFERTAR
+                                        {
+                                            <tr>
+                                                <td>@publi.Nombre</td>
+                                                <td>@publi.Descripcion</td>
+                                                <td style="text-align: right;">
+                                                    <div class="d-flex justify-content-end">
+                                                        <div class="btn-group" style="margin-right: 1rem;">
+                                                            <button class="btn btn-dark rounded" style="margin-right: 0.5rem;">Ofertar</button>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <h5>Parece que no tienes productos publicados actualmente...</h5> //SI EL USUARIO NO TIENE PUBLICACIONES
+                        }
+                    </li>
+                }  
+            }
+            else
+            {
+                <li class="list-group-item"><h3>Error: no se encontró o no existe la publicacion seleccionada</h3></li>
             }
         }
+    </ul>
+</div>
 
-    }
+@code {
+
+    [Parameter]
+    public int Id { get; set; }
+
+    public bool cargando { get; set; }
+    public int UserId;
+
+    public Publicacion PublicacionActual { get; set; } = new();
+    public List<Publicacion> MisPublicaciones { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
-        publicaciones = await PublicacionService.ReadAllPublicaciones();
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        UserId = int.Parse(authState.User!.FindFirst("UsuarioId")!.Value); //TRAIGO EL ID DEL USUARIO QUE OFERTA
     }
 
-    public async Task CargarOferta(EditContext editContext)
+    protected override async Task OnParametersSetAsync()
     {
-        var oferta = new Oferta();
-        //oferta.UsuarioId = int.Parse(@UserService!.Current!.FindFirst("IdUsuario")!.Value);
-        //oferta.ProductoNombre = Modelo.ProductoNombre;
-        //oferta.ProductoDescripcion = Modelo.ProductoDescripcion;
-        //oferta.PublicacionId = (int)PublicacionId!; // esto nunca dará problemas por el OnParametersSet()
-        if (imagenAGuardar != null) // guardo img en disco
-        {
-            var fileStream = imagenAGuardar?.OpenReadStream(imgMaxsize);
-            var fileName = Guid.NewGuid().ToString() + Path.GetExtension(imagenAGuardar?.Name);
-            var filePath = Path.Combine("wwwroot", "images", fileName);
+        cargando = true; 
+        PublicacionActual = await PublicacionService.ReadPublicacionById(Id); //LEE LA PUBLICACION ACTUAL 
+        MisPublicaciones = await PublicacionService.ReadAllPublicacionesCurrentUser(UserId); //TRAE LAS PUBLICACIONES DEL USUARIO QUE OFERTA
+        //FALTA FILTRARLAS POR SUCURSAL ASI SOLO SE PUEDEN OFRECER PUBLICACIONES DE LA MISMA SUCURSAL QUE LA PUBLICACION
 
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await fileStream!.CopyToAsync(stream);
-            }
-            //oferta.ProductoFotoUrl = fileName;
-        }
-        await OfertaService.CreateOferta(oferta);
-        NavMan.NavigateTo("/publicacion/" + PublicacionId);
+        await Task.Delay(1000); //DEJAME EL DELAY DE 1 SEGUNDO POR FAVOR MARTIN :)
+        cargando = false;
     }
+  
 }

@@ -33,10 +33,10 @@ namespace TruequeTools.Services
             return result;
         }
 
-        //DEVUELVE UNA LISTA CON TODAS LAS OFERTAS DEL USUARIO QUE SE PASA COMO PARAMETRO
-        public Task<List<Oferta>> ReadAllOfertasCurrentUser(int userId)
+        public async Task<List<Oferta>> ReadAllOfertasRealizadasCurrentUser(int userId)
         {
-            throw new NotImplementedException();
+            var ofertas = await contexto.Ofertas.Where(p => p.UsuarioId == userId).ToListAsync();
+            return ofertas!; ;
         }
 
     }

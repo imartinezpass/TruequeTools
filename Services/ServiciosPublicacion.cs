@@ -37,9 +37,10 @@ namespace TruequeTools.Services
         //DEVUELVE UNA LISTA CON TODAS LAS PUBLICACIONES DEL USUARIO PASADO COMO PARAMETRO
         public async Task<List<Publicacion>> ReadAllPublicacionesCurrentUser(int userId)
         {
-            var publicaciones = await (from p in contexto.Publicaciones join u in contexto.Usuarios on p.UsuarioId equals userId select p).ToListAsync();
-            return publicaciones;
+            var publicaciones = await contexto.Publicaciones.Where(p => p.UsuarioId == userId).ToListAsync();
+            return publicaciones!;
         }
+
 
         //DEVUELVE LA PUBLICACION CON EL ID PASADO COMO PARAMETRO O UNA PUBLICACION VACIA EN CASO DE NO ENCONTRARLA
         public async Task<Publicacion> ReadPublicacionById(int id)

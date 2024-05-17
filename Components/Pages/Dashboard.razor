@@ -1,98 +1,57 @@
 ﻿@page "/dashboard"
 
-@using Microsoft.AspNetCore.Identity
-@using System.ComponentModel.DataAnnotations
-@using System.Text
-@using System.Text.Encodings.Web
-@using Microsoft.AspNetCore.WebUtilities
-@using Microsoft.Extensions.Logging
 @using TruequeTools.Data
 @using TruequeTools.Entities
-@using Microsoft.AspNetCore.Components.Authorization
 
+@inject TruequeToolsDataContext context
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IServiciosOferta OfertaService
 @inject IServiciosPublicacion PublicacionService
+
 @attribute [Authorize(Roles = "Admin,User")]
 
-<div class="container">
-    <div class="row">
-        <div class="col-sm">
-            <h2>Ofertas pendientes</h2>
-            @if (publicaciones.Count == 0)
-            {
-                <div class="alert alert-primary" role="alert">
-                    <p class="font-weight-bold">
-                        Aún no tienes ofertas porque no tienes ninguna publicación activa.
-                        ¿Por qué no realizas una nueva publicación?
-                    </p>
-                </div>
-            }
-            else if (ofertas.Count == 0)
-            {
-                <div class="alert alert-primary" role="alert">
-                    <p class="font-weight-bold">
-                        Parece que aún no tienes ninguna oferta pendiente.
-                        ¿Por qué no promocionas una de tus publicaciones?
-                    </p>
-                </div>
-            }
-            else
-            {
-                <div class="alert alert-primary row" role="alert">
-                    <h3 class="font-weight-bold">
-                        Tienes un total de <span style="font-weight:900">@ofertas.Count</span> ofertas pendientes.
-                    </h3>
-                    @foreach (KeyValuePair<Publicacion, List<Oferta>> dict in PublicacionYOfertas!)
-                    {
-                        <div class="alert alert-light col" role="alert">
-                            <p>
-                                La publicación: <span style="font-weight:900">@dict.Key.Nombre</span> tiene <span style="font-weight:900">@dict.Value.Count</span> ofertas.
-                            </p>
-                            @foreach (var oferta in dict.Value)
-                            {
-                                <div class="card-body">
-                                    <h4 style="margin:0">"oferta.Nombre"</h4>
-                                </div>
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">Descripción: "oferta.ProductoDescripcion"</li>
-                                    <li class="list-group-item">
-                                        <img style="max-width:200px;max-height:200px" class="card-img-top img-thumbnail rounded mx-0 d-block" src=images/"oferta.ProductoFotoUrl" alt="Foto del producto ofertado" />
-                                    </li>
-                                </ul>
-                            }
-                        </div>
-                    }
-                </div>
-
-            }
-        </div>
-
-    </div>
+<div class="border">
+    <h1>Ofertas Realizadas: @OfertasRealizadas.Count</h1>
+    @foreach(var publi in OfertasRealizadas)
+    {
+        context.Entry(publi).Reference(x => x.PublicacionQueOferto).Load();
+        context.Entry(publi).Reference(x => x.PublicacionQueOfrezco).Load();
+        context.Entry(publi.PublicacionQueOfrezco).Reference(x => x.Usuario).Load();
+        <p>Yo oferto sobre la publicacion de @publi.PublicacionQueOfrezco.Usuario.Nombre @publi.PublicacionQueOferto.Nombre</p>
+    }
+</div>
+<div class="border">
+    <h1>Recibidas: @OfertasRecibidas.Count</h1>
+    @foreach (var publi in OfertasRecibidas)
+    {
+        context.Entry(publi).Reference(p => p.Usuario).Load();
+        context.Entry(publi).Reference(p => p.PublicacionQueOferto).Load();
+        <p>@publi.Usuario.Nombre me ofrece a mi @publi.PublicacionQueOferto.Nombre</p>
+    }
 </div>
 
 @code {
-    List<Oferta> ofertas = new List<Oferta>();
-    List<Publicacion> publicaciones = new List<Publicacion>();
-    Dictionary<Publicacion, List<Oferta>>? PublicacionYOfertas = new Dictionary<Publicacion, List<Oferta>>();
+
+    List<Oferta> OfertasRecibidas { get; set; } = new();
+    List<Oferta> OfertasRealizadas { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
-        //await UserService!.InitializeAsync();
-        //int userId = int.Parse(@UserService!.Current!.FindFirst("IdUsuario")!.Value);
-        //publicaciones = await PublicacionService.ReadAllPublicacionesCurrentUser(userId);
-        if (publicaciones.Count > 0)
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var UserId = int.Parse(authState.User!.FindFirst("UsuarioId")!.Value); //TRAIGO EL ID DEL USUARIO
+
+        List<Publicacion> UserPublicaciones = await PublicacionService.ReadAllPublicacionesCurrentUser(UserId);
+
+        OfertasRealizadas = await OfertaService.ReadAllOfertasRealizadasCurrentUser(UserId);
+
+        foreach (var publi in UserPublicaciones)
         {
-            //ofertas = await OfertaService.ReadAllOfertasCurrentUser(userId);
-            if (ofertas.Count > 0)
+            await context.Entry(publi).Collection(p => p.OfertasRecibidas).LoadAsync();
+            foreach (var oferta in publi.OfertasRecibidas)
             {
-                List<Oferta>? ofertasPublicacionActual;
-                foreach (var p in publicaciones)
-                {
-                    //ofertasPublicacionActual = ofertas.Where(o => o.PublicacionId == p.Id).ToList();
-                    //PublicacionYOfertas?.Add(p, ofertasPublicacionActual);
-                }
+                OfertasRecibidas.Add(oferta);
             }
         }
     }
-
 }
+

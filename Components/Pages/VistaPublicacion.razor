@@ -4,11 +4,11 @@
 @using TruequeTools.Entities
 
 @inject TruequeToolsDataContext context
+@inject NavigationManager NavMan
 @inject IServiciosPublicacion PublicacionService
 @inject IServiciosUsuario UsuarioService
 @inject IServiciosPregunta PreguntaService
 @inject IServiciosSucursal SucursalService
-@inject NavigationManager NavMan
 
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
 
@@ -113,10 +113,10 @@
         await Task.Delay(1000);
         cargando = false;
     }
-  
+
     public void Ofertar()
     {
-        NavMan.NavigateTo("/realizar-oferta/" + PublicacionActual.Id);
+        NavMan.NavigateTo("/ofertar/" + PublicacionActual.Id);       
     }
-
+            
 }
