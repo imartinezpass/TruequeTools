@@ -1,0 +1,11 @@
+@using TruequeTools.Entities
+
+@inject NavigationManager NavMan
+@inject IServiciosSucursal SucursalService
+
+@rendermode @(new InteractiveServerRenderMode(prerender:false))
+
+@attribute [Authorize(Roles = "Admin")]
+
+
+

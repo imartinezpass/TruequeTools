@@ -107,6 +107,9 @@
     public Publicacion PublicacionActual { get; set; } = new();
 
     protected override async Task OnParametersSetAsync()
+
+    preguntas = await Http.GetFromJsonAsync<List<Comentario>>("api/pregunta");6
+
     {
         cargando = true;
         PublicacionActual = await PublicacionService.ReadPublicacionById(Id);
@@ -118,5 +121,11 @@
     {
         NavMan.NavigateTo("/ofertar/" + PublicacionActual.Id);       
     }
+
+    public void Preguntar(){
+        NavMan.NavigateTo("/Preguntar/" + PublicacionActual.Id);  6
+    }
+
+    
             
 }
