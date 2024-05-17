@@ -6,6 +6,8 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject TruequeToolsDataContext context
 @inject IServiciosPublicacion PublicacionService
+@inject IServiciosOferta OfertaService
+@inject NavigationManager NavMan
 
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
 
@@ -15,10 +17,12 @@
 
 <div>
     <ul class="list-group" style="padding-bottom:1.1rem">
-        <li class="list-group-item"><h1>Ofertar a la publicacion N°@Id</h1></li>
         @if (cargando)
         {
-            <li class="list-group-item"><h3>Cargando...</h3></li>
+            <div class="msj-div">
+
+                <h3>Cargando...</h3>
+            </div>
         }
         else
         {
@@ -27,12 +31,15 @@
                 context.Entry(PublicacionActual).Reference(p => p.Sucursal).Load();
                 context.Entry(PublicacionActual).Reference(p => p.Usuario).Load();
 
-                if(PublicacionActual.UsuarioId == UserId)
+                if (PublicacionActual.UsuarioId == UserId)
                 {
-                    <li class="list-group-item"><h3>Error: no puedes ofertar a una publicacion propia</h3></li>
+                    <div class="msj-div">
+                        <h3>Error: no puedes ofertar a una publicacion propia</h3>
+                    </div>
                 }
                 else
                 {
+                    <li class="list-group-item"><h1>Ofertar a la publicacion N°@Id</h1></li>
                     <li class="list-group-item d-flex justify-content-center">
                         <div class="card col-12 col-md-8 col-lg-3">
                             @if (@PublicacionActual.FotoUrl == null)
@@ -52,44 +59,71 @@
                             </ul>
                         </div>
                     </li>
-                    <li class="list-group-item">
-                        @if (MisPublicaciones.Count != 0)
-                        {
+
+                    @if (MisPublicaciones.Count != 0)
+                    {
+                        <div style="margin-block-start:10px" class="table-responsive msj-div">
                             <h5>Mis Productos</h5>
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Producto </th>
+                                        <th>Descripción</th>
+                                        <th style="min-width: 120px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var publi in MisPublicaciones) //MUESTRA TODAS LAS PUBLICACIONES CON UN BOTON PARA OFERTAR
+                                    {
                                         <tr>
-                                            <th>Producto </th>
-                                            <th>Descripcion</th>
-                                            <th style="min-width: 120px;"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var publi in MisPublicaciones) //MUESTRA TODAS LAS PUBLICACIONES CON UN BOTON PARA OFERTAR
-                                        {
-                                            <tr>
-                                                <td>@publi.Nombre</td>
-                                                <td>@publi.Descripcion</td>
-                                                <td style="text-align: right;">
-                                                    <div class="d-flex justify-content-end">
-                                                        <div class="btn-group" style="margin-right: 1rem;">
-                                                            <button class="btn btn-dark rounded" style="margin-right: 0.5rem;">Ofertar</button>
-                                                        </div>
+                                            <td>@publi.Nombre</td>
+                                            <td>@publi.Descripcion</td>
+                                            <td style="text-align: right;">
+                                                <div class="d-flex justify-content-end">
+                                                    <div class="btn-group" style="margin-right: 1rem;">
+                                                        @if (publi.CategoriaId != PublicacionActual.CategoriaId || publi.SucursalId != PublicacionActual.SucursalId)
+                                                        {
+                                                            <i style="margin-block:auto;padding-inline-end: 10%;">Categoria o sucursales diferentes</i>
+                                                            <span class="disabledbutton">
+                                                                <button class="btn btn-dark rounded" disabled style="margin-right: 0.5rem;">Ofertar</button>
+                                                            </span>
+                                                        }
+                                                        else if (OfertasPublicacionActual.Where(o => o.PublicacionQueOfertoId == publi.Id).Count() > 0)
+                                                        {
+                                                            <i style="margin-block:auto;padding-inline-end: 10%;">Actualmente ofertado a esta publicación</i>
+                                                            <span class="disabledbutton">
+                                                                <button class="btn btn-dark rounded" disabled style="margin-right: 0.5rem;">Ofertar</button>
+                                                            </span>
+                                                        }
+                                                        else
+                                                        {
+                                                            <span class="enabledbutton">
+                                                                <button class="btn btn-dark rounded" @onclick="@(() => Ofertar(publi.Id))" style="margin-right: 0.5rem;">Ofertar</button>
+                                                            </span>
+
+                                                        }
                                                     </div>
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        }
-                        else
-                        {
-                            <h5>Parece que no tienes productos publicados actualmente...</h5> //SI EL USUARIO NO TIENE PUBLICACIONES
-                        }
-                    </li>
-                }  
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div style="margin-block-start:10px" class="msj-div">
+
+                            <h3>
+                                No puedes realizar una oferta porque no tienes ningún producto publicado.
+                                ¿Por qué no publicas uno?
+                            </h3>
+                        </div>
+                        //SI EL USUARIO NO TIENE PUBLICACIONES
+                    }
+
+                }
             }
             else
             {
@@ -97,6 +131,10 @@
             }
         }
     </ul>
+</div>
+<div class="msj-div @visibilidad">
+    <h3>Se ha realizado la oferta de manera exitosa.</h3>
+    <button class="btn btn-dark rounded" @onclick=Volver>Volver</button>
 </div>
 
 @code {
@@ -109,22 +147,40 @@
 
     public Publicacion PublicacionActual { get; set; } = new();
     public List<Publicacion> MisPublicaciones { get; set; } = new();
+    public List<Oferta> OfertasPublicacionActual { get; set; } = new();
+    public String visibilidad = "hidden";
+
+    AuthenticationState? authState;
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         UserId = int.Parse(authState.User!.FindFirst("UsuarioId")!.Value); //TRAIGO EL ID DEL USUARIO QUE OFERTA
     }
 
     protected override async Task OnParametersSetAsync()
     {
-        cargando = true; 
-        PublicacionActual = await PublicacionService.ReadPublicacionById(Id); //LEE LA PUBLICACION ACTUAL 
+        cargando = true;
+        PublicacionActual = await PublicacionService.ReadPublicacionById(Id); //LEE LA PUBLICACION ACTUAL
         MisPublicaciones = await PublicacionService.ReadAllPublicacionesCurrentUser(UserId); //TRAE LAS PUBLICACIONES DEL USUARIO QUE OFERTA
-        //FALTA FILTRARLAS POR SUCURSAL ASI SOLO SE PUEDEN OFRECER PUBLICACIONES DE LA MISMA SUCURSAL QUE LA PUBLICACION
-
+        OfertasPublicacionActual = await PublicacionService.ReadAllOfertasOfPublicacion(PublicacionActual.Id);
         await Task.Delay(1000); //DEJAME EL DELAY DE 1 SEGUNDO POR FAVOR MARTIN :)
         cargando = false;
     }
-  
+
+    private async void Ofertar(int publiId)
+    {
+        visibilidad = "";
+        var oferta = new Oferta();
+        oferta.UsuarioId = UserId;
+        oferta.PublicacionQueOfertoId = publiId;
+        oferta.PublicacionQueOfrezcoId = PublicacionActual.Id;
+        oferta.Estado = 0;
+        await OfertaService.CreateOferta(oferta);
+
+    }
+    private void Volver()
+    {
+        NavMan.NavigateTo("/publicacion/" + PublicacionActual.Id);
+    }
 }

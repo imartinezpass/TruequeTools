@@ -24,12 +24,12 @@ namespace TruequeTools.Entities
 
         //METADATA
 
-        [Column("estado")]
+        [Column("estado")] // -1 rechazada, 0 pendiente, 1 aceptada
         public int Estado { get; set; }
 
         //CLAVES EXTERNAS
 
-        [Column("usuarioId")]
+        [Column("usuarioId")] // esto es redundante, lo sacamos con publicacionOfrecidaId usando sql queries
         public int UsuarioId { get; set; }
 
         [Column("publicacionOfertadaId")]

@@ -33,7 +33,7 @@ namespace TruequeTools.Services
             return result;
         }
 
-        public async Task<List<Oferta>> ReadAllOfertasRealizadasCurrentUser(int userId)
+        public async Task<List<Oferta>> ReadAllOfertasRealizadasByUser(int userId)
         {
             var ofertas = await contexto.Ofertas.Where(p => p.UsuarioId == userId).ToListAsync();
             return ofertas!; ;

@@ -1,0 +1,30 @@
+﻿/* Style for the container div */
+.ofertas-div {
+    padding: 20px;
+    background-color: #f2ada7;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-block-end: 15px;
+}
+
+    /* Style for the heading */
+    .ofertas-div h1 {
+        font-weight: bold;
+        color: #f2f0e4;
+        margin-bottom: 10px;
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Style for the paragraphs */
+    .ofertas-div p {
+        color: #bf4c41;
+        margin-bottom: 5px;
+    }
+
+.oferta-cuerpo {
+    background-color: #f2f0e4;
+    padding: 10px;
+    border-radius: 15px;
+    margin-block-end: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}

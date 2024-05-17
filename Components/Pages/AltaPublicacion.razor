@@ -78,7 +78,7 @@
                 <img class="img-fluid img-thumbnail rounded mx-auto d-block w-100" @ref="previewImageElem" />
             </div>
             <button type="submit" class="w-100 btn btn-lg btn-dark">Crear Publicacion</button>
-        </EditForm>  
+        </EditForm>
     </div>
 </div>
 
@@ -134,7 +134,7 @@
         publicacion.CategoriaId = Modelo.CategoriaId;
         publicacion.UsuarioId = int.Parse(user!.FindFirst("UsuarioId")!.Value);
         publicacion.SucursalId = Modelo.SucursalId;
-       
+
         await PublicacionService.CreatePublicacion(publicacion);
 
         NavMan.NavigateTo("/");

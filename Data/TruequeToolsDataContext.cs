@@ -111,7 +111,7 @@ namespace TruequeTools.Data
                .HasOne(x => x.PublicacionQueOferto)
                .WithMany(u => u.OfertasRealizadas)
                .HasForeignKey(x => x.PublicacionQueOfertoId)
-               .OnDelete(DeleteBehavior.Restrict); 
+               .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Oferta>() // Configuración de la relación entre Oferta y Publicacion (hacia publicacion)
                .HasOne(x => x.PublicacionQueOfrezco)

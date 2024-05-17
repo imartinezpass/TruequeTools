@@ -27,6 +27,13 @@ namespace TruequeTools.Services
             return publicacion.Id;
         }
 
+        public async Task<List<Oferta>> ReadAllOfertasOfPublicacion(int publicacionId)
+        {
+            return await contexto.Ofertas
+            .Where(o => o.PublicacionQueOfrezcoId == publicacionId)
+            .ToListAsync();
+        }
+
         //DEVUELVE UNA LISTA CON TODAS LAS PUBLICACIONES
         public async Task<List<Publicacion>> ReadAllPublicaciones()
         {

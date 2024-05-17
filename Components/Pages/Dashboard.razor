@@ -10,23 +10,57 @@
 
 @attribute [Authorize(Roles = "Admin,User")]
 
-<div class="border">
-    <h1>Ofertas Realizadas: @OfertasRealizadas.Count</h1>
-    @foreach(var publi in OfertasRealizadas)
+<div class="ofertas-div">
+    <h1 class="fw-bold">Ofertas Realizadas: @OfertasRealizadas.Count</h1>
+    @foreach (var publi in OfertasRealizadas)
     {
-        context.Entry(publi).Reference(x => x.PublicacionQueOferto).Load();
-        context.Entry(publi).Reference(x => x.PublicacionQueOfrezco).Load();
-        context.Entry(publi.PublicacionQueOfrezco).Reference(x => x.Usuario).Load();
-        <p>Yo oferto sobre la publicacion de @publi.PublicacionQueOfrezco.Usuario.Nombre @publi.PublicacionQueOferto.Nombre</p>
+        var estado = "";
+        @if (publi.Estado == 0)
+        {
+            estado = "Pendiente";
+        }
+        else if (publi.Estado == -1)
+        {
+            estado = "Reachazada";
+        }
+        else
+        {
+            estado = "Aceptada";
+        }
+        context?.Entry(publi).Reference(x => x.PublicacionQueOferto).Load();
+        context?.Entry(publi).Reference(x => x.PublicacionQueOfrezco).Load();
+        context?.Entry(publi.PublicacionQueOfrezco).Reference(x => x.Usuario).Load();
+        <div class="oferta-cuerpo">
+            <p><span class="fw-bold">Usuario: </span>@publi?.PublicacionQueOfrezco?.Usuario?.Nombre</p>
+            <p><span class="fw-bold">Mi oferta: </span>@publi?.PublicacionQueOferto?.Nombre</p>
+            <p><span class="fw-bold">Estado: </span>@estado</p>
+        </div>
     }
 </div>
-<div class="border">
+<div class="ofertas-div">
     <h1>Recibidas: @OfertasRecibidas.Count</h1>
     @foreach (var publi in OfertasRecibidas)
     {
-        context.Entry(publi).Reference(p => p.Usuario).Load();
-        context.Entry(publi).Reference(p => p.PublicacionQueOferto).Load();
-        <p>@publi.Usuario.Nombre me ofrece a mi @publi.PublicacionQueOferto.Nombre</p>
+        var estado = "";
+        @if (publi.Estado == 0)
+        {
+            estado = "Pendiente";
+        }
+        else if (publi.Estado == -1)
+        {
+            estado = "Reachazada";
+        }
+        else
+        {
+            estado = "Aceptada";
+        }
+        context?.Entry(publi).Reference(p => p.Usuario).Load();
+        context?.Entry(publi).Reference(p => p.PublicacionQueOferto).Load();
+        <div class="oferta-cuerpo">
+            <p><span class="fw-bold">Ofertante: @publi?!.Usuario.Nombre</span></p>
+            <p><span class="fw-bold">Oferta: </span>@publi?.PublicacionQueOferto?.Nombre</p>
+            <p><span class="fw-bold">Estado: </span>@estado</p>
+        </div>
     }
 </div>
 
@@ -42,7 +76,7 @@
 
         List<Publicacion> UserPublicaciones = await PublicacionService.ReadAllPublicacionesCurrentUser(UserId);
 
-        OfertasRealizadas = await OfertaService.ReadAllOfertasRealizadasCurrentUser(UserId);
+        OfertasRealizadas = await OfertaService.ReadAllOfertasRealizadasByUser(UserId);
 
         foreach (var publi in UserPublicaciones)
         {

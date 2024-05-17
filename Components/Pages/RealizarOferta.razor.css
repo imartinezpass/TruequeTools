@@ -15,3 +15,60 @@
     min-height: 200px; /* Altura mínima de la imagen */
     min-width: 180px; /* Anchura mínima de la imagen */
 }
+
+.enabledbutton:hover {
+    transition: 0.3s ease;
+    transform: scale(1.1);
+}
+
+
+.disabledbutton:hover {
+    animation: horizontal-shaking 0.3s
+}
+
+.hidden {
+    opacity: 0;
+    transition: ease 0.3s;
+    padding: 0;
+    margin: 0;
+    position: absolute;
+    top: 0;
+}
+
+.msj-div {
+    padding: 20px;
+    background-color: #f2ada7;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-block-end: 15px;
+}
+
+    /* Style for the heading */
+    .msj-div h3, h5, th, td {
+        font-weight: bold;
+        color: #f2f0e4;
+        margin-bottom: 10px;
+        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+@keyframes horizontal-shaking {
+    0% {
+        transform: translateX(0)
+    }
+
+    25% {
+        transform: translateX(5px)
+    }
+
+    50% {
+        transform: translateX(-5px)
+    }
+
+    75% {
+        transform: translateX(5px)
+    }
+
+    100% {
+        transform: translateX(0)
+    }
+}
