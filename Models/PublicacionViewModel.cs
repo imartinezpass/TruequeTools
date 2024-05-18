@@ -24,9 +24,13 @@ namespace TruequeTools.Models
         [Display(Name = "Sucursal")]
         public int SucursalId { get; set; } = 1;
 
+        [Range(1, 3, ErrorMessage = "La categoría debe ser seleccionada.")]
         [Display(Name = "Categoria")]
-        public int CategoriaId { get; set; } = 1;
+        public int CategoriaId { get; set; } = 0;
 
-        public string FotoUrl { get; set; } = "resources/blank.svg";
+        public string? FotoUrl { get; set; }
+
+        [Range(0, 1024*1024*5, ErrorMessage = "Imagen demasiado grande(5MB máximo), seleccione otra si lo desea.")]
+        public long FileSize { get; set; } = 0;
     }
 }
