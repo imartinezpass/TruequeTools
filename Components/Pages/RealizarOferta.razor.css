@@ -16,6 +16,29 @@
     min-width: 180px; /* Anchura mínima de la imagen */
 }
 
+.popup {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.7);
+    transition: opacity 500ms;
+    z-index: 100;
+}
+
+.popupcontenido {
+    margin: 70px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 5px;
+    width: 30%;
+    position: relative;
+    transition: all 5s ease-in-out;
+}
+
+
+
 .enabledbutton:hover {
     transition: 0.3s ease;
     transform: scale(1.1);
@@ -27,12 +50,7 @@
 }
 
 .hidden {
-    opacity: 0;
-    transition: ease 0.3s;
-    padding: 0;
-    margin: 0;
-    position: absolute;
-    top: 0;
+    display: none
 }
 
 .msj-div {

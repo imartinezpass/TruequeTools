@@ -8,6 +8,7 @@
 @inject IServiciosPublicacion PublicacionService
 @inject IServiciosOferta OfertaService
 @inject NavigationManager NavMan
+@inject IJSRuntime JS
 
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
 
@@ -98,7 +99,9 @@
                                                         else
                                                         {
                                                             <span class="enabledbutton">
-                                                                <button class="btn btn-dark rounded" @onclick="@(() => Ofertar(publi.Id))" style="margin-right: 0.5rem;">Ofertar</button>
+                                                                <button class="btn btn-dark rounded" @onclick="@(() =>Ofertar(publi.Id))" style="margin-right: 0.5rem;">
+                                                                    Ofertar
+                                                                </button>
                                                             </span>
 
                                                         }
@@ -132,11 +135,12 @@
         }
     </ul>
 </div>
-<div class="msj-div @visibilidad">
-    <h3>Se ha realizado la oferta de manera exitosa.</h3>
-    <button class="btn btn-dark rounded" @onclick=Volver>Volver</button>
+<div class="@visibilidad popup">
+    <div class="popupcontenido msj-div">
+        <h3>Se ha realizado la oferta de manera exitosa.</h3>
+        <button class="btn btn-dark rounded" @onclick=Volver>Volver</button>
+    </div>
 </div>
-
 @code {
 
     [Parameter]
@@ -149,6 +153,7 @@
     public List<Publicacion> MisPublicaciones { get; set; } = new();
     public List<Oferta> OfertasPublicacionActual { get; set; } = new();
     public String visibilidad = "hidden";
+    public String popup = "";
 
     AuthenticationState? authState;
 
@@ -167,10 +172,10 @@
         await Task.Delay(1000); //DEJAME EL DELAY DE 1 SEGUNDO POR FAVOR MARTIN :)
         cargando = false;
     }
-
     private async void Ofertar(int publiId)
     {
         visibilidad = "";
+        popup = "pop-up";
         var oferta = new Oferta();
         oferta.UsuarioId = UserId;
         oferta.PublicacionQueOfertoId = publiId;
