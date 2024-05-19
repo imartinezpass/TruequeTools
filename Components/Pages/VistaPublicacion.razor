@@ -16,7 +16,6 @@
 
 <div>
     <ul class="list-group" style="padding-bottom:1.1rem">
-        <li class="list-group-item"><h1>Publicacion N°@Id</h1></li>
         @if (cargando)
         {
             <li class="list-group-item"><h3>Cargando...</h3></li>
@@ -25,13 +24,12 @@
         {
             @if (PublicacionActual.Nombre != null)
             {
-
                 context.Entry(PublicacionActual).Reference(p => p.Usuario).Load();
                 context.Entry(PublicacionActual).Collection(p => p.Preguntas!).Load();
                 context.Entry(PublicacionActual).Reference(p => p.Sucursal).Load();
                 context.Entry(PublicacionActual).Reference(p => p.Categoria).Load();
 
-                <li class="list-group-item"><h3>@PublicacionActual.Nombre</h3></li>
+                <li class="list-group-item"><h3>@PublicacionActual.Nombre - #@Id</h3></li>
                 <li class="list-group-item">
                     @if (PublicacionActual.FotoUrl == null)
                     {
@@ -43,9 +41,9 @@
                     }
                 </li>
                 <li class="list-group-item">@PublicacionActual.Descripcion</li>
-                <li class="list-group-item">Publicado el @PublicacionActual.FechaPublicacion por: @PublicacionActual.Usuario!.Email</li>
-                <li class="list-group-item">Sucursal de intercambio: @PublicacionActual.Sucursal!.Nombre</li>
-                <li class="list-group-item">Categoría: @PublicacionActual.Categoria!.Nombre</li>
+                <li class="list-group-item">Publicado el <b>@PublicacionActual.FechaPublicacion</b> por <b>@PublicacionActual.Usuario!.Nombre</b></li>
+                <li class="list-group-item">Sucursal de intercambio <b>@PublicacionActual.Sucursal!.Nombre</b></li>
+                <li class="list-group-item">Categoría <b>@PublicacionActual.Categoria!.Nombre</b></li>
                 <li class="list-group-item">
                     <div>
                         Preguntas
@@ -56,7 +54,7 @@
                                 context.Entry(pregunta).Reference(p => p.Usuario).Load();
                                 <div class="mb-2">
                                     <ul class="list-group">
-                                        <li class="list-group-item">@pregunta.Usuario!.Nombre pregunta: @pregunta.Texto</li>
+                                        <li class="list-group-item"><b>@pregunta.Usuario!.Nombre</b> pregunta: @pregunta.Texto</li>
                                         @if (pregunta.Respuesta == null)
                                         {
                                             <li class="list-group-item">Esperando respuesta...</li>
@@ -73,7 +71,7 @@
                         {
                             <div class="mb-2">
                                 <ul class="list-group">
-                                    <li class="list-group-item">todavia no hay preguntas en la publicacion...</li>
+                                    <li class="list-group-item">Todavía no hay preguntas en la publicacion...</li>
                                 </ul>
                             </div>
 
@@ -98,8 +96,10 @@
                 </li>
             }
             else
-            {
-                <li class="list-group-item"><h3>Error: no se encontró o no existe la publicacion seleccionada</h3></li>
+            {    
+                <div class="alert alert-danger" role="alert">
+                    Error: no se encontró o no existe la publicacion seleccionada
+			    </div>    
             }
         }
     </ul>

@@ -40,7 +40,16 @@
     </div>
 </div>
 
-@if (busquedaRealizada)
+@if (showSpinner)
+{
+    <div class="d-flex justify-content-center" style="margin:1rem">
+        <div class="spinner-border" role="status">
+            <span class="sr-only"></span>
+        </div>
+    </div>
+}
+
+@if (busquedaRealizada && !showSpinner)
 {
     @if (publicaciones != null && publicaciones.Any())
     {
@@ -86,6 +95,7 @@
     string? searchString;
     int selectedFilter;
     bool busquedaRealizada = false;
+    bool showSpinner = false;
     List<Publicacion> publicaciones = new List<Publicacion>();
     List<Categoria> categorias = new List<Categoria>();
 
@@ -101,6 +111,8 @@
 
     protected async Task BuscarPublicaciones()
     {
+        showSpinner = true;
+        await Task.Delay(500);
         if(String.IsNullOrEmpty(searchString)){
             publicaciones = await PublicacionService.ReadAllPublicaciones();
         }
@@ -115,6 +127,7 @@
             .ToList();
         }
         busquedaRealizada = true;
+        showSpinner = false;
         StateHasChanged();
     }
 

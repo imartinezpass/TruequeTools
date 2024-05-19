@@ -38,8 +38,8 @@
                         <h4 style="margin:0">@publi.Nombre</h4>
                     </div>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Sucursal: @publi.Sucursal!.Nombre</li>
-                        <li class="list-group-item">Categoria: @publi.Categoria!.Nombre</li>
+                        <li class="list-group-item">Sucursal: <b>@publi.Sucursal!.Nombre</b></li>
+                        <li class="list-group-item">Categoría: <b>@publi.Categoria!.Nombre</b></li>
                     </ul>
                     <div class="card-body">
                         <a class="btn btn-secondary" @onclick="@(() => VerPublicacion(publi.Id))">Ver Publicacion</a>
