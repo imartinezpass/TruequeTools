@@ -188,13 +188,16 @@
 
     public async Task LimpiarImagen(EditContext editContext)
     {
-        Modelo.FileSize = 0;
-        file = null;
-        if (inputFile != null)
+        if (Modelo.FileSize > 5 * 1024 * 1024)
         {
-            await JS.InvokeVoidAsync("resetInputFile", inputFile.Element); // Limpia el input file usando JavaScript
+            Modelo.FileSize = 0;
+            file = null;
+            if (inputFile != null)
+            {
+                await JS.InvokeVoidAsync("resetInputFile", inputFile.Element); // Limpia el input file usando JavaScript
+            }
+            StateHasChanged();
         }
-        StateHasChanged();
     }
 
 }
