@@ -29,7 +29,7 @@
         }
         context?.Entry(publi).Reference(x => x.PublicacionQueOferto).Load();
         context?.Entry(publi).Reference(x => x.PublicacionQueOfrezco).Load();
-        context?.Entry(publi.PublicacionQueOfrezco).Reference(x => x.Usuario).Load();
+        context?.Entry(publi.PublicacionQueOfrezco!).Reference(x => x.Usuario).Load();
         <div class="oferta-cuerpo">
             <p><span class="fw-bold">Usuario: </span>@publi?.PublicacionQueOfrezco?.Usuario?.Nombre</p>
             <p><span class="fw-bold">Mi oferta: </span>@publi?.PublicacionQueOferto?.Nombre</p>
@@ -57,8 +57,8 @@
         context?.Entry(publi).Reference(p => p.Usuario).Load();
         context?.Entry(publi).Reference(p => p.PublicacionQueOferto).Load();
         <div class="oferta-cuerpo">
-            <p><span class="fw-bold">Ofertante: @publi?!.Usuario.Nombre</span></p>
-            <p><span class="fw-bold">Oferta: </span>@publi?.PublicacionQueOferto?.Nombre</p>
+            <p><span class="fw-bold">Ofertante: </span>@publi.Usuario!.Nombre</p>
+            <p><span class="fw-bold">Oferta: </span>@publi.PublicacionQueOferto!.Nombre</p>
             <p><span class="fw-bold">Estado: </span>@estado</p>
         </div>
     }
@@ -80,8 +80,8 @@
 
         foreach (var publi in UserPublicaciones)
         {
-            await context.Entry(publi).Collection(p => p.OfertasRecibidas).LoadAsync();
-            foreach (var oferta in publi.OfertasRecibidas)
+            await context.Entry(publi).Collection(p => p.OfertasRecibidas!).LoadAsync();
+            foreach (var oferta in publi.OfertasRecibidas!)
             {
                 OfertasRecibidas.Add(oferta);
             }
