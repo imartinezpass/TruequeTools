@@ -18,7 +18,11 @@
     <ul class="list-group" style="padding-bottom:1.1rem">
         @if (cargando)
         {
-            <li class="list-group-item"><h3>Cargando...</h3></li>
+            <ul class="d-flex justify-content-center">
+                <div class="spinner-border" role="status">
+                    <span class="sr-only"></span>
+                </div>
+            </ul>
         }
         else
         {
@@ -45,36 +49,31 @@
                 <li class="list-group-item">Sucursal de intercambio <b>@PublicacionActual.Sucursal!.Nombre</b></li>
                 <li class="list-group-item">Categoría <b>@PublicacionActual.Categoria!.Nombre</b></li>
                 <li class="list-group-item">
+                    Preguntas
                     <div>
-                        Preguntas
                         @if (PublicacionActual.Preguntas!.Count != 0)
                         {
                             @foreach (var pregunta in PublicacionActual.Preguntas)
                             {
                                 context.Entry(pregunta).Reference(p => p.Usuario).Load();
-                                <div class="mb-2">
-                                    <ul class="list-group">
-                                        <li class="list-group-item"><b>@pregunta.Usuario!.Nombre</b> pregunta: @pregunta.Texto</li>
-                                        @if (pregunta.Respuesta == null)
-                                        {
-                                            <li class="list-group-item">Esperando respuesta...</li>
-                                        }
-                                        else
-                                        {
-                                            <li class="list-group-item">@pregunta.Respuesta</li>
-                                        }
-                                    </ul>
+                                <div class="mb-2 oferta-cuerpo">
+                                    <p><b>@pregunta.Usuario!.Nombre</b> pregunta: @pregunta.Texto</p>
+                                    @if (pregunta.Respuesta == null)
+                                    {
+                                        <p>Esperando respuesta...</p>
+                                    }
+                                    else
+                                    {
+                                        <p>@pregunta.Respuesta</p>
+                                    }
                                 </div>
                             }
                         }
                         else
                         {
-                            <div class="mb-2">
-                                <ul class="list-group">
-                                    <li class="list-group-item">Todavía no hay preguntas en la publicacion...</li>
-                                </ul>
+                            <div class="mb-2 oferta-cuerpo">                          
+                                <p>Todavía no hay preguntas en la publicacion...</p>
                             </div>
-
                         }
                     </div>
                 </li>
@@ -96,10 +95,10 @@
                 </li>
             }
             else
-            {    
+            {
                 <div class="alert alert-danger" role="alert">
-                    Error: no se encontró o no existe la publicacion seleccionada
-			    </div>    
+                    <h3>Error: no se encontró o no existe la publicacion seleccionada</h3>
+                </div>
             }
         }
     </ul>
@@ -120,7 +119,7 @@
     {
         cargando = true;
         PublicacionActual = await PublicacionService.ReadPublicacionById(Id);
-        await Task.Delay(1000);
+        await Task.Delay(500);
         cargando = false;
     }
 

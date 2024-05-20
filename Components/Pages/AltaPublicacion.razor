@@ -71,9 +71,11 @@
                 <ValidationMessage For="() => Modelo.CategoriaId" class="text-danger" />
             </div>
             <hr />
-            <h5>Foto (opcional)</h5>
+            <label for="foto">Foto (opcional)</label>
             <div class="form-floating mb-3">
-                <InputFile @ref="inputFile" OnChange="ShowPreview" accept="image/*" class="form-control" />
+                <div>
+                    <InputFile @ref="inputFile" OnChange="ShowPreview" accept="image/*" class="form-control" style="background:#e9ecef" />     
+                </div>
             </div>
             <ValidationMessage For="() => Modelo.FileSize" class="text-danger" />
             <div class="form-floating mb-3">

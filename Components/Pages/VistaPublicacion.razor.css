@@ -14,5 +14,13 @@
     height: 15vw; /* Esto establece la altura como el 20% del ancho de la ventana */
     object-fit: contain; /* Esto asegura que la imagen se ajuste dentro del área de la etiqueta <img> */
     min-height: 200px; /* Altura mínima de la imagen */
-    min-width: 180px; /* Anchura mínima de la imagen *
+    min-width: 180px; /* Anchura mínima de la imagen */
+}
+
+.oferta-cuerpo {
+    background-color: #f2f0e4;
+    padding: 10px;
+    border-radius: 15px;
+    margin-block-end: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }

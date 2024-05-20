@@ -1,49 +1,7 @@
-﻿.card-img-top {
-    width: 100%;
-    height: 20vw; /* Esto establece la altura como el 20% del ancho de la ventana */
-    object-fit: cover; /* Esto asegura que la imagen cubra toda el área de la etiqueta <img> */
-    background-color: #f2f0e4;
-    min-height: 200px; /* Altura mínima de la imagen */
-    min-width: 180px; /* Anchura mínima de la imagen */
-}
-
-.card-img-top-svg {
-    width: 100%;
-    height: 20vw; /* Esto establece la altura como el 20% del ancho de la ventana */
-    object-fit: contain; /* Esto asegura que la imagen se ajuste dentro del área de la etiqueta <img> */
-    background-color: #f2f0e4;
-    min-height: 200px; /* Altura mínima de la imagen */
-    min-width: 180px; /* Anchura mínima de la imagen */
-}
-
-.popup {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(0, 0, 0, 0.7);
-    transition: opacity 500ms;
-    z-index: 100;
-}
-
-.popupcontenido {
-    margin: 70px auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 5px;
-    width: 30%;
-    position: relative;
-    transition: all 5s ease-in-out;
-}
-
-
-
-.enabledbutton:hover {
+﻿.enabledbutton:hover {
     transition: 0.3s ease;
     transform: scale(1.1);
 }
-
 
 .disabledbutton:hover {
     animation: horizontal-shaking 0.3s
@@ -52,22 +10,6 @@
 .hidden {
     display: none
 }
-
-.msj-div {
-    padding: 20px;
-    background-color: #f2ada7;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-block-end: 15px;
-}
-
-    /* Style for the heading */
-    .msj-div h3, h5, th, td {
-        font-weight: bold;
-        color: #f2f0e4;
-        margin-bottom: 10px;
-        text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    }
 
 @keyframes horizontal-shaking {
     0% {
