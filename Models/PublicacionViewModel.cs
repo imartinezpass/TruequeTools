@@ -11,12 +11,12 @@ namespace TruequeTools.Models
 {
     public class PublicacionViewModel()
     {
-        [Required(ErrorMessage = "Debe ingresar el nombre del producto")]
+        [Required(ErrorMessage = "El nombre debe tener al menos 6 caracteres.")]
         [MinLength(6, ErrorMessage = "El nombre debe tener al menos 6 caracteres.")]
         [Display(Name = "Nombre")]
         public string Nombre { get; set; } = "";
 
-        [Required(ErrorMessage = "Debe ingresar una descripción del producto")]
+        [Required(ErrorMessage = "La descripcion debe tener al menos 20 caracteres.")]
         [MinLength(20, ErrorMessage = "La descripcion debe tener al menos 20 caracteres.")]
         [Display(Name = "Descripcion")]
         public string Descripcion { get; set; } = "";
