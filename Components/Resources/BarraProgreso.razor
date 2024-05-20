@@ -1,0 +1,47 @@
+﻿@implements IDisposable
+
+@rendermode InteractiveServer
+
+@*<h3>Progress Bar Example</h3>*@
+
+<div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="@progress" aria-valuemin="0" aria-valuemax="100">
+    <div class="progress-bar bg-success" style="width: @progress%"></div>
+</div>
+
+@*<p>@progress% completed</p>*@
+
+@code {
+
+    private double progress = 0;
+    private Timer? timer;
+
+    protected override void OnInitialized()
+    {
+        StartProgress();
+    }
+
+    private void StartProgress()
+    {
+        timer = new Timer(UpdateProgress!, null, 0, 100); // Actualiza cada 100 ms
+    }
+
+    private void UpdateProgress(object state)
+    {
+        if (progress < 100)
+        {
+            progress += 1; // Incrementa en 1%
+            InvokeAsync(StateHasChanged);
+        }
+        else
+        {
+            timer!.Dispose();
+        }
+    }
+
+    public void Dispose()
+    {
+        timer?.Dispose();
+    }
+
+}
+
