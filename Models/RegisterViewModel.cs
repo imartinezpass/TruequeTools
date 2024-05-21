@@ -33,7 +33,6 @@ namespace TruequeTools.Models
         public string Correo { get; set; } = "";
 
         [Required(ErrorMessage = "La contraseña debe tener al menos un caracter alfanumérico, un número, una mayúscula y un caracter especial con un minimo de 6 caracteres.")]
-        [StringLength(50, ErrorMessage = "La contraseña debe tener al menos un caracter alfanumérico, un número, una mayúscula y un caracter especial con un minimo de 6 caracteres.", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "Contraseña")]
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{6,}$", ErrorMessage = "La contraseña debe tener al menos un caracter alfanumérico, un número, una mayúscula y un caracter especial con un minimo de 6 caracteres.")]
