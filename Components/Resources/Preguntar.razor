@@ -1,6 +1,5 @@
 @using TruequeTools.Entities
 
-@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IServiciosPregunta PreguntaService
 @inject IJSRuntime JS
 
@@ -9,7 +8,7 @@
 @attribute [Authorize(Roles = "Admin,User")]
 
 <!-- Modal -->
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade" id="ModalPreguntar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -17,7 +16,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CerrarModal"></button>
             </div>
             <div class="modal-body">
-				@if (UsuarioId == PublicacionOwnerId)
+				@if (UserRequesterId == PublicacionOwnerId)
 				{
 					<div class="alert alert-danger" role="alert">
 						No puedes preguntar en una publicacion propia !
@@ -64,31 +63,25 @@
 
 @code{
 
+	[Parameter]
+	public int PublicacionId { get; set; }
+	[Parameter]
+	public int PublicacionOwnerId { get; set; }
+	[Parameter]
+	public int UserRequesterId { get; set; }
+
 	[SupplyParameterFromForm]
 	private PreguntaViewModel Modelo { get; set; } = new();
 
-	[Parameter]
-	public int PublicacionId { get; set; }
-
-	[Parameter]
-	public int PublicacionOwnerId { get; set; }
-
 	string? MensajeError;
-	int UsuarioId;
 	bool exito = false;
-
-	protected override async Task OnInitializedAsync()
-	{
-		var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-		UsuarioId = int.Parse(authState.User!.FindFirst("UsuarioId")!.Value);
-	}
 
 	public async Task RealizarPregunta(EditContext editContext)
 	{
 		var pregunta = new Pregunta
 		{
 			Texto = Modelo.Pregunta,
-			UsuarioId = UsuarioId,
+				UsuarioId = UserRequesterId,
 			PublicacionId = PublicacionId
 		};
 

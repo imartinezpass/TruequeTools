@@ -4,6 +4,7 @@
 @using TruequeTools.Components.Resources
 @using TruequeTools.Entities
 
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject TruequeToolsDataContext context
 @inject NavigationManager NavMan
 @inject IServiciosPublicacion PublicacionService
@@ -79,20 +80,20 @@
                     </div>
                 </li>
                 <li class="list-group-item">
-                    <button class="btn btn-dark" @onclick="Ofertar">
+                    <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#ModalOfertar">
                         Ofertar
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-up" viewBox="0 0 16 16">
                             <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5m-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5" />
                         </svg>
                     </button>
-                    <NavLink class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#ModalPreguntar">
                         Preguntar
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-patch-question" viewBox="0 0 16 16">
                             <path d="M8.05 9.6c.336 0 .504-.24.554-.627.04-.534.198-.815.847-1.26.673-.475 1.049-1.09 1.049-1.986 0-1.325-.92-2.227-2.262-2.227-1.02 0-1.792.492-2.1 1.29A1.7 1.7 0 0 0 6 5.48c0 .393.203.64.545.64.272 0 .455-.147.564-.51.158-.592.525-.915 1.074-.915.61 0 1.03.446 1.03 1.084 0 .563-.208.885-.822 1.325-.619.433-.926.914-.926 1.64v.111c0 .428.208.745.585.745" />
                             <path d="m10.273 2.513-.921-.944.715-.698.622.637.89-.011a2.89 2.89 0 0 1 2.924 2.924l-.01.89.636.622a2.89 2.89 0 0 1 0 4.134l-.637.622.011.89a2.89 2.89 0 0 1-2.924 2.924l-.89-.01-.622.636a2.89 2.89 0 0 1-4.134 0l-.622-.637-.89.011a2.89 2.89 0 0 1-2.924-2.924l.01-.89-.636-.622a2.89 2.89 0 0 1 0-4.134l.637-.622-.011-.89a2.89 2.89 0 0 1 2.924-2.924l.89.01.622-.636a2.89 2.89 0 0 1 4.134 0l-.715.698a1.89 1.89 0 0 0-2.704 0l-.92.944-1.32-.016a1.89 1.89 0 0 0-1.911 1.912l.016 1.318-.944.921a1.89 1.89 0 0 0 0 2.704l.944.92-.016 1.32a1.89 1.89 0 0 0 1.912 1.911l1.318-.016.921.944a1.89 1.89 0 0 0 2.704 0l.92-.944 1.32.016a1.89 1.89 0 0 0 1.911-1.912l-.016-1.318.944-.921a1.89 1.89 0 0 0 0-2.704l-.944-.92.016-1.32a1.89 1.89 0 0 0-1.912-1.911z" />
                             <path d="M7.001 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0" />
                         </svg>
-                    </NavLink>
+                    </button>
                 </li>
             }
             else
@@ -105,7 +106,17 @@
     </ul>
 </div>
 
-<Preguntar PublicacionId="PublicacionActual.Id" PublicacionOwnerId="PublicacionActual.UsuarioId"/> @*MODAL CON LA FUNCION PREGUNTAR*@
+<Ofertar 
+    PublicacionId="PublicacionActual.Id"
+    UserRequesterId="UsuarioId"
+    PublicacionActual="PublicacionActual"
+    MisPublicaciones="MisPublicaciones"
+    OfertasPublicacionActual="OfertasPublicacionActual"/> @*MODAL CON LA FUNCION OFERTAR*@
+
+<Preguntar 
+    PublicacionId="PublicacionActual.Id"
+    UserRequesterId="UsuarioId"
+    PublicacionOwnerId="PublicacionActual.UsuarioId"/> @*MODAL CON LA FUNCION PREGUNTAR*@
 
 @code {
 
@@ -115,18 +126,24 @@
     public bool cargando { get; set; }
 
     public Publicacion PublicacionActual { get; set; } = new();
+    public List<Publicacion> MisPublicaciones { get; set; } = new();
+    public List<Oferta> OfertasPublicacionActual { get; set; } = new();
+    public int UsuarioId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        UsuarioId = int.Parse(authState.User!.FindFirst("UsuarioId")!.Value);
+    }
 
     protected override async Task OnParametersSetAsync()
     {
         cargando = true;
-        PublicacionActual = await PublicacionService.ReadPublicacionById(Id);
+        PublicacionActual = await PublicacionService.ReadPublicacionById(Id); //LEE LA PUBLICACION ACTUAL
+        MisPublicaciones = await PublicacionService.ReadAllPublicacionesCurrentUser(UsuarioId); //TRAE LAS PUBLICACIONES DEL USUARIO
+        OfertasPublicacionActual = await PublicacionService.ReadAllOfertasOfPublicacion(PublicacionActual.Id);
         await Task.Delay(500);
         cargando = false;
-    }
-
-    public void Ofertar()
-    {
-        NavMan.NavigateTo("/ofertar/" + PublicacionActual.Id);       
     }
 
 }
