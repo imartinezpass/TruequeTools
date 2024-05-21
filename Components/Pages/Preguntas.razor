@@ -1,0 +1,93 @@
+﻿@page "/preguntas"
+
+@using TruequeTools.Data
+@using TruequeTools.Entities
+
+@inject TruequeToolsDataContext context
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IServiciosPregunta PreguntaService
+@inject IServiciosPublicacion PublicacionService
+
+@attribute [Authorize(Roles = "Admin,User")]
+
+<div>
+    <ul class="list-group" style="padding-bottom:1.1rem">
+        <li class="list-group-item"><h3>Preguntas Realizadas: @PreguntasRealizadas.Count</h3></li>
+        @if (PreguntasRealizadas.Count != 0)
+        {
+            <li class="list-group-item">
+                @foreach (var pregunta in PreguntasRealizadas)
+                {
+                    context?.Entry(pregunta).Reference(x => x.Publicacion).Load();
+                    <div class="oferta-cuerpo">
+                        <p><span class="fw-bold">Publicacion: </span>@pregunta?.Publicacion!.Nombre</p>
+                        <p><span class="fw-bold">Pregunta: </span>@pregunta?.Texto</p>
+                        @if (pregunta!.Respuesta == null)
+                        {
+                            <p>Esperando respuesta...</p>
+                        }
+                        else
+                        {
+                            <p><span class="fw-bold">Respuesta: </span>@pregunta?.Respuesta</p>
+                        }
+                        
+                    </div>
+                }
+            </li>
+        }
+    </ul>
+</div>
+
+<div>
+    <ul class="list-group" style="padding-bottom:1.1rem">
+        <li class="list-group-item"><h3>Preguntas Recibidas: @PreguntasRecibidas.Count</h3></li>
+        @if (PreguntasRecibidas.Count != 0)
+        {
+            <li class="list-group-item">
+                @foreach (var pregunta in PreguntasRecibidas)
+                {
+                    context?.Entry(pregunta).Reference(x => x.Publicacion).Load();
+                    <div class="oferta-cuerpo">
+                        <p><span class="fw-bold">Publicacion: </span>@pregunta?.Publicacion!.Nombre</p>
+                        <p><span class="fw-bold">Pregunta: </span>@pregunta?.Texto</p>
+                        @if (pregunta!.Respuesta == null)
+                        {
+                            <button class="btn btn-dark">Responder</button>
+                        }
+                        else
+                        {
+                            <p><span class="fw-bold">Respuesta: </span>@pregunta?.Respuesta</p>
+                        }
+
+                    </div>
+                }
+            </li>
+        }
+    </ul>
+</div>
+
+@code {
+
+    List<Pregunta> PreguntasRealizadas { get; set; } = new();
+    List<Pregunta> PreguntasRecibidas { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var UserId = int.Parse(authState.User!.FindFirst("UsuarioId")!.Value); //TRAIGO EL ID DEL USUARIO
+
+        List<Publicacion> UserPublicaciones = await PublicacionService.ReadAllPublicacionesCurrentUser(UserId);
+
+        PreguntasRealizadas = await PreguntaService.ReadAllPreguntasRealizadasByUser(UserId);
+
+        foreach (var publi in UserPublicaciones)
+        {
+            await context.Entry(publi).Collection(p => p.Preguntas!).LoadAsync();
+            foreach (var oferta in publi.Preguntas!)
+            {
+                PreguntasRecibidas.Add(oferta);
+            }
+        }
+    }
+
+}

@@ -25,12 +25,18 @@ namespace TruequeTools.Services
 			await contexto.SaveChangesAsync();
 		}
 
-		//DEVUELVE UNA LISTA CON TODAS LAS PREGUNTAS DE LA PUBLICACION QUE SE PASA COMO PARAMETRO
-		public async Task<List<Pregunta>> ReadPreguntasByPublicacionId(int id)
+        //DEVUELVE UNA LISTA CON TODAS LAS PREGUNTAS DE LA PUBLICACION QUE SE PASA COMO PARAMETRO
+        public async Task<List<Pregunta>> ReadPreguntasByPublicacionId(int id)
 		{
 			return await contexto.Preguntas.Where(p => p.PublicacionId == id).ToListAsync();
 		}
 
-	}
+        public async Task<List<Pregunta>> ReadAllPreguntasRealizadasByUser(int userId)
+        {
+            var preguntas = await contexto.Preguntas.Where(p => p.UsuarioId == userId).ToListAsync();
+            return preguntas;
+        }
+
+    }
 
 }

@@ -1,4 +1,4 @@
-﻿@page "/dashboard"
+﻿@page "/ofertas"
 
 @using TruequeTools.Data
 @using TruequeTools.Entities
@@ -80,8 +80,8 @@
 
 @code {
 
-    List<Oferta> OfertasRecibidas { get; set; } = new();
     List<Oferta> OfertasRealizadas { get; set; } = new();
+    List<Oferta> OfertasRecibidas { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {

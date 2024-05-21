@@ -15,7 +15,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         options.Cookie.Name = "truequetools_auth_token";
         options.LoginPath = "/identificarse";
-        options.AccessDeniedPath = "/acceso-denegado";
+        options.AccessDeniedPath = "/denegado";
         options.Cookie.MaxAge = TimeSpan.FromMinutes(15);
     });
 builder.Services.AddAuthorization();
