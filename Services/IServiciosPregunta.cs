@@ -12,6 +12,7 @@ namespace TruequeTools.Services
 	{
 		public Task<List<Pregunta>> ReadPreguntasByPublicacionId(int id);
 		public Task CreatePregunta(Pregunta pregunta);
+		public Task ResponderPregunta(int preguntaId, string respuesta);
         public Task<List<Pregunta>> ReadAllPreguntasRealizadasByUser(int userId);
     }
 }

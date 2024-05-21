@@ -9,6 +9,8 @@
 @inject IServiciosPregunta PreguntaService
 @inject IServiciosPublicacion PublicacionService
 
+@rendermode @(new InteractiveServerRenderMode(prerender:false))
+
 @attribute [Authorize(Roles = "Admin,User")]
 
 <div>
@@ -53,7 +55,7 @@
                         <p><span class="fw-bold">Pregunta: </span>@pregunta?.Texto</p>
                         @if (pregunta!.Respuesta == null)
                         {
-                            <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#ModalResponder">Responder</button>
+                            <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#ModalResponder" @onclick="@(() =>Responder(pregunta.Id, pregunta.PublicacionId, pregunta.Texto!))">Responder</button>
                         }
                         else
                         {
@@ -67,12 +69,19 @@
     </ul>
 </div>
 
-<Responder /> @*MODAL CON LA FUNCION RESPONDER*@
+<Responder 
+    PreguntaId="PreguntaId"
+    PublicacionId="PublicacionId"
+    PreguntaText=@PreguntaText/> @*MODAL CON LA FUNCION RESPONDER*@
 
 @code {
 
     List<Pregunta> PreguntasRealizadas { get; set; } = new();
     List<Pregunta> PreguntasRecibidas { get; set; } = new();
+
+    int PreguntaId { get; set; }
+    int PublicacionId { get; set; }
+    string? PreguntaText { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -91,6 +100,13 @@
                 PreguntasRecibidas.Add(oferta);
             }
         }
+    }
+
+    void Responder(int preguntaId, int publicacionId, string preguntaTexto)
+    {
+        PreguntaId = preguntaId;
+        PublicacionId = publicacionId;
+        PreguntaText = preguntaTexto;
     }
 
 }

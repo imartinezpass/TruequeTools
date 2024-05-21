@@ -37,6 +37,12 @@ namespace TruequeTools.Services
             return preguntas;
         }
 
-    }
+		public async Task ResponderPregunta(int preguntaId, string respuesta)
+		{
+			var pregunta = await contexto.Preguntas.FirstOrDefaultAsync(p => p.Id == preguntaId);
+			pregunta!.Respuesta = respuesta;
+			await contexto.SaveChangesAsync();
+		}
+	}
 
 }

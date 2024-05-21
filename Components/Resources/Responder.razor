@@ -24,6 +24,7 @@
 				}
 				else
 				{
+					<p>Pregunta: @PreguntaText</p>
 					<EditForm Model="@Modelo" OnValidSubmit="ResponderPregunta" FormName="RespuestaForm">
 						<DataAnnotationsValidator />
 						<ValidationSummary class="text-danger" role="alert" />
@@ -58,6 +59,8 @@
 	public int PublicacionId { get; set; }
 	[Parameter]
 	public int PreguntaId { get; set; }
+	[Parameter]
+	public string PreguntaText { get; set; } = "";
 
 	[SupplyParameterFromForm]
 	private RespuestaViewModel Modelo { get; set; } = new();
@@ -68,8 +71,7 @@
 	public async Task ResponderPregunta(EditContext editContext)
 	{
 		exito = true;
-		// PreguntaId.Respuesta = Modelo.Respuesta
-		// await base de datos update
+		await PreguntaService.ResponderPregunta(PreguntaId, Modelo.Respuesta);
 	}
 
 	public async void CerrarModal()
