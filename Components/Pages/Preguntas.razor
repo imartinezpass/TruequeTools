@@ -2,6 +2,7 @@
 
 @using TruequeTools.Data
 @using TruequeTools.Entities
+@using TruequeTools.Components.Resources
 
 @inject TruequeToolsDataContext context
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -52,7 +53,7 @@
                         <p><span class="fw-bold">Pregunta: </span>@pregunta?.Texto</p>
                         @if (pregunta!.Respuesta == null)
                         {
-                            <button class="btn btn-dark">Responder</button>
+                            <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#ModalResponder">Responder</button>
                         }
                         else
                         {
@@ -65,6 +66,8 @@
         }
     </ul>
 </div>
+
+<Responder /> @*MODAL CON LA FUNCION RESPONDER*@
 
 @code {
 

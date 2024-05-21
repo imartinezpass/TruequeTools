@@ -1,0 +1,92 @@
+﻿@using TruequeTools.Entities
+
+@inject IServiciosPregunta PreguntaService
+@inject IJSRuntime JS
+
+@rendermode InteractiveServer
+
+@attribute [Authorize(Roles = "Admin,User")]
+
+<!-- Modal -->
+<div class="modal fade" id="ModalResponder" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="staticBackdropLabel">Responder en la publicacion #@PublicacionId</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CerrarModal"></button>
+			</div>
+			<div class="modal-body">
+				@if (exito)
+				{
+					<div class="alert alert-success" role="alert">
+						Se registró tu respuesta !
+					</div>
+				}
+				else
+				{
+					<EditForm Model="@Modelo" OnValidSubmit="ResponderPregunta" FormName="RespuestaForm">
+						<DataAnnotationsValidator />
+						<ValidationSummary class="text-danger" role="alert" />
+						@if (!string.IsNullOrEmpty(MensajeError))
+						{
+							<div class="alert alert-danger mt-3" role="alert">
+								@MensajeError
+							</div>
+						}
+						<div class="form-floating mb-3">
+							<InputText @bind-Value="Modelo.Respuesta" class="form-control" autocomplete="nombre" aria-required="true" placeholder="" maxlength="100" />
+							<label for="nombre">Texto de la respuesta...</label>
+							<ValidationMessage For="() => Modelo.Respuesta" class="text-danger" />
+						</div>
+						<button type="submit" class="w-100 btn btn-lg btn-dark">Responder</button>
+					</EditForm>
+				}
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	function refreshPage() {
+		location.reload();
+	}
+</script>
+
+@code {
+
+	[Parameter]
+	public int PublicacionId { get; set; }
+	[Parameter]
+	public int PreguntaId { get; set; }
+
+	[SupplyParameterFromForm]
+	private RespuestaViewModel Modelo { get; set; } = new();
+
+	string? MensajeError;
+	bool exito = false;
+
+	public async Task ResponderPregunta(EditContext editContext)
+	{
+		exito = true;
+		// PreguntaId.Respuesta = Modelo.Respuesta
+		// await base de datos update
+	}
+
+	public async void CerrarModal()
+	{
+		if (exito)
+		{
+			await JS.InvokeVoidAsync("refreshPage");
+		}
+		else
+		{
+			Modelo = new RespuestaViewModel();
+			MensajeError = null;
+			exito = false;
+			StateHasChanged();
+		}
+	}
+
+}
+
+
