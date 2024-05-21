@@ -5,7 +5,7 @@
 @inject IServiciosOferta OfertaService
 @inject IJSRuntime JS
 
-@rendermode @(new InteractiveServerRenderMode(prerender:false))
+@rendermode InteractiveServer
 
 @attribute [Authorize(Roles = "Admin,User")]
 
@@ -15,7 +15,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="staticBackdropLabel">Ofertar en la publicacion #@PublicacionId</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CerrarModal"></button>
             </div>
             <div class="modal-body">
                 <ul class="list-group">
@@ -161,6 +161,7 @@
 
     private async void RealizarOferta(int publiId)
     {
+        exito = true;
         var oferta = new Oferta
         {
             UsuarioId = UserRequesterId,
@@ -168,9 +169,15 @@
             PublicacionQueOfrezcoId = PublicacionActual!.Id,
             Estado = 0
         };
-
         await OfertaService.CreateOferta(oferta); 
-        exito = true;
+    }
+
+    public async void CerrarModal()
+    {
+        if (exito)
+        {
+            await JS.InvokeVoidAsync("refreshPage");
+        }
     }
 
 }

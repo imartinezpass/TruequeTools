@@ -78,15 +78,14 @@
 
 	public async Task RealizarPregunta(EditContext editContext)
 	{
+		exito = true;
 		var pregunta = new Pregunta
 		{
 			Texto = Modelo.Pregunta,
 				UsuarioId = UserRequesterId,
 			PublicacionId = PublicacionId
 		};
-
 		await PreguntaService.CreatePregunta(pregunta);
-		exito = true;
 	}
 
 	public async void CerrarModal()
