@@ -30,6 +30,7 @@ builder.Services.AddScoped<IServiciosSucursal, ServiciosSucursal>();
 builder.Services.AddScoped<IServiciosUsuario, ServiciosUsuario>();
 builder.Services.AddScoped<IServiciosPregunta, ServiciosPregunta>();
 builder.Services.AddScoped<IServiciosOferta, ServiciosOferta>();
+builder.Services.AddScoped<IServiciosImagen, ServiciosImagen>();
 //**********NACHEX CODE ENDS********** CRUD - AGREGAR SOLO SERVICIOS
 
 var app = builder.Build();

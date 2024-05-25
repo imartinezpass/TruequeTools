@@ -44,6 +44,10 @@ namespace TruequeTools.Entities
         public Publicacion? PublicacionQueOferto { get; set; }
         public Publicacion? PublicacionQueOfrezco { get; set; }
 
+        //ATRIBUTOS NO SQL - REVERSE RELATIONSHIP FIELDS
+
+        public Trueque? Trueque { get; set; }
+
     }
 
 }

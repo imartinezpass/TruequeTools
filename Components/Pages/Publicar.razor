@@ -17,6 +17,7 @@
 @inject IServiciosSucursal SucursalService
 @inject IServiciosCategoria CategoriaService
 @inject IServiciosPublicacion PublicacionService
+@inject IServiciosImagen ImagenService
 @inject IJSRuntime JS
 
 @rendermode InteractiveServer
@@ -173,17 +174,30 @@
             }
         }
 
-        var publicacion = new Publicacion();
+        var publicacion = new Publicacion
+        {
+            Nombre = Modelo.Nombre,
+            Descripcion = Modelo.Descripcion,
+            CategoriaId = Modelo.CategoriaId,
+            UsuarioId = int.Parse(user!.FindFirst("UsuarioId")!.Value),
+            HasImages = (file != null),
+            SucursalId = Modelo.SucursalId
+        };
 
-        publicacion.Nombre = Modelo.Nombre;
-        publicacion.Descripcion = Modelo.Descripcion;
-        publicacion.CategoriaId = Modelo.CategoriaId;
-        publicacion.UsuarioId = int.Parse(user!.FindFirst("UsuarioId")!.Value);
-        publicacion.SucursalId = Modelo.SucursalId;
-        publicacion.FotoUrl = Modelo.FotoUrl;
+        int publicacionID = await PublicacionService.CreatePublicacion(publicacion);
 
-        await PublicacionService.CreatePublicacion(publicacion);
-
+        if(file != null)
+        {
+            //********************************* PROVISORIAMENTE GUARDO UNA IMAGEN
+            Imagen m = new Imagen();
+            m.FotoUrl = Modelo.FotoUrl; //ASI SE GUARDABA ANTES LA IMAGEN PERO EN PUBLICACION
+            m.PublicacionId = publicacionID;
+            List<Imagen> imagenes = new();
+            imagenes.Add(m);
+            await ImagenService.AltaImagenes(imagenes); //RECIBE UNA LISTA DE IMAGENES Y LAS AGREGA A LA TABLA "IMAGENES"
+            //********************************* VER COMO CAMBIAR EL INPUTFILE A MULTIPLES
+        }
+        
         NavMan.NavigateTo("/");
 
     }

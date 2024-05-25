@@ -37,13 +37,15 @@
 
                 <li class="list-group-item"><h3>@PublicacionActual.Nombre - #@Id</h3></li>
                 <li class="list-group-item">
-                    @if (PublicacionActual.FotoUrl == null)
+                    @if (PublicacionActual.HasImages)
                     {
-                        <img class="card-img-top-svg" src=resources/blank.svg alt="Foto del Producto">
+                        context.Entry(PublicacionActual).Collection(p => p.Imagenes!).Load(); @*Traigo las Imagenes de la Publicacion*@
+                        var primeraImagen = PublicacionActual.Imagenes!.FirstOrDefault();
+                        <img class="card-img-top" src="images/@primeraImagen!.FotoUrl" alt="Foto del Producto">
                     }
                     else
                     {
-                        <img class="card-img-top" src=images/@PublicacionActual.FotoUrl alt="Foto del Producto">
+                        <img class="card-img-top-svg" src=resources/blank.svg alt="Foto del Producto">    
                     }
                 </li>
                 <li class="list-group-item">@PublicacionActual.Descripcion</li>

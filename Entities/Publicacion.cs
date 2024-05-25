@@ -33,10 +33,6 @@ namespace TruequeTools.Entities
         [MinLength(20)]
         public string? Descripcion { get; set; }
 
-        [Column("fotoUrl")]
-        [MaxLength(255)]
-        public string? FotoUrl { get; set; }
-
         //METADATA
 
         [Column("fechaPublicacion")]
@@ -47,6 +43,9 @@ namespace TruequeTools.Entities
 
         [Column("isOculta")]
         public bool IsOculta { get; set; } = false;
+
+        [Column("hasImages")]
+        public bool HasImages { get; set; } = false;
 
         //CLAVES EXTERNAS
 
@@ -68,7 +67,8 @@ namespace TruequeTools.Entities
         //ATRIBUTOS NO SQL - REVERSE RELATIONSHIP FIELDS
 
         public List<Pregunta>? Preguntas { get; set; }
-		public List<Oferta>? OfertasRealizadas { get; set; }
+        public List<Imagen>? Imagenes { get; set; }
+        public List<Oferta>? OfertasRealizadas { get; set; }
         public List<Oferta>? OfertasRecibidas { get; set; }
 
     }

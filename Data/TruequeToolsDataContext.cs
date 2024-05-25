@@ -18,16 +18,25 @@ namespace TruequeTools.Data
 
         //VINCULO ENTRE LA BASE DE DATOS Y LAS ENTIDADES
         public DbSet<Categoria> Categorias { get; set; }
+        public DbSet<Imagen> Imagenes { get; set; }
         public DbSet<Pregunta> Preguntas { get; set; }
         public DbSet<Publicacion> Publicaciones { get; set; }
         public DbSet<Sucursal> Sucursales { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }
+        public DbSet<Trueque> Trueques { get; set; }
         public DbSet<Oferta> Ofertas { get; set; }
         //VINCULO ENTRE LA BASE DE DATOS Y LAS ENTIDADES
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            //ENTIDAD TRUEQUE
+
+            modelBuilder.Entity<Trueque>() // Configuración de la relación entre Trueque y Oferta
+               .HasOne(x => x.Oferta)
+               .WithOne(x => x.Trueque)
+               .HasForeignKey<Trueque>(x => x.OfertaId);
 
             //ENTIDAD USUARIO
 
@@ -89,6 +98,11 @@ namespace TruequeTools.Data
                 .WithOne(x => x.Publicacion)
                 .HasForeignKey(p => p.PublicacionId);
 
+            modelBuilder.Entity<Publicacion>() // Configuración de la relación entre Publicacion e Imagen
+                .HasMany(x => x.Imagenes)
+                .WithOne()
+                .HasForeignKey(p => p.PublicacionId);
+
             modelBuilder.Entity<Publicacion>() // Configuración de la relación entre Publicacion y Oferta (sobre publicacion)
                 .HasMany(x => x.OfertasRealizadas)
                 .WithOne(x => x.PublicacionQueOferto)
@@ -117,7 +131,6 @@ namespace TruequeTools.Data
                .HasOne(x => x.PublicacionQueOfrezco)
                .WithMany(u => u.OfertasRecibidas)
                .HasForeignKey(x => x.PublicacionQueOfrezcoId);
-
 
             // Genera la base de datos con categorías predefinidas
             modelBuilder.Entity<Categoria>().HasData(
