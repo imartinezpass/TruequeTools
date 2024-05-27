@@ -30,7 +30,7 @@ namespace TruequeTools.Models
 
         public string? FotoUrl { get; set; }
 
-        [Range(0, 1024*1024*5, ErrorMessage = "Imagen demasiado grande(5MB máximo), seleccione otra si lo desea.")]
+        [Range(0, 1024*1024*5, ErrorMessage = "Imagen demasiado grande(5MB máximo), seleccione otra si lo desea." )]
         public long FileSize { get; set; } = 0;
     }
 }

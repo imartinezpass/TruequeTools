@@ -29,7 +29,7 @@
 <div class="row">
     <div class="col-lg-4 offset-lg-4 pt-4 pb-4 border" style="margin-bottom:1.1rem">
         <h1 style="text-align:center">Publicar</h1>
-        <EditForm Model="@Modelo" enctype="multipart/form-data" OnValidSubmit ="CargarPublicacion" OnInvalidSubmit="LimpiarImagen" FormName="CargarPublicacionForm">
+        <EditForm Model="@Modelo" enctype="multipart/form-data" OnValidSubmit ="CargarPublicacion" FormName="CargarPublicacionForm">
             <DataAnnotationsValidator />
             <h2 style="text-align:center">Dar a conocer tu producto</h2>
             <hr />
@@ -75,8 +75,34 @@
             <label for="foto">Foto (opcional)</label>
             <div class="form-floating mb-3">
                 <div>
-                    <InputFile @ref="inputFile" OnChange="ShowPreview" accept="image/*" class="form-control" style="background:#e9ecef" />     
+                    <div>
+                        <InputFile @ref="inputFile1" OnChange="e => ShowPreview(e, inputFile1,0)" accept="image/*" class="form-control" style="background:#e9ecef" />
+                    </div>
                 </div>
+                @if (mostrarInputs[0])
+                {
+                    <div>
+                        <InputFile @ref="inputFile2" OnChange="e => ShowPreview(e, inputFile2,1)" accept="image/*" class="form-control" style="background:#e9ecef" />
+                    </div>
+                    if (mostrarInputs[1])
+                    {
+                        <div>
+                            <InputFile @ref="inputFile3" OnChange="e => ShowPreview(e, inputFile3,2)" accept="image/*" class="form-control" style="background:#e9ecef" />
+                        </div>
+                        if (mostrarInputs[2])
+                        {
+                            <div>
+                                <InputFile @ref="inputFile4" OnChange="e => ShowPreview(e, inputFile4,3)" accept="image/*" class="form-control" style="background:#e9ecef" />
+                            </div>
+                            if (mostrarInputs[3])
+                            {
+                                <div>
+                                    <InputFile @ref="inputFile5" OnChange="e => ShowPreview(e, inputFile5,3)" accept="image/*" class="form-control" style="background:#e9ecef" />
+                                </div>
+                            }
+                        }
+                    }
+                }
             </div>
             <ValidationMessage For="() => Modelo.FileSize" class="text-danger" />
             <div class="form-floating mb-3">
@@ -109,18 +135,20 @@
     List<Categoria> categorias = new List<Categoria>();
     int sucursalPreferidaId;
 
-    private IBrowserFile? file;
-    private InputFile? inputFile;
+    private List<IBrowserFile?> files = new List<IBrowserFile?>();
+    private InputFile? inputFile1,inputFile2,inputFile3,inputFile4,inputFile5;
     private ElementReference previewImageElem;
+    List<Boolean> mostrarInputs = [false,false,false,false];
 
-    private async Task ShowPreview(InputFileChangeEventArgs e)
+    private async Task ShowPreview(InputFileChangeEventArgs e, InputFile? inputFile, int num)
     {
-        file = e.File;
-        Modelo.FileSize = file.Size;
+        files.Add(e.File);
+        Modelo.FileSize = files[num].Size;
         StateHasChanged();
-        if (file != null && Modelo.FileSize <= 5 * 1024 * 1024)
+        if (files[num] != null && Modelo.FileSize <= 5 * 1024 * 1024)
         {
             await JS.InvokeVoidAsync("previewImage", inputFile!.Element, previewImageElem); //código para hacer la preview de la imágen, funciona con javascript
+            mostrarInputs[num] = true;
 
         }
         //código para hacer la preview de la imágen, funciona con javascript
@@ -146,33 +174,41 @@
     }
 
     public async Task CargarPublicacion(EditContext editContext)
-    {
-        if (file != null)
+    {   
+        List<Imagen> imagenes = new();
+        foreach (var file in files)
         {
-            var uniqueFileName = $"{DateTime.Now:yyyyMMddHHmmssfff}{Path.GetExtension(file.Name)}";
-            var filePath = Path.Combine(WebHostEnv.WebRootPath, "images", uniqueFileName);
-
-            try
+            if (file != null)
             {
-                using (var fileStream = new FileStream(filePath, FileMode.Create))
-                {
-                    // Leer el contenido del archivo cargado en un búfer de memoria
-                    await using (var memoryStream = new MemoryStream())
-                    {
-                        await file.OpenReadStream(5000 * 1024).CopyToAsync(memoryStream);
+                var uniqueFileName = $"{DateTime.Now:yyyyMMddHHmmssfff}{Path.GetExtension(file.Name)}";
+                var filePath = Path.Combine(WebHostEnv.WebRootPath, "images", uniqueFileName);
 
-                        // Copiar el contenido del búfer de memoria al archivo de destino
-                        memoryStream.Seek(0, SeekOrigin.Begin); // Asegurar que el puntero esté al principio del búfer
-                        await memoryStream.CopyToAsync(fileStream);
+                try
+                {
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        // Leer el contenido del archivo cargado en un búfer de memoria
+                        await using (var memoryStream = new MemoryStream())
+                        {
+                            await file.OpenReadStream(5000 * 1024).CopyToAsync(memoryStream);
+
+                            // Copiar el contenido del búfer de memoria al archivo de destino
+                            memoryStream.Seek(0, SeekOrigin.Begin); // Asegurar que el puntero esté al principio del búfer
+                            await memoryStream.CopyToAsync(fileStream);
+                        }
+                        Modelo.FotoUrl = $"{uniqueFileName}";
+                        Imagen m = new Imagen();
+                        m.FotoUrl = Modelo.FotoUrl;
+                        imagenes.Add(m);
                     }
-                    Modelo.FotoUrl = $"{uniqueFileName}";
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message); // Manejar cualquier excepción ocurrida durante la operación de escritura
                 }
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message); // Manejar cualquier excepción ocurrida durante la operación de escritura
-            }
         }
+        
 
         var publicacion = new Publicacion
         {
@@ -180,20 +216,20 @@
             Descripcion = Modelo.Descripcion,
             CategoriaId = Modelo.CategoriaId,
             UsuarioId = int.Parse(user!.FindFirst("UsuarioId")!.Value),
-            HasImages = (file != null),
+            HasImages = (files != null),
             SucursalId = Modelo.SucursalId
         };
 
         int publicacionID = await PublicacionService.CreatePublicacion(publicacion);
 
-        if(file != null)
+        if(files != null)
         {
             //********************************* PROVISORIAMENTE GUARDO UNA IMAGEN
-            Imagen m = new Imagen();
-            m.FotoUrl = Modelo.FotoUrl; //ASI SE GUARDABA ANTES LA IMAGEN PERO EN PUBLICACION
-            m.PublicacionId = publicacionID;
-            List<Imagen> imagenes = new();
-            imagenes.Add(m);
+            
+            foreach (var m in imagenes) //ASI SE GUARDABA ANTES LA IMAGEN PERO EN PUBLICACION
+                m.PublicacionId = publicacionID;
+            
+            
             await ImagenService.AltaImagenes(imagenes); //RECIBE UNA LISTA DE IMAGENES Y LAS AGREGA A LA TABLA "IMAGENES"
             //********************************* VER COMO CAMBIAR EL INPUTFILE A MULTIPLES
         }
@@ -202,18 +238,18 @@
 
     }
 
-    public async Task LimpiarImagen(EditContext editContext)
-    {
-        if (Modelo.FileSize > 5 * 1024 * 1024)
-        {
-            Modelo.FileSize = 0;
-            file = null;
-            if (inputFile != null)
-            {
-                await JS.InvokeVoidAsync("resetInputFile", inputFile.Element); // Limpia el input file usando JavaScript
-            }
-            StateHasChanged();
-        }
-    }
+    //public async Task LimpiarImagen(EditContext editContext)
+    //{
+    //    if (Modelo.FileSize > 5 * 1024 * 1024)
+    //    {
+    //        Modelo.FileSize = 0;
+    //        file = null;
+    //        if (inputFile != null)
+    //        {
+    //            await JS.InvokeVoidAsync("resetInputFile", inputFile.Element); // Limpia el input file usando JavaScript
+    //        }
+    //        StateHasChanged();
+    //    }
+    //}
 
 }
