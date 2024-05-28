@@ -58,9 +58,14 @@ namespace TruequeTools.Entities
         [Column("sucursalId")]
         public int SucursalId { get; set; }
 
-        //ATRIBUTOS NO SQL - FOREGIN KEY FIELDS
+		//MARCA DE BORRADO LOGICO
 
-        public Categoria? Categoria { get; set; }
+		[Column("deleted")]
+		public bool Deleted { get; set; } = false;
+
+		//ATRIBUTOS NO SQL - FOREGIN KEY FIELDS
+
+		public Categoria? Categoria { get; set; }
         public Usuario? Usuario { get; set; }
         public Sucursal? Sucursal { get; set; }
 

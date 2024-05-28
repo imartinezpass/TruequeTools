@@ -52,7 +52,7 @@
 	private async Task AutenticarUsuario()
 	{
 
-		var cuenta = appDbContext.Usuarios.Where(x => x.Email == Modelo.Correo).FirstOrDefault();
+		var cuenta = appDbContext.Usuarios.Where(x => x.Email == Modelo.Correo && x.Deleted == false).FirstOrDefault();
 		if(cuenta is null || cuenta.Contraseña != Modelo.Contraseña)
 		{
 			MensajeError = "Error: El correo o la contraseña no son correctos";
