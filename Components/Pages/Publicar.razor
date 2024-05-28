@@ -107,6 +107,31 @@
 
 @code {
 
+    [SupplyParameterFromForm]
+    private PublicacionViewModel Modelo { get; set; } = new();
+
+    List<Sucursal> sucursales = new List<Sucursal>();
+    List<Categoria> categorias = new List<Categoria>();
+
+    private String? MensajeError;
+    private ClaimsPrincipal? user;
+    int sucursalPreferidaId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        user = authState.User;
+        sucursales = await SucursalService.ReadAllSucursales(); //LECTURA DE TODAS LAS SUCURSALES
+        categorias = await CategoriaService.ReadAllCategorias(); //LECTURA DE TODAS LAS CATEGORIAS
+        sucursalPreferidaId = int.Parse(user!.FindFirst("SucursalId")!.Value);
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        Modelo.SucursalId = sucursalPreferidaId; // Configurar el modelo de vista con la sucursal preferida del usuario
+    }
+
     @***********NACHO - MANEJO DE IMAGENES***********@
     IList<string> imageDataUrls = new List<string>();
     IReadOnlyList<IBrowserFile>? selectedImages;
@@ -137,14 +162,11 @@
 
     void RemoveImage(string imageDataUrl)
     {
-        // Encuentra el índice de la imagen en la lista de URL de imágenes
         var index = imageDataUrls.IndexOf(imageDataUrl);
         if (index != -1)
         {
-            // Elimina la imagen de la lista de URL de imágenes
             imageDataUrls.RemoveAt(index);
 
-            // Si también hay una imagen seleccionada correspondiente, elimínala también
             if (selectedImages != null && selectedImages.Count > index)
             {
                 selectedImages = selectedImages.Where((_, i) => i != index).ToList();
@@ -153,33 +175,43 @@
     }
     @***********NACHO - MANEJO DE IMAGENES***********@
 
-    [SupplyParameterFromForm]
-    private PublicacionViewModel Modelo { get; set; } = new();
-
-    List<Sucursal> sucursales = new List<Sucursal>();
-    List<Categoria> categorias = new List<Categoria>();
-
-    private String? MensajeError;
-    private ClaimsPrincipal? user;
-    int sucursalPreferidaId;
-
-    protected override async Task OnInitializedAsync()
-    {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        user = authState.User;
-        sucursales = await SucursalService.ReadAllSucursales(); //LECTURA DE TODAS LAS SUCURSALES
-        categorias = await CategoriaService.ReadAllCategorias(); //LECTURA DE TODAS LAS CATEGORIAS
-        sucursalPreferidaId = int.Parse(user!.FindFirst("SucursalId")!.Value);
-    }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        await base.OnParametersSetAsync();
-        Modelo.SucursalId = sucursalPreferidaId; // Configurar el modelo de vista con la sucursal preferida del usuario
-    }
-
     public async Task CargarPublicacion(EditContext editContext)
-    {   
+    {
+        //**********NACHO - MANEJO DE IMAGENES***********
+        List<Imagen> imagenes = new();
+        bool result;
+
+        if (selectedImages != null)
+        {
+            try
+            {
+                foreach (var file in selectedImages!)
+                {
+                    var timestamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+                    var fileExtension = Path.GetExtension(file.Name);
+                    var fileName = $"{timestamp}{fileExtension}";
+
+                    Stream stream = file.OpenReadStream();
+                    var path = Path.Combine(Environment.WebRootPath, "images", fileName);
+                    await using var fs = new FileStream(path, FileMode.Create);
+                    await stream.CopyToAsync(fs);
+
+                    var imagen = new Imagen {FotoUrl = fileName};
+                    imagenes.Add(imagen);
+                }
+                result = true;
+            }
+            catch (Exception ex)
+            {
+                await JS.InvokeVoidAsync("alert", ex.ToString());
+                result = false;
+            }
+        }
+        else
+        {
+            result = false;
+        }
+        //**********NACHO - MANEJO DE IMAGENES***********
 
         var publicacion = new Publicacion
         {
@@ -187,38 +219,19 @@
             Descripcion = Modelo.Descripcion,
             CategoriaId = Modelo.CategoriaId,
             UsuarioId = int.Parse(user!.FindFirst("UsuarioId")!.Value),
-            HasImages = (selectedImages != null), //**********NACHO - MANEJO DE IMAGENES***********
+            HasImages = result,
             SucursalId = Modelo.SucursalId
         };
 
         int publicacionID = await PublicacionService.CreatePublicacion(publicacion);
 
         //**********NACHO - MANEJO DE IMAGENES***********
-        if (publicacion.HasImages)
+        if (result)
         {
-            List<Imagen> imagenes = new();
-
-            foreach (var file in selectedImages!)
+            foreach (var img in imagenes)
             {
-                var timestamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
-                var fileExtension = Path.GetExtension(file.Name);
-                var fileName = $"{timestamp}{fileExtension}";
-
-                Stream stream = file.OpenReadStream();
-                var path = Path.Combine(Environment.WebRootPath, "images", fileName);
-                await using var fs = new FileStream(path, FileMode.Create);
-                await stream.CopyToAsync(fs);
-
-                var imagen = new Imagen
-                {
-                    PublicacionId = publicacionID,
-                    FotoUrl = fileName,
-                };
-
-                imagenes.Add(imagen);
-
+                img.PublicacionId = publicacionID;
             }
-           
             await ImagenService.AltaImagenes(imagenes);
         }
         //**********NACHO - MANEJO DE IMAGENES***********
