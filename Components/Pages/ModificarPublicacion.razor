@@ -1,17 +1,27 @@
-﻿@using TruequeTools.Data
+﻿@page "/modificarPublicacion/{Id:int}"
+
+@using TruequeTools.Data
+@using TruequeTools.Components.Resources
 @using TruequeTools.Entities
 
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject TruequeToolsDataContext context
 @inject NavigationManager NavMan
 @inject IServiciosSucursal SucursalService
 @inject IServiciosCategoria CategoriaService
 @inject IServiciosPublicacion PublicacionService
 @inject IServiciosImagen ImagenService
 
+@rendermode @(new InteractiveServerRenderMode(prerender:false))
 
+@attribute [Authorize(Roles = "Admin,User")]
 
-<h3>ModificarPublicacion</h3>
+<h3>Modificar Publicacion</h3>
 
 @code {
+    [Parameter]
+    public int Id { get; set; }
+
     List<Sucursal> sucursales = new List<Sucursal>();
     List<Categoria> categorias = new List<Categoria>();
 }

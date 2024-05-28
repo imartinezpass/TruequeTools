@@ -111,7 +111,7 @@
                     </button>
                     @if (PublicacionActual.Usuario!.Id == UsuarioId)
                     {
-                        <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#ModalModificar">
+                        <button class="btn btn-secondary" @onclick="@(() => ModificarPublicacion(Id))">
                             Modificar
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
                                 <path d="M12.146.854a.5.5 0 0 1 .708 0l1.292 1.292a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2H12.5a.5.5 0 0 1 .5.5v1.293l-1.5-1.5V2zm-1-.5v1.293L3.207 10.793 2 12l1.207-1.207L10.5 2.293V1h-.293L11.207 1.5zM1 13.5v2h2a.5.5 0 0 1-.5-.5v-1h-1a.5.5 0 0 1-.5-.5z" />
@@ -174,6 +174,11 @@
         OfertasPublicacionActual = await PublicacionService.ReadAllOfertasOfPublicacion(PublicacionActual.Id);
         await Task.Delay(500);
         cargando = false;
+    }
+
+    void ModificarPublicacion(int id)
+    {
+        NavMan.NavigateTo($"/modificarPublicacion/{id}");
     }
 
 }

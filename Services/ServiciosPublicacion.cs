@@ -48,6 +48,12 @@ namespace TruequeTools.Services
             return publicaciones!;
         }
 
+        //DEVUELVE UNA LISTA CON TODAS LAS PUBLICACIONES ACTIVAS DEL USUARIO PASADO COMO PARAMETRO
+        public async Task<List<Publicacion>> ReadAllPublicacionesActivasCurrentUser(int userId)
+        {
+            var publicaciones = await contexto.Publicaciones.Where(p => p.UsuarioId == userId & p.Deleted==false & p.IsOculta==false).ToListAsync();
+            return publicaciones!;
+        }
 
         //DEVUELVE LA PUBLICACION CON EL ID PASADO COMO PARAMETRO O UNA PUBLICACION VACIA EN CASO DE NO ENCONTRARLA
         public async Task<Publicacion> ReadPublicacionById(int id)

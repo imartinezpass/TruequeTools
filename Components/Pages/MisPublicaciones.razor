@@ -73,7 +73,7 @@ else
         if (user.Identity?.IsAuthenticated ?? false)
         {
             var usuario = int.Parse(user.FindFirst("UsuarioId")!.Value);
-            publicaciones = await PublicacionService.ReadAllPublicacionesCurrentUser(usuario);
+            publicaciones = await PublicacionService.ReadAllPublicacionesActivasCurrentUser(usuario);
         }
         await Task.Delay(500); // Espera 0.5 segundos y muestra el spinner durante ese tiempo
         showSpinner = false; // Desactiva el spinner
