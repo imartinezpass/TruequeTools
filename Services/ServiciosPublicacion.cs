@@ -41,6 +41,13 @@ namespace TruequeTools.Services
             return result;
         }
 
+        //DEVUELVE UNA LISTA CON LAS PRIMERAS 12 PUBLICACIONES ACTIVAS
+        public async Task<List<Publicacion>> ReadAllPublicacionesActivas()
+        {
+            var result = await contexto.Publicaciones.Where(p => p.Deleted == false & p.IsOculta == false).Take(12).ToListAsync();
+            return result;
+        }
+
         //DEVUELVE UNA LISTA CON TODAS LAS PUBLICACIONES DEL USUARIO PASADO COMO PARAMETRO
         public async Task<List<Publicacion>> ReadAllPublicacionesCurrentUser(int userId)
         {
@@ -68,6 +75,24 @@ namespace TruequeTools.Services
             else
             {
                 return new Publicacion();
+            }
+        }
+
+        //SOBREESCRIBE UNA PUBLICACION BUSCANDOLA POR EL ID
+        public async Task<Publicacion> OverwritePublicacionById(Publicacion publicacion)
+        {
+            var publicacionExistente = await contexto.Publicaciones.FindAsync(publicacion.Id);  // Buscar la publicación existente por su ID
+
+            if (publicacionExistente != null)
+            {
+                publicacionExistente = publicacion;
+                await contexto.SaveChangesAsync();
+
+                return publicacionExistente;
+            }
+            else
+            {
+                throw new Exception("La publicación no existe.");
             }
         }
 

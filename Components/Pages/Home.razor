@@ -6,6 +6,7 @@
 
 @inject TruequeToolsDataContext context
 @inject NavigationManager NavMan
+@inject IServiciosPublicacion PublicacionService
 
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
 
@@ -80,8 +81,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        publicaciones = await context.Publicaciones.Take(12).ToListAsync(); //Traigo las primeras 12 publicaciones
-        
+        publicaciones = await PublicacionService.ReadAllPublicacionesActivas(); //Traigo las primeras 12 publicaciones
+
         await Task.Delay(500); // Espera 0.5 segundos y muestra el spinner durante ese tiempo
         showSpinner = false; // Desactiva el spinner
         StateHasChanged(); // Notifica a Blazor que debe actualizar la interfaz de usuario

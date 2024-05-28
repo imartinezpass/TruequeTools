@@ -14,8 +14,10 @@ namespace TruequeTools.Services
         public Task<Publicacion> ReadPublicacionById(int id);
         public Task<List<Publicacion>> ReadPublicacionesByNombre(string titulo);
         public Task<List<Publicacion>> ReadAllPublicaciones();
+        public Task<List<Publicacion>> ReadAllPublicacionesActivas();
         public Task<List<Publicacion>> ReadAllPublicacionesActivasCurrentUser(int userId);
         public Task<List<Publicacion>> ReadAllPublicacionesCurrentUser(int userId);
+        public Task<Publicacion> OverwritePublicacionById(Publicacion publicacion);
         public Task<List<Oferta>> ReadAllOfertasOfPublicacion(int publicacionId);
 
     }
