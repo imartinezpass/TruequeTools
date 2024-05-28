@@ -52,8 +52,8 @@
 									<td style="text-align: right;">
 										<div class="d-flex justify-content-end">
 											<div class="btn-group" style="margin-right: 1rem;">
-												<button class="btn btn-secondary rounded" style="margin-right: 0.5rem;" @onclick="@(() => EditarSucursal(suc.Id))" data-bs-toggle="modal" data-bs-target="#ModalSucursal">Editar</button>
-												<button class="btn btn-danger rounded" @onclick="@(() => EliminarSucursal(suc.Id))">Eliminar</button>
+												<button class="btn btn-secondary rounded" style="margin-right: 0.5rem;" @onclick="@(() => ModificarSucursal(suc.Id))" data-bs-toggle="modal" data-bs-target="#ModalSucursal">Editar</button>
+												<button class="btn btn-danger rounded" @onclick="@(() => ModificarSucursal(suc.Id))" data-bs-toggle="modal" data-bs-target="#ModalBorrar">Eliminar</button>
 											</div>
 										</div>
 									</td>
@@ -71,13 +71,9 @@
 </div>
 
 <SucursalesEdit Id="PubliId"/>
+<SucursalesBorrar Id="PubliId" />
 
 @code {
-
-	private async Task ShowModal()
-	{
-		await JS.InvokeVoidAsync("$('#myModal').modal('show')");
-	}
 
 	List<Sucursal> sucrusales = new List<Sucursal>();
 
@@ -94,22 +90,9 @@
 		PubliId = 0;
 	}
 
-	void EditarSucursal(int id)
+	void ModificarSucursal(int id)
 	{
 		PubliId = id;
-	}
-
-	async Task EliminarSucursal(int id)
-	{
-		try
-		{
-			await SucursalService.DeleteSucursal(id); //BAJA DE SUCURSAL
-			sucrusales = await SucursalService.ReadAllSucursales(); //ACTUALIZO LA TABLA
-		}
-		catch (Exception ex)
-		{
-			await JS.InvokeVoidAsync("alert", ex.ToString());
-		}
 	}
 
 }

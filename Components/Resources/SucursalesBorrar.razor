@@ -1,0 +1,76 @@
+﻿@using TruequeTools.Entities
+
+@inject NavigationManager NavMan
+@inject IServiciosSucursal SucursalService
+@inject IJSRuntime JS
+
+@rendermode @(new InteractiveServerRenderMode(prerender:false))
+
+@attribute [Authorize(Roles = "Admin")]
+
+<div class="modal fade" id="ModalBorrar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">		
+				<h1 class="modal-title fs-5" id="staticBackdropLabel">Eliminar Sucursal</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CerrarModal"></button>
+			</div>
+			<div class="modal-body">
+				<ul class="list-group">
+					@if (exito)
+					{
+						<div>
+							<div class="alert alert-success" role="alert">
+								Se eliminó la sucursal !
+							</div>
+						</div>
+					}
+					else
+					{
+						<div>
+							<div class="alert alert-warning" role="alert">
+								No puedes eliminar la sucursal central !
+							</div>
+						</div>
+					}
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	function refreshPage() {
+		location.reload();
+	}
+</script>
+
+@code {
+
+	[Parameter]
+	public int Id { get; set; }
+
+	public bool exito { get; set; } = false;
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if(Id != 1)
+		{
+			await SucursalService.DeleteSucursal(Id); //BAJA DE SUCURSAL
+			exito = true;
+		}
+		else
+		{
+			exito = false;
+		}
+	}
+
+	public async void CerrarModal()
+	{
+		if (exito)
+		{
+			await JS.InvokeVoidAsync("refreshPage");
+		}
+	}
+
+}
