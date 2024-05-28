@@ -1,9 +1,11 @@
 ﻿@page "/sucursales"
 
 @using TruequeTools.Entities
+@using TruequeTools.Components.Resources
 
 @inject NavigationManager NavMan
 @inject IServiciosSucursal SucursalService
+@inject IJSRuntime JS
 
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
 
@@ -50,7 +52,7 @@
 									<td style="text-align: right;">
 										<div class="d-flex justify-content-end">
 											<div class="btn-group" style="margin-right: 1rem;">
-												<button class="btn btn-secondary rounded" style="margin-right: 0.5rem;" @onclick="@(() => EditarSucursal(suc.Id))">Editar</button>
+												<button class="btn btn-secondary rounded" style="margin-right: 0.5rem;" @onclick="@(() => EditarSucursal(suc.Id))" data-bs-toggle="modal" data-bs-target="#ModalSucursal">Editar</button>
 												<button class="btn btn-danger rounded" @onclick="@(() => EliminarSucursal(suc.Id))">Eliminar</button>
 											</div>
 										</div>
@@ -64,13 +66,22 @@
 
 			}
 		</div>
-		<button class="w-30 btn btn-lg btn-dark d-block mx-auto text-center" @onclick="CrearSucursal">Nueva Sucursal</button>
+		<button class="w-30 btn btn-lg btn-dark d-block mx-auto text-center" data-bs-toggle="modal" data-bs-target="#ModalSucursal" @onclick="CrearSucursal">Nueva Sucursal</button>
 	</div>
 </div>
 
+<SucursalesEdit Id="PubliId"/>
+
 @code {
 
+	private async Task ShowModal()
+	{
+		await JS.InvokeVoidAsync("$('#myModal').modal('show')");
+	}
+
 	List<Sucursal> sucrusales = new List<Sucursal>();
+
+	public int PubliId;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -80,18 +91,25 @@
 
 	void CrearSucursal()
 	{
-		NavMan.NavigateTo("/sucursales-edit"); //ALTA DE SUCURSAL
+		PubliId = 0;
 	}
 
 	void EditarSucursal(int id)
 	{
-		NavMan.NavigateTo($"/sucursales-edit/{id}"); //MODIFICACION DE SUCURSAL
+		PubliId = id;
 	}
 
 	async Task EliminarSucursal(int id)
 	{
-		await SucursalService.DeleteSucursal(id); //BAJA DE SUCURSAL
-		sucrusales = await SucursalService.ReadAllSucursales(); //ACTUALIZO LA TABLA
+		try
+		{
+			await SucursalService.DeleteSucursal(id); //BAJA DE SUCURSAL
+			sucrusales = await SucursalService.ReadAllSucursales(); //ACTUALIZO LA TABLA
+		}
+		catch (Exception ex)
+		{
+			await JS.InvokeVoidAsync("alert", ex.ToString());
+		}
 	}
 
 }

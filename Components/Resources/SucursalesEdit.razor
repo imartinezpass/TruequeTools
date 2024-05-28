@@ -1,0 +1,150 @@
+﻿@using TruequeTools.Entities
+
+@inject NavigationManager NavMan
+@inject IServiciosSucursal SucursalService
+@inject IJSRuntime JS
+
+@rendermode @(new InteractiveServerRenderMode(prerender:false))
+
+@attribute [Authorize(Roles = "Admin")]
+	
+<div class="modal fade" id="ModalSucursal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog custom-modal-width">
+        <div class="modal-content">
+            <div class="modal-header">
+				@if (Id == 0)
+				{
+					<h1 class="modal-title fs-5" id="staticBackdropLabel">Nueva Sucursal</h1>
+				}
+				else
+				{
+					<h1 class="modal-title fs-5" id="staticBackdropLabel">Modificar la sucursal #@Id</h1>
+				}
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CerrarModal"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group">
+                    @if (exito)
+                    {
+						<div>
+							<div class="alert alert-success" role="alert">
+								Se guardaron los cambios !
+							</div>
+						</div>
+                    }
+                    else
+                    {
+						<div class="row">
+							<EditForm Model="@Modelo" OnValidSubmit="HandleSubmit" FormName="SucursalForm">
+								<DataAnnotationsValidator />
+								<ValidationSummary class="text-danger" role="alert" />
+								@if (!string.IsNullOrEmpty(MensajeError))
+								{
+									<div class="alert alert-danger mt-3" role="alert">
+										@MensajeError
+									</div>
+								}
+								<div class="form-floating mb-3">
+									<InputText id="nombre" @bind-Value="Modelo.Nombre" class="form-control" placeholder="" maxlength="100" />
+									<label for="nombre">Nombre</label>
+									<ValidationMessage For="() => Modelo.Nombre" class="text-danger" />
+								</div>
+								<div class="form-floating mb-3">
+									<InputText id="direccion" @bind-Value="Modelo.Direccion" class="form-control" placeholder="" maxlength="100" />
+									<label for="direccion">Direccion</label>
+									<ValidationMessage For="() => Modelo.Direccion" class="text-danger" />
+								</div>
+								<div class="form-floating mb-3">
+									<InputText id="localidad" @bind-Value="Modelo.Localidad" class="form-control" placeholder="" maxlength="100" />
+									<label for="localidad">Localidad</label>
+									<ValidationMessage For="() => Modelo.Localidad" class="text-danger" />
+								</div>
+								<button type="submit" class="w-100 btn btn-lg btn-dark">Guardar</button>
+							</EditForm>
+						</div>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function refreshPage() {
+        location.reload();
+    }
+</script>
+
+@code {
+
+	[Parameter]
+	public int? Id { get; set; }
+
+	[SupplyParameterFromForm]
+	public SucursalViewModel Modelo { get; set; } = new();
+
+	string? MensajeError;
+	public bool exito { get; set; } = false;
+
+	protected override async Task OnParametersSetAsync()
+	{
+		if (Id != 0)
+		{
+			var SucursalActual = await SucursalService.ReadSucursalById((int)Id!);
+			Modelo.Nombre = SucursalActual.Nombre!;
+			Modelo.Direccion = SucursalActual.Direccion!;
+			Modelo.Localidad = SucursalActual.Localidad!;
+		}
+		else
+		{
+			Modelo = new SucursalViewModel();
+		}
+	}
+
+	async Task HandleSubmit()
+	{
+		var sucursal = new Sucursal
+		{
+			Nombre = Modelo.Nombre,
+			Direccion = Modelo.Direccion,
+			Localidad = Modelo.Localidad,
+		};
+
+		if (Id != 0)
+		{
+			await SucursalService.UpdateSucursal(sucursal, (int)Id!);
+		}
+		else
+		{
+			await SucursalService.CreateSucursal(sucursal);
+		}
+
+		exito = true;
+	}
+
+	public async void CerrarModal()
+	{
+		if (exito)
+		{
+			await JS.InvokeVoidAsync("refreshPage");
+		}
+		else
+		{
+			if (Id != 0)
+			{
+				var SucursalActual = await SucursalService.ReadSucursalById((int)Id!);
+				Modelo.Nombre = SucursalActual.Nombre!;
+				Modelo.Direccion = SucursalActual.Direccion!;
+				Modelo.Localidad = SucursalActual.Localidad!;
+			}
+			else
+			{
+				Modelo = new SucursalViewModel();
+			}	
+			MensajeError = null;
+			exito = false;
+			StateHasChanged();
+		}
+	}
+
+}

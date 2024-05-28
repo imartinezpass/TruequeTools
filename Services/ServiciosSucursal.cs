@@ -55,6 +55,7 @@ namespace TruequeTools.Services
 			{
 				updatedSucursal.Nombre = sucursal.Nombre;
 				updatedSucursal.Direccion = sucursal.Direccion;
+				updatedSucursal.Localidad = sucursal.Localidad;
 				await contexto.SaveChangesAsync();
 			}
 		}
