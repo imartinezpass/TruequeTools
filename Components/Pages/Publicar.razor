@@ -165,13 +165,13 @@
         var index = imageDataUrls.IndexOf(imageDataUrl);
         if (index != -1)
         {
-            imageDataUrls.RemoveAt(index);
+        imageDataUrls.RemoveAt(index);
 
             if (selectedImages != null && selectedImages.Count > index)
             {
                 selectedImages = selectedImages.Where((_, i) => i != index).ToList();
             }
-        }
+    }
     }
     @***********NACHO - MANEJO DE IMAGENES***********@
 
@@ -190,6 +190,12 @@
                     var timestamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
                     var fileExtension = Path.GetExtension(file.Name);
                     var fileName = $"{timestamp}{fileExtension}";
+
+                    if(file.Size > 512 * 1000)
+                    {
+                        MensajeError = "El tamaño de cada imagen no debe superar los 500kb";
+                        return;
+                    }
 
                     Stream stream = file.OpenReadStream();
                     var path = Path.Combine(Environment.WebRootPath, "images", fileName);
