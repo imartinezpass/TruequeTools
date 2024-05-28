@@ -1,5 +1,17 @@
-﻿<h3>ModificarPublicacion</h3>
+﻿@using TruequeTools.Data
+@using TruequeTools.Entities
+
+@inject NavigationManager NavMan
+@inject IServiciosSucursal SucursalService
+@inject IServiciosCategoria CategoriaService
+@inject IServiciosPublicacion PublicacionService
+@inject IServiciosImagen ImagenService
+
+
+
+<h3>ModificarPublicacion</h3>
 
 @code {
-
+    List<Sucursal> sucursales = new List<Sucursal>();
+    List<Categoria> categorias = new List<Categoria>();
 }

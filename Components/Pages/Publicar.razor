@@ -216,13 +216,13 @@
             Descripcion = Modelo.Descripcion,
             CategoriaId = Modelo.CategoriaId,
             UsuarioId = int.Parse(user!.FindFirst("UsuarioId")!.Value),
-            HasImages = (files != null),
+            HasImages = (imagenes.Count != 0),
             SucursalId = Modelo.SucursalId
         };
 
         int publicacionID = await PublicacionService.CreatePublicacion(publicacion);
 
-        if(files != null)
+        if(imagenes.Count != 0)
         {
             //********************************* PROVISORIAMENTE GUARDO UNA IMAGEN
             
