@@ -1,5 +1,6 @@
 ﻿@page "/publicar"
 
+@using System.IO;
 @using Microsoft.AspNetCore.Identity
 @using System.ComponentModel.DataAnnotations
 @using System.Text
@@ -13,6 +14,7 @@
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavMan
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment Environment
 @inject IWebHostEnvironment WebHostEnv
 @inject IServiciosSucursal SucursalService
 @inject IServiciosCategoria CategoriaService
@@ -72,88 +74,94 @@
                 <ValidationMessage For="() => Modelo.CategoriaId" class="text-danger" />
             </div>
             <hr />
+            @***********NACHO - MANEJO DE IMAGENES***********@
             <label for="foto">Foto (opcional)</label>
             <div class="form-floating mb-3">
                 <div>
-                    <div>
-                        <InputFile @ref="inputFile1" OnChange="e => ShowPreview(e, inputFile1,0)" accept="image/*" class="form-control" style="background:#e9ecef" />
-                    </div>
-                </div>
-                @if (mostrarInputs[0])
-                {
-                    <div>
-                        <InputFile @ref="inputFile2" OnChange="e => ShowPreview(e, inputFile2,1)" accept="image/*" class="form-control" style="background:#e9ecef" />
-                    </div>
-                    if (mostrarInputs[1])
-                    {
-                        <div>
-                            <InputFile @ref="inputFile3" OnChange="e => ShowPreview(e, inputFile3,2)" accept="image/*" class="form-control" style="background:#e9ecef" />
-                        </div>
-                        if (mostrarInputs[2])
-                        {
-                            <div>
-                                <InputFile @ref="inputFile4" OnChange="e => ShowPreview(e, inputFile4,3)" accept="image/*" class="form-control" style="background:#e9ecef" />
-                            </div>
-                            if (mostrarInputs[3])
-                            {
-                                <div>
-                                    <InputFile @ref="inputFile5" OnChange="e => ShowPreview(e, inputFile5,3)" accept="image/*" class="form-control" style="background:#e9ecef" />
-                                </div>
-                            }
-                        }
-                    }
-                }
+                    <InputFile multiple OnChange="OnInputFileChange" accept="image/*" class="form-control" />
+                </div>    
             </div>
             <ValidationMessage For="() => Modelo.FileSize" class="text-danger" />
-            <div class="form-floating mb-3">
-                <img class="img-fluid img-thumbnail rounded mx-auto d-block w-100" @ref="previewImageElem" />
+            <div class="image-list">
+                <table class="table table-bordered">
+                    <tr>
+                        @foreach (var imageDataUrl in imageDataUrls)
+                        {
+                            <td>
+                                <img src="@imageDataUrl" />
+                                <button class="btn btn-danger" style="background-color: red;" type="button" @onclick="() => RemoveImage(imageDataUrl)">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+                                        <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
+                                    </svg>
+                                </button>
+                            </td>
+                        }
+                    </tr>
+                </table>
             </div>
+            @***********NACHO - MANEJO DE IMAGENES***********@
             <button type="submit" class="w-100 btn btn-lg btn-dark">Crear Publicacion</button>
         </EditForm>
     </div>
 </div>
 
-<script>
-    window.previewImage = (inputElem, imgElem) => {
-        const url = URL.createObjectURL(inputElem.files[0]);
-        imgElem.addEventListener('load', () => URL.revokeObjectURL(url), { once: true });
-        imgElem.src = url;
-    }
-</script>
-
-<script>
-    window.resetInputFile = (inputElem) => {
-        inputElem.value = "";
-    }
-</script>
-
 @code {
-    private String? MensajeError;
-    private ClaimsPrincipal? user;
+
+    @***********NACHO - MANEJO DE IMAGENES***********@
+    IList<string> imageDataUrls = new List<string>();
+    IReadOnlyList<IBrowserFile>? selectedImages;
+
+    async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        var imageFiles = e.GetMultipleFiles();
+
+        if (imageFiles.Count + imageDataUrls.Count > 5)
+        {
+            MensajeError = "Solo puedes elegir hasta un máximo de 5 imágenes";
+            return;
+        }
+
+        var format = "image/png";
+        selectedImages = imageFiles;
+
+        foreach (var imageFile in imageFiles)
+        {
+            var resizedImageFile = await imageFile.RequestImageFileAsync(format, 100, 100);
+            var buffer = new byte[resizedImageFile.Size];
+            await resizedImageFile.OpenReadStream().ReadAsync(buffer);
+
+            var imageDataUrl = $"data:{format};base64,{Convert.ToBase64String(buffer)}";
+            imageDataUrls.Add(imageDataUrl);
+        }
+    }
+
+    void RemoveImage(string imageDataUrl)
+    {
+        // Encuentra el índice de la imagen en la lista de URL de imágenes
+        var index = imageDataUrls.IndexOf(imageDataUrl);
+        if (index != -1)
+        {
+            // Elimina la imagen de la lista de URL de imágenes
+            imageDataUrls.RemoveAt(index);
+
+            // Si también hay una imagen seleccionada correspondiente, elimínala también
+            if (selectedImages != null && selectedImages.Count > index)
+            {
+                selectedImages = selectedImages.Where((_, i) => i != index).ToList();
+            }
+        }
+    }
+    @***********NACHO - MANEJO DE IMAGENES***********@
+
+    [SupplyParameterFromForm]
+    private PublicacionViewModel Modelo { get; set; } = new();
 
     List<Sucursal> sucursales = new List<Sucursal>();
     List<Categoria> categorias = new List<Categoria>();
+
+    private String? MensajeError;
+    private ClaimsPrincipal? user;
     int sucursalPreferidaId;
-
-    private List<IBrowserFile?> files = new List<IBrowserFile?>();
-    private InputFile? inputFile1,inputFile2,inputFile3,inputFile4,inputFile5;
-    private ElementReference previewImageElem;
-    List<Boolean> mostrarInputs = [false,false,false,false];
-
-    private async Task ShowPreview(InputFileChangeEventArgs e, InputFile? inputFile, int num)
-    {
-        files.Add(e.File);
-        Modelo.FileSize = files[num].Size;
-        StateHasChanged();
-        if (files[num] != null && Modelo.FileSize <= 5 * 1024 * 1024)
-        {
-            await JS.InvokeVoidAsync("previewImage", inputFile!.Element, previewImageElem); //código para hacer la preview de la imágen, funciona con javascript
-            mostrarInputs[num] = true;
-
-        }
-        //código para hacer la preview de la imágen, funciona con javascript
-
-    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -164,9 +172,6 @@
         sucursalPreferidaId = int.Parse(user!.FindFirst("SucursalId")!.Value);
     }
 
-    [SupplyParameterFromForm]
-    private PublicacionViewModel Modelo { get; set; } = new();
-
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
@@ -175,40 +180,6 @@
 
     public async Task CargarPublicacion(EditContext editContext)
     {   
-        List<Imagen> imagenes = new();
-        foreach (var file in files)
-        {
-            if (file != null)
-            {
-                var uniqueFileName = $"{DateTime.Now:yyyyMMddHHmmssfff}{Path.GetExtension(file.Name)}";
-                var filePath = Path.Combine(WebHostEnv.WebRootPath, "images", uniqueFileName);
-
-                try
-                {
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        // Leer el contenido del archivo cargado en un búfer de memoria
-                        await using (var memoryStream = new MemoryStream())
-                        {
-                            await file.OpenReadStream(5000 * 1024).CopyToAsync(memoryStream);
-
-                            // Copiar el contenido del búfer de memoria al archivo de destino
-                            memoryStream.Seek(0, SeekOrigin.Begin); // Asegurar que el puntero esté al principio del búfer
-                            await memoryStream.CopyToAsync(fileStream);
-                        }
-                        Modelo.FotoUrl = $"{uniqueFileName}";
-                        Imagen m = new Imagen();
-                        m.FotoUrl = Modelo.FotoUrl;
-                        imagenes.Add(m);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message); // Manejar cualquier excepción ocurrida durante la operación de escritura
-                }
-            }
-        }
-        
 
         var publicacion = new Publicacion
         {
@@ -216,40 +187,44 @@
             Descripcion = Modelo.Descripcion,
             CategoriaId = Modelo.CategoriaId,
             UsuarioId = int.Parse(user!.FindFirst("UsuarioId")!.Value),
-            HasImages = (imagenes.Count != 0),
+            HasImages = (selectedImages != null), //**********NACHO - MANEJO DE IMAGENES***********
             SucursalId = Modelo.SucursalId
         };
 
         int publicacionID = await PublicacionService.CreatePublicacion(publicacion);
 
-        if(imagenes.Count != 0)
+        //**********NACHO - MANEJO DE IMAGENES***********
+        if (publicacion.HasImages)
         {
-            //********************************* PROVISORIAMENTE GUARDO UNA IMAGEN
-            
-            foreach (var m in imagenes) //ASI SE GUARDABA ANTES LA IMAGEN PERO EN PUBLICACION
-                m.PublicacionId = publicacionID;
-            
-            
-            await ImagenService.AltaImagenes(imagenes); //RECIBE UNA LISTA DE IMAGENES Y LAS AGREGA A LA TABLA "IMAGENES"
-            //********************************* VER COMO CAMBIAR EL INPUTFILE A MULTIPLES
+            List<Imagen> imagenes = new();
+
+            foreach (var file in selectedImages!)
+            {
+                var timestamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+                var fileExtension = Path.GetExtension(file.Name);
+                var fileName = $"{timestamp}{fileExtension}";
+
+                Stream stream = file.OpenReadStream();
+                var path = Path.Combine(Environment.WebRootPath, "images", fileName);
+                await using var fs = new FileStream(path, FileMode.Create);
+                await stream.CopyToAsync(fs);
+
+                var imagen = new Imagen
+                {
+                    PublicacionId = publicacionID,
+                    FotoUrl = fileName,
+                };
+
+                imagenes.Add(imagen);
+
+            }
+           
+            await ImagenService.AltaImagenes(imagenes);
         }
-        
+        //**********NACHO - MANEJO DE IMAGENES***********
+
         NavMan.NavigateTo("/");
 
     }
-
-    //public async Task LimpiarImagen(EditContext editContext)
-    //{
-    //    if (Modelo.FileSize > 5 * 1024 * 1024)
-    //    {
-    //        Modelo.FileSize = 0;
-    //        file = null;
-    //        if (inputFile != null)
-    //        {
-    //            await JS.InvokeVoidAsync("resetInputFile", inputFile.Element); // Limpia el input file usando JavaScript
-    //        }
-    //        StateHasChanged();
-    //    }
-    //}
 
 }

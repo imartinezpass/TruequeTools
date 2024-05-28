@@ -40,8 +40,21 @@
                     @if (PublicacionActual.HasImages)
                     {
                         context.Entry(PublicacionActual).Collection(p => p.Imagenes!).Load(); @*Traigo las Imagenes de la Publicacion*@
-                        var primeraImagen = PublicacionActual.Imagenes!.FirstOrDefault();
-                        <img class="card-img-top" src="images/@primeraImagen!.FotoUrl" alt="Foto del Producto">
+                        @*var primeraImagen = PublicacionActual.Imagenes!.FirstOrDefault();
+                        <img class="card-img-top" src="images/@primeraImagen!.FotoUrl" alt="Foto del Producto">*@
+
+                        <div class="image-list">
+                            <table class="table table-bordered">
+                                <tr>
+                                    @foreach (var img in PublicacionActual.Imagenes!)
+                                    {
+                                        <td>
+                                            <img src="images/@img.FotoUrl" style="max-width:300px"/>
+                                        </td>
+                                    }
+                                </tr>
+                            </table>
+                        </div>
                     }
                     else
                     {
