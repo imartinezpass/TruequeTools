@@ -1,0 +1,87 @@
+﻿@page "/misPublicaciones"
+
+@using Microsoft.EntityFrameworkCore
+@using TruequeTools.Data
+@using TruequeTools.Entities
+@using System.Security.Claims
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject TruequeToolsDataContext context
+@inject NavigationManager NavMan
+@inject IServiciosPublicacion PublicacionService
+
+@attribute [Authorize(Roles = "Admin,User")]
+
+@rendermode @(new InteractiveServerRenderMode(prerender:false))
+
+<h3>MisPublicaciones</h3>
+
+@if (showSpinner)
+{
+    <div class="d-flex justify-content-center" style="margin:1rem">
+        <div class="spinner-border" role="status">
+            <span class="sr-only"></span>
+        </div>
+    </div>
+}
+else
+{
+    <div class="row margin:1rem">
+        @foreach (var publi in publicaciones)
+        {
+            context.Entry(publi).Reference(p => p.Categoria).Load();
+            context.Entry(publi).Reference(p => p.Sucursal).Load(); //Traigo los datos de la sucursal asociada con la publicacion
+
+            <div class="col-lg-4 col-md-6 col-12 mb-3">
+                <div class="card" style="margin:1rem">
+                    @if (@publi.HasImages)
+                    {
+                        context.Entry(publi).Collection(p => p.Imagenes!).Load(); @*Traigo las Imagenes de la Publicacion*@
+                        var primeraImagen = publi.Imagenes!.FirstOrDefault();
+                        <img class="card-img-top" src="images/@primeraImagen!.FotoUrl" alt="Foto del Producto">
+                    }
+                    else
+                    {
+                        <img class="card-img-top-svg" src=resources/blank.svg alt="Foto del Producto">
+                    }
+                    <div class="card-body">
+                        <h4 style="margin:0">@publi.Nombre</h4>
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">Sucursal: @publi.Sucursal!.Nombre</li>
+                        <li class="list-group-item">Categoria: @publi.Categoria!.Nombre</li>
+                    </ul>
+                    <div class="card-body">
+                        <a class="btn btn-secondary" @onclick="@(() => VerPublicacion(publi.Id))">Ver Publicacion</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private ClaimsPrincipal? user;
+    List<Publicacion> publicaciones = new List<Publicacion>();
+    bool showSpinner = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        showSpinner = true;
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        user = authState.User;
+        if (user.Identity?.IsAuthenticated ?? false)
+        {
+            var usuario = int.Parse(user.FindFirst("UsuarioId")!.Value);
+            publicaciones = await PublicacionService.ReadAllPublicacionesCurrentUser(usuario);
+        }
+        await Task.Delay(500); // Espera 0.5 segundos y muestra el spinner durante ese tiempo
+        showSpinner = false; // Desactiva el spinner
+        StateHasChanged(); // Notifica a Blazor que debe actualizar la interfaz de usuario
+    }
+
+    void VerPublicacion(int id)
+    {
+        NavMan.NavigateTo($"/publicacion/{id}");
+    }
+}
