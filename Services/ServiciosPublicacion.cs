@@ -41,8 +41,15 @@ namespace TruequeTools.Services
             return result;
         }
 
-        //DEVUELVE UNA LISTA CON LAS PRIMERAS 12 PUBLICACIONES ACTIVAS
+        //DEVUELVE UNA LISTA CON LAS PUBLICACIONES ACTIVAS
         public async Task<List<Publicacion>> ReadAllPublicacionesActivas()
+        {
+            var result = await contexto.Publicaciones.Where(p => p.Deleted == false & p.IsOculta == false).ToListAsync();
+            return result;
+        }
+
+        //DEVUELVE UNA LISTA CON LAS PRIMERAS 12 PUBLICACIONES ACTIVAS
+        public async Task<List<Publicacion>> ReadAllPublicacionesActivas12()
         {
             var result = await contexto.Publicaciones.Where(p => p.Deleted == false & p.IsOculta == false).Take(12).ToListAsync();
             return result;
@@ -96,10 +103,17 @@ namespace TruequeTools.Services
             }
         }
 
+        //DEVUELVE UNA LISTA CON PUBLICACIONES ACTIVAS QUE POSEAN EL STRING "unTitulo" EN EL TITULO DE LA PUBLCIACION
+        public async Task<List<Publicacion>> ReadPublicacionesActivasByNombre(string unTitulo)
+        {
+            var result = await contexto.Publicaciones.Where(p => p.Nombre!.Contains(unTitulo) & p.Deleted == false & p.IsOculta == false).ToListAsync();
+            return result;
+        }
+
         //DEVUELVE UNA LISTA CON PUBLICACIONES QUE POSEAN EL STRING "unTitulo" EN EL TITULO DE LA PUBLCIACION
         public async Task<List<Publicacion>> ReadPublicacionesByNombre(string unTitulo)
         {
-            var result = await contexto.Publicaciones.Where(publicacion => publicacion.Nombre!.Contains(unTitulo)).ToListAsync();
+            var result = await contexto.Publicaciones.Where(p => p.Nombre!.Contains(unTitulo)).ToListAsync();
             return result;
         }
 

@@ -116,16 +116,16 @@
         showSpinner = true;
         await Task.Delay(500);
         if(String.IsNullOrEmpty(searchString)){
-            publicaciones = await PublicacionService.ReadAllPublicaciones();
+            publicaciones = await PublicacionService.ReadAllPublicacionesActivas();
         }
         else
         {
-            publicaciones = await PublicacionService.ReadPublicacionesByNombre(searchString);
+            publicaciones = await PublicacionService.ReadPublicacionesActivasByNombre(searchString);
         }
         if (selectedFilter != 0)
         {
             publicaciones = publicaciones
-            .Where(publicacion => publicacion.Nombre != null && publicacion.CategoriaId == selectedFilter)
+            .Where(p => p.Nombre != null && p.CategoriaId == selectedFilter && p.Deleted == false && p.IsOculta == false)
             .ToList();
         }
         busquedaRealizada = true;

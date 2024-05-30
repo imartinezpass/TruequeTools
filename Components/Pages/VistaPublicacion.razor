@@ -170,7 +170,7 @@
     {
         cargando = true;
         PublicacionActual = await PublicacionService.ReadPublicacionById(Id); //LEE LA PUBLICACION ACTUAL
-        MisPublicaciones = await PublicacionService.ReadAllPublicacionesCurrentUser(UsuarioId); //TRAE LAS PUBLICACIONES DEL USUARIO
+        MisPublicaciones = await PublicacionService.ReadAllPublicacionesActivasCurrentUser(UsuarioId); //TRAE LAS PUBLICACIONES DEL USUARIO
         OfertasPublicacionActual = await PublicacionService.ReadAllOfertasOfPublicacion(PublicacionActual.Id);
         await Task.Delay(500);
         cargando = false;
