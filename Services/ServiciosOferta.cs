@@ -36,9 +36,41 @@ namespace TruequeTools.Services
         public async Task<List<Oferta>> ReadAllOfertasRealizadasByUser(int userId)
         {
             var ofertas = await contexto.Ofertas.Where(p => p.UsuarioId == userId).ToListAsync();
-            return ofertas!; ;
+            return ofertas!; 
         }
 
+        //SOBREESCRIBE UNA OFERTA BUSCANDOLA POR EL ID
+        public async Task<Oferta> OverwriteOfertaById(Oferta oferta)
+        {
+            var ofertaExistente = await contexto.Ofertas.FindAsync(oferta.Id);  // Buscar la publicación existente por su ID
+
+            if (ofertaExistente != null)
+            {
+                ofertaExistente = oferta;
+                await contexto.SaveChangesAsync();
+
+                return ofertaExistente;
+            }
+            else
+            {
+                throw new Exception("La oferta no existe.");
+            }
+        }
+
+        //CAMBIA EL ESTADO DE TODAS LAS OFERTAS CON CIERTO ID DE PUBLICACION OFERTADA O OFRECIDA A RECHAZADA
+        public async Task RechazarOfertas(int publicacionId)
+        {
+            var ofertas = await contexto.Ofertas
+                .Where(oferta => (oferta.PublicacionQueOfertoId == publicacionId || oferta.PublicacionQueOfrezcoId == publicacionId) && oferta.Estado == 0)
+                .ToListAsync();
+
+            foreach (var oferta in ofertas)
+            {
+                oferta.Estado = -1;
+            }
+
+            await contexto.SaveChangesAsync();
+        }
     }
 
 }

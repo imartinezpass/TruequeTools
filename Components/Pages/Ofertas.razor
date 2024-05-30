@@ -5,8 +5,12 @@
 
 @inject TruequeToolsDataContext context
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavMan
+@inject IServiciosPublicacion PublicacionService
 @inject IServiciosOferta OfertaService
 @inject IServiciosPublicacion PublicacionService
+
+@rendermode @(new InteractiveServerRenderMode(prerender:false))
 
 @attribute [Authorize(Roles = "Admin,User")]
 
@@ -16,27 +20,27 @@
         @if(OfertasRealizadas.Count != 0)
         {
             <li class="list-group-item">
-                @foreach (var publi in OfertasRealizadas)
+                @foreach (var ofertaR in OfertasRealizadas)
                 {
                     var estado = "";
-                    @if (publi.Estado == 0)
+                    @if (ofertaR.Estado == 0)
                     {
                         estado = "Pendiente";
                     }
-                    else if (publi.Estado == -1)
+                    else if (ofertaR.Estado == -1)
                     {
-                        estado = "Reachazada";
+                        estado = "Rechazada";
                     }
                     else
                     {
                         estado = "Aceptada";
                     }
-                    context?.Entry(publi).Reference(x => x.PublicacionQueOferto).Load();
-                    context?.Entry(publi).Reference(x => x.PublicacionQueOfrezco).Load();
-                    context?.Entry(publi.PublicacionQueOfrezco!).Reference(x => x.Usuario).Load();
+                    context?.Entry(ofertaR).Reference(x => x.PublicacionQueOferto).Load();
+                    context?.Entry(ofertaR).Reference(x => x.PublicacionQueOfrezco).Load();
+                    context?.Entry(ofertaR.PublicacionQueOfrezco!).Reference(x => x.Usuario).Load();
                     <div class="oferta-cuerpo">
-                        <p><span class="fw-bold">Usuario: </span>@publi?.PublicacionQueOfrezco?.Usuario?.Nombre</p>
-                        <p><span class="fw-bold">Mi oferta: </span>@publi?.PublicacionQueOferto?.Nombre por @publi?.PublicacionQueOfrezco!.Nombre</p>
+                        <p><span class="fw-bold">Usuario: </span>@ofertaR?.PublicacionQueOfrezco?.Usuario?.Nombre</p>
+                        <p><span class="fw-bold">Mi oferta: </span>@ofertaR?.PublicacionQueOferto?.Nombre por @ofertaR?.PublicacionQueOfrezco!.Nombre</p>
                         <p><span class="fw-bold">Estado: </span>@estado</p>
                     </div>
                 }
@@ -50,27 +54,43 @@
         @if (OfertasRecibidas.Count != 0)
         {
             <li class="list-group-item">
-                @foreach (var publi in OfertasRecibidas)
+                @foreach (var recibida in OfertasRecibidas)
                 {
                     var estado = "";
-                    @if (publi.Estado == 0)
+                    @if (recibida.Estado == 0)
                     {
                         estado = "Pendiente";
                     }
-                    else if (publi.Estado == -1)
+                    else if (recibida.Estado == -1)
                     {
-                        estado = "Reachazada";
+                        estado = "Rechazada";
                     }
                     else
                     {
                         estado = "Aceptada";
                     }
-                    context?.Entry(publi).Reference(p => p.Usuario).Load();
-                    context?.Entry(publi).Reference(p => p.PublicacionQueOferto).Load();
+                    context?.Entry(recibida).Reference(p => p.Usuario).Load();
+                    context?.Entry(recibida).Reference(p => p.PublicacionQueOferto).Load();
                     <div class="oferta-cuerpo">
-                        <p><span class="fw-bold">Ofertante: </span>@publi.Usuario!.Nombre</p>
-                        <p><span class="fw-bold">Su Oferta: </span>@publi.PublicacionQueOferto!.Nombre por @publi.PublicacionQueOfrezco!.Nombre</p>
+                        <p><span class="fw-bold">Ofertante: </span>@recibida.Usuario!.Nombre</p>
+                        <p><span class="fw-bold">Su Oferta: </span>@recibida.PublicacionQueOferto!.Nombre</p>
+                        <p><span class="fw-bold">Mi Producto: </span>@recibida.PublicacionQueOfrezco!.Nombre</p>
                         <p><span class="fw-bold">Estado: </span>@estado</p>
+                        @if (recibida.Estado == 0)
+                        {
+                            <button class="btn btn-success" @onclick="@(() => AceptarOferta(recibida))">
+                                Aceptar
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
+                                    <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-4 4.5a.75.75 0 0 1-1.08 0l-2-2.25a.75.75 0 0 1 1.08-1.05l1.47 1.65 3.47-3.9z" />
+                                </svg>
+                            </button>
+                            <button class="btn btn-danger" @onclick="@(() => RechazarOferta(recibida))">
+                                Rechazar
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
+                                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
+                                </svg>
+                            </button>
+                        }
                     </div>
                 }
             </li>
@@ -100,6 +120,26 @@
                 OfertasRecibidas.Add(oferta);
             }
         }
+    }
+
+    public async Task AceptarOferta(Oferta oferta)
+    {
+        oferta.Estado = 1;
+        oferta.PublicacionQueOferto.IsOculta = true;
+        oferta.PublicacionQueOfrezco.IsOculta = true;
+        await OfertaService.OverwriteOfertaById(oferta);
+        await PublicacionService.OverwritePublicacionById(oferta.PublicacionQueOfrezco);
+        await PublicacionService.OverwritePublicacionById(oferta.PublicacionQueOferto);
+        await OfertaService.RechazarOfertas(oferta.PublicacionQueOfertoId);
+        await OfertaService.RechazarOfertas(oferta.PublicacionQueOfrezcoId);
+        StateHasChanged();
+    }
+
+    public async Task RechazarOferta(Oferta oferta)
+    {
+        oferta.Estado = -1;
+        await OfertaService.OverwriteOfertaById(oferta);
+        StateHasChanged();
     }
 }
 
