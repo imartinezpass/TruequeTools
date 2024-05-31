@@ -40,7 +40,8 @@
                     context?.Entry(ofertaR.PublicacionQueOfrezco!).Reference(x => x.Usuario).Load();
                     <div class="oferta-cuerpo">
                         <p><span class="fw-bold">Usuario: </span>@ofertaR?.PublicacionQueOfrezco?.Usuario?.Nombre</p>
-                        <p><span class="fw-bold">Mi oferta: </span>@ofertaR?.PublicacionQueOferto?.Nombre por @ofertaR?.PublicacionQueOfrezco!.Nombre</p>
+                        <p><span class="fw-bold">Mi Oferta: </span>@ofertaR?.PublicacionQueOfrezco!.Nombre</p>
+                        <p><span class="fw-bold">Su Producto: </span>@ofertaR?.PublicacionQueOferto!.Nombre</p>
                         <p><span class="fw-bold">Estado: </span>@estado</p>
                     </div>
                 }

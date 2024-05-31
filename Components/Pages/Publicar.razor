@@ -31,7 +31,7 @@
 <div class="row">
     <div class="col-lg-4 offset-lg-4 pt-4 pb-4 border" style="margin-bottom:1.1rem">
         <h1 style="text-align:center">Publicar</h1>
-        <EditForm Model="@Modelo" enctype="multipart/form-data" OnValidSubmit ="CargarPublicacion" FormName="CargarPublicacionForm">
+        <EditForm Model="@Modelo" enctype="multipart/form-data" OnValidSubmit="CargarPublicacion" FormName="CargarPublicacionForm">
             <DataAnnotationsValidator />
             <h2 style="text-align:center">Dar a conocer tu producto</h2>
             <hr />
@@ -78,8 +78,9 @@
             <label for="foto">Foto (opcional)</label>
             <div class="form-floating mb-3">
                 <div>
-                    <InputFile multiple OnChange="OnInputFileChange" accept="image/*" class="form-control" />
-                </div>    
+                    <InputFile id="fileInput" multiple OnChange="OnInputFileChange" accept="image/*" class="form-control" />
+                    <button type="button" class="btn btn-danger mt-2" @onclick="ClearInputFile">Limpiar</button>
+                </div>
             </div>
             <ValidationMessage For="() => Modelo.FileSize" class="text-danger" />
             <div class="image-list">
@@ -89,11 +90,6 @@
                         {
                             <td>
                                 <img src="@imageDataUrl" />
-                                <button class="btn btn-danger" style="background-color: red;" type="button" @onclick="() => RemoveImage(imageDataUrl)">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
-                                        <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
-                                    </svg>
-                                </button>
                             </td>
                         }
                     </tr>
@@ -104,6 +100,13 @@
         </EditForm>
     </div>
 </div>
+
+<script>
+    function ClearInput() {
+        var input = document.getElementById("fileInput");
+        input.value = ''; // Limpiar el valor del input
+    }
+</script>
 
 @code {
 
@@ -136,8 +139,17 @@
     IList<string> imageDataUrls = new List<string>();
     IReadOnlyList<IBrowserFile>? selectedImages;
 
+    void ClearInputFile()
+    {
+        // Limpiar el input file y la lista de imágenes seleccionadas
+        imageDataUrls.Clear();
+        selectedImages = null;
+        JS.InvokeVoidAsync("ClearInput");
+    }
+
     async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
+        imageDataUrls.Clear();
         var imageFiles = e.GetMultipleFiles();
 
         if (imageFiles.Count + imageDataUrls.Count > 5)
@@ -160,19 +172,6 @@
         }
     }
 
-    void RemoveImage(string imageDataUrl)
-    {
-        var index = imageDataUrls.IndexOf(imageDataUrl);
-        if (index != -1)
-        {
-        imageDataUrls.RemoveAt(index);
-
-            if (selectedImages != null && selectedImages.Count > index)
-            {
-                selectedImages = selectedImages.Where((_, i) => i != index).ToList();
-            }
-    }
-    }
     @***********NACHO - MANEJO DE IMAGENES***********@
 
     public async Task CargarPublicacion(EditContext editContext)
@@ -191,7 +190,7 @@
                     var fileExtension = Path.GetExtension(file.Name);
                     var fileName = $"{timestamp}{fileExtension}";
 
-                    if(file.Size > 512 * 1000)
+                    if (file.Size > 512 * 1000)
                     {
                         MensajeError = "El tamaño de cada imagen no debe superar los 500kb";
                         return;
@@ -202,7 +201,7 @@
                     await using var fs = new FileStream(path, FileMode.Create);
                     await stream.CopyToAsync(fs);
 
-                    var imagen = new Imagen {FotoUrl = fileName};
+                    var imagen = new Imagen { FotoUrl = fileName };
                     imagenes.Add(imagen);
                 }
                 result = true;
@@ -220,14 +219,14 @@
         //**********NACHO - MANEJO DE IMAGENES***********
 
         var publicacion = new Publicacion
-        {
-            Nombre = Modelo.Nombre,
-            Descripcion = Modelo.Descripcion,
-            CategoriaId = Modelo.CategoriaId,
-            UsuarioId = int.Parse(user!.FindFirst("UsuarioId")!.Value),
-            HasImages = result,
-            SucursalId = Modelo.SucursalId
-        };
+            {
+                Nombre = Modelo.Nombre,
+                Descripcion = Modelo.Descripcion,
+                CategoriaId = Modelo.CategoriaId,
+                UsuarioId = int.Parse(user!.FindFirst("UsuarioId")!.Value),
+                HasImages = result,
+                SucursalId = Modelo.SucursalId
+            };
 
         int publicacionID = await PublicacionService.CreatePublicacion(publicacion);
 
@@ -247,3 +246,4 @@
     }
 
 }
+
