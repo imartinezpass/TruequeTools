@@ -27,6 +27,17 @@ namespace TruequeTools.Services
             }
         }
 
+        public async Task BajaImagenesPorIdPublicacion(int idPublicacion)
+        {
+            var imagenes = contexto.Imagenes.Where(i => i.PublicacionId == idPublicacion).ToList();
+
+            if (imagenes.Any())
+            {
+                contexto.Imagenes.RemoveRange(imagenes);
+                await contexto.SaveChangesAsync();
+            }
+        }
+
     }
 
 }
