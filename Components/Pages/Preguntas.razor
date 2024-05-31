@@ -94,11 +94,14 @@
 
         foreach (var publi in UserPublicaciones)
         {
-            await context.Entry(publi).Collection(p => p.Preguntas!).LoadAsync();
-            foreach (var oferta in publi.Preguntas!)
+            if(publi.Deleted == false)
             {
-                PreguntasRecibidas.Add(oferta);
-            }
+                await context.Entry(publi).Collection(p => p.Preguntas!).LoadAsync();
+                foreach (var oferta in publi.Preguntas!)
+                {
+                    PreguntasRecibidas.Add(oferta);
+                }
+            }   
         }
     }
 
