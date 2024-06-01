@@ -4,8 +4,6 @@
 @using TruequeTools.Data
 @using TruequeTools.Entities
 
-@inject TruequeToolsDataContext context
-@inject NavigationManager NavMan
 @inject IServiciosPublicacion PublicacionService
 
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
@@ -19,38 +17,7 @@
 
 @if (publicaciones != null && publicaciones.Any())
 {
-    <div class="row margin:1rem">
-        @foreach (var publi in publicaciones)
-        {
-            context.Entry(publi).Reference(p => p.Categoria).Load();
-            context.Entry(publi).Reference(p => p.Sucursal).Load(); //Traigo los datos de la sucursal asociada con la publicacion
-
-            <div class="col-lg-4 col-md-6 col-12 mb-3">
-                <div class="card" style="margin:1rem">
-                    @if (@publi.HasImages)
-                    {         
-                        context.Entry(publi).Collection(p => p.Imagenes!).Load(); @*Traigo las Imagenes de la Publicacion*@
-                        var primeraImagen = publi.Imagenes!.FirstOrDefault();
-                        <img class="card-img-top" src="images/@primeraImagen!.FotoUrl" alt="Foto del Producto">
-                    }
-                    else
-                    {
-                        <img class="card-img-top-svg" src=resources/blank.svg alt="Foto del Producto">
-                    }
-                    <div class="card-body">
-                        <h4 style="margin:0">@publi.Nombre</h4>
-                    </div>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item">Sucursal: <b>@publi.Sucursal!.Nombre</b></li>
-                        <li class="list-group-item">Categoría: <b>@publi.Categoria!.Nombre</b></li>
-                    </ul>
-                    <div class="card-body">
-                        <a class="btn btn-secondary" @onclick="@(() => VerPublicacion(publi.Id))">Ver Publicacion</a>
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
+    <TarjetaPublicacion ListaPublicaciones="publicaciones" />
 }
 else
 {
@@ -73,11 +40,6 @@ else
     List<Publicacion> publicaciones = new List<Publicacion>();
 
     private bool showSpinner = true;
-
-    void VerPublicacion(int id)
-    {
-        NavMan.NavigateTo($"/publicacion/{id}");
-    }
 
     protected override async Task OnInitializedAsync()
     {

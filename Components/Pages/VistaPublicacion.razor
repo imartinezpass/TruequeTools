@@ -41,7 +41,7 @@
                     {
                         context.Entry(PublicacionActual).Collection(p => p.Imagenes!).Load(); @*Traigo las Imagenes de la Publicacion*@
                         @*var primeraImagen = PublicacionActual.Imagenes!.FirstOrDefault();
-                        <img class="card-img-top" src="images/@primeraImagen!.FotoUrl" alt="Foto del Producto">*@
+                        <img class="card-img-top-vp" src="images/@primeraImagen!.FotoUrl" alt="Foto del Producto">*@
 
                         <div class="image-list">
                             <table class="table table-bordered">
@@ -58,7 +58,7 @@
                     }
                     else
                     {
-                        <img class="card-img-top-svg" src=resources/blank.svg alt="Foto del Producto">    
+                        <img class="card-img-top-svg-vp" src=resources/blank.svg alt="Foto del Producto">    
                     }
                 </li>
                 <li class="list-group-item">@PublicacionActual.Descripcion</li>
@@ -73,7 +73,7 @@
                             @foreach (var pregunta in PublicacionActual.Preguntas)
                             {
                                 context.Entry(pregunta).Reference(p => p.Usuario).Load();
-                                <div class="mb-2 oferta-cuerpo">
+                                <div class="mb-2 oferta-cuerpo-vp">
                                     <p><b>@pregunta.Usuario!.Nombre</b> pregunta: @pregunta.Texto</p>
                                     @if (pregunta.Respuesta == null)
                                     {
@@ -88,7 +88,7 @@
                         }
                         else
                         {
-                            <div class="mb-2 oferta-cuerpo">                          
+                            <div class="mb-2 oferta-cuerpo-vp">                          
                                 <p>Todavía no hay preguntas en la publicacion...</p>
                             </div>
                         }
