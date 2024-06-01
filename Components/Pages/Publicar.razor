@@ -78,23 +78,28 @@
             <label for="foto">Foto (opcional)</label>
             <div class="form-floating mb-3">
                 <div>
-                    <InputFile id="fileInput" multiple OnChange="OnInputFileChange" accept="image/*" class="form-control" />
-                    <button type="button" class="btn btn-danger mt-2" @onclick="ClearInputFile">Limpiar</button>
+                    <InputFile id="fileInput" multiple OnChange="OnInputFileChange" accept="image/*" class="form-control" />          
                 </div>
+                <ValidationMessage For="() => Modelo.FileSize" class="text-danger" />
             </div>
-            <ValidationMessage For="() => Modelo.FileSize" class="text-danger" />
-            <div class="image-list">
-                <table class="table table-bordered">
-                    <tr>
-                        @foreach (var imageDataUrl in imageDataUrls)
-                        {
-                            <td>
-                                <img src="@imageDataUrl" />
-                            </td>
-                        }
-                    </tr>
-                </table>
-            </div>
+            @if (selectedImages != null)
+            {
+                <div class="form-floating mb-3">
+                    <button type="button" class="btn btn-danger mt-2 d-block mx-auto text-center" @onclick="ClearInputFile">Limpiar</button>
+                </div>
+                <div class="table-responsive" style="display:flex; justify-content:center">
+                    <table class="table table-bordered" style="text-align:center">
+                        <tr>
+                            @foreach (var imageDataUrl in imageDataUrls)
+                            {
+                                <td>
+                                    <img src="@imageDataUrl" />
+                                </td>
+                            }
+                        </tr>
+                    </table>
+                </div>
+            }
             @***********NACHO - MANEJO DE IMAGENES***********@
             <button type="submit" class="w-100 btn btn-lg btn-dark">Crear Publicacion</button>
         </EditForm>
