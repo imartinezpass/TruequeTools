@@ -23,82 +23,108 @@
 @inject IServiciosImagen ImagenService
 @inject IJSRuntime JS
 
-@rendermode InteractiveServer
+@rendermode @(new InteractiveServerRenderMode(prerender:false))
 
 @attribute [Authorize(Roles = "Admin,User")]
 
 <PageTitle>Modificar Publicacion</PageTitle>
 
-<div class="row">
-    <div class="col-lg-4 offset-lg-4 pt-4 pb-4 border" style="margin-bottom:1.1rem">
-        <h1 style="text-align:center">Modificar Publicacion @Id</h1>
-        <EditForm Model="@Modelo" enctype="multipart/form-data" OnValidSubmit="Modificar" FormName="ModificarPublicacion">
-            <DataAnnotationsValidator />
-            <h2 style="text-align:center">Dar a conocer tu producto</h2>
-            <hr />
-            <ValidationSummary class="text-danger" role="alert" />
-            @if (!string.IsNullOrEmpty(MensajeError))
-            {
-                <div class="alert alert-danger mt-3" role="alert">
-                    @MensajeError
+@if (!autorizado)
+{
+    if (cargando)
+    {
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+                <span class="sr-only"></span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <Denegado />
+    } 
+}
+else
+{
+    <div class="row">
+        <div class="col-lg-4 offset-lg-4 pt-4 pb-4 border" style="margin-bottom:1.1rem">
+            <h1 style="text-align:center">Modificar Publicacion #@Id</h1>
+            <EditForm Model="@Modelo" enctype="multipart/form-data" OnValidSubmit="Modificar" FormName="ModificarPublicacion">
+                <DataAnnotationsValidator />
+                <h2 style="text-align:center">Editar detalles del producto</h2>
+                <hr />
+                <ValidationSummary class="text-danger" role="alert" />
+                @if (!string.IsNullOrEmpty(MensajeError))
+                {
+                    <div class="alert alert-danger mt-3" role="alert">
+                        @MensajeError
+                    </div>
+                }
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="Modelo.Nombre" class="form-control" autocomplete="off" aria-required="true" placeholder="Nombre del producto" maxlength="50" />
+                    <label for="nombre">Nombre del producto</label>
+                    <ValidationMessage For="() => Modelo.Nombre" class="text-danger" />
                 </div>
-            }
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="Modelo.Nombre" class="form-control" autocomplete="off" aria-required="true" placeholder="Nombre del producto" maxlength="50" />
-                <label for="nombre">Nombre del producto</label>
-                <ValidationMessage For="() => Modelo.Nombre" class="text-danger" />
-            </div>
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="Modelo.Descripcion" class="form-control" autocomplete="off" aria-required="true" placeholder="Descripcion del producto" maxlength="200" />
-                <label for="descripcion">Descripcion del producto</label>
-                <ValidationMessage For="() => Modelo.Descripcion" class="text-danger" />
-            </div>
-            <div class="form-floating mb-3">
-                <InputSelect @bind-Value="@Modelo.SucursalId" class="form-control" autocomplete="sucursal" aria-required="true" placeholder="" maxlength="50">
-                    @foreach (var suc in sucursales)
-                    {
-                        <option value="@suc.Id">@suc.Nombre</option>
-                    }
-                </InputSelect>
-                <label for="sucursal">Sucursal</label>
-                <ValidationMessage For="() => Modelo.SucursalId" class="text-danger" />
-            </div>
-            <div class="form-floating mb-3">
-                <InputSelect @bind-Value="@Modelo.CategoriaId" class="form-control" autocomplete="categoria" aria-required="true" placeholder="" maxlength="50">
-                    <option value=0>Seleccione una categoría</option>
-                    @foreach (var cat in categorias)
-                    {
-                        <option value="@cat.Id">@cat.Nombre</option>
-                    }
-                </InputSelect>
-                <label for="categoria">Categoria</label>
-                <ValidationMessage For="() => Modelo.CategoriaId" class="text-danger" />
-            </div>
-            <hr />
-            <label for="foto">Foto (opcional)</label>
-            <div class="form-floating mb-3">
-                <div>
-                    <InputFile id="fileInput" multiple OnChange="OnInputFileChange" accept="image/*" class="form-control" />
-                    <button type="button" class="btn btn-danger mt-2" @onclick="ClearInputFile">Limpiar</button>
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="Modelo.Descripcion" class="form-control" autocomplete="off" aria-required="true" placeholder="Descripcion del producto" maxlength="200" />
+                    <label for="descripcion">Descripcion del producto</label>
+                    <ValidationMessage For="() => Modelo.Descripcion" class="text-danger" />
                 </div>
-            </div>
-            <ValidationMessage For="() => Modelo.FileSize" class="text-danger" />
-            <div class="image-list">
-                <table class="table table-bordered">
-                    <tr>
-                        @foreach (var imageDataUrl in imageDataUrls)
+                <div class="form-floating mb-3">
+                    <InputSelect @bind-Value="@Modelo.SucursalId" class="form-control" autocomplete="sucursal" aria-required="true" placeholder="" maxlength="50">
+                        @foreach (var suc in sucursales)
                         {
-                            <td>
-                                <img src="@imageDataUrl" style="max-width:150px" />
-                            </td>
+                            <option value="@suc.Id">@suc.Nombre</option>
                         }
-                    </tr>
-                </table>
-            </div>
-            <button type="submit" class="w-100 btn btn-lg btn-dark">Modificar Publicacion</button>
-        </EditForm>
+                    </InputSelect>
+                    <label for="sucursal">Sucursal</label>
+                    <ValidationMessage For="() => Modelo.SucursalId" class="text-danger" />
+                </div>
+                <div class="form-floating mb-3">
+                    <InputSelect @bind-Value="@Modelo.CategoriaId" class="form-control" autocomplete="categoria" aria-required="true" placeholder="" maxlength="50">
+                        <option value=0>Seleccione una categoría</option>
+                        @foreach (var cat in categorias)
+                        {
+                            <option value="@cat.Id">@cat.Nombre</option>
+                        }
+                    </InputSelect>
+                    <label for="categoria">Categoria</label>
+                    <ValidationMessage For="() => Modelo.CategoriaId" class="text-danger" />
+                </div>
+                <hr />
+                @***********NACHO - MANEJO DE IMAGENES***********@
+                <label for="foto">Fotos (opcional)</label>
+                <div class="form-floating mb-3">
+                    <div>
+                        <InputFile id="fileInput" multiple OnChange="OnInputFileChange" accept="image/*" class="form-control" />
+                    </div>
+                    <ValidationMessage For="() => Modelo.FileSize" class="text-danger" />
+                </div>
+                @if (selectedImages != null)
+                {
+                    <div class="form-floating mb-3">
+                        <button type="button" class="btn btn-danger mt-2 d-block mx-auto text-center" @onclick="ClearInputFile">Limpiar</button>
+                    </div>
+                    <div class="table-responsive" style="display:flex; justify-content:center">
+                        <table class="table table-bordered" style="text-align:center">
+                            <tr>
+                                @foreach (var imageDataUrl in imageDataUrls)
+                                {
+                                    <td>
+                                        <img src="@imageDataUrl" />
+                                    </td>
+                                }
+                            </tr>
+                        </table>
+                    </div>
+                }
+                @***********NACHO - MANEJO DE IMAGENES***********@
+                <button type="submit" class="w-100 btn btn-lg btn-dark">Modificar Publicacion</button>
+            </EditForm>
+        </div>
     </div>
-</div>
+
+}
 
 <script>
     function ClearInput() {
@@ -112,6 +138,8 @@
     public int Id { get; set; }
     private String? MensajeError;
     private ClaimsPrincipal? user;
+    bool autorizado = false;
+    bool cargando = true;
 
     Publicacion publicacionVieja = new Publicacion();
     List<Sucursal> sucursales = new List<Sucursal>();
@@ -125,11 +153,19 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        user = authState.User;
+        await Task.Delay(500);
         sucursales = await SucursalService.ReadAllSucursales(); //LECTURA DE TODAS LAS SUCURSALES
         categorias = await CategoriaService.ReadAllCategorias(); //LECTURA DE TODAS LAS CATEGORIAS
         publicacionVieja = await PublicacionService.ReadPublicacionById(Id);
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var UsuarioId = int.Parse(authState.User!.FindFirst("UsuarioId")!.Value);
+
+        context.Entry(publicacionVieja).Reference(p => p.Usuario).Load();
+        if(UsuarioId == publicacionVieja.Usuario!.Id)
+        {
+            autorizado = true;
+        }
+
         if (publicacionVieja.HasImages)
         {
             context.Entry(publicacionVieja).Collection(p => p.Imagenes!).Load();
@@ -139,6 +175,8 @@
                 imageDataUrls.Add(imageDataUrl);
             }
         }
+
+        cargando = false;
     }
 
     protected override async Task OnParametersSetAsync()
@@ -262,7 +300,7 @@
             await ImagenService.AltaImagenes(imagenes);
         }
 
-        NavMan.NavigateTo("/");
+        NavMan.NavigateTo($"/publicacion/{Id}");
 
     }
 }

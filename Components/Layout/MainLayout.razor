@@ -39,7 +39,12 @@
                     <div>
                         @if (context.User.Identity != null)
                         {
-                            <t style="margin-right:5px">Bienvenido de nuevo, <b>@context.User.Identity.Name</b></t>
+                            <t style="margin-right:5px">
+                                Bienvenido de nuevo, 
+                                <NavLink href="modificar" style="margin-left:0">
+                                    <b>@context.User.Identity.Name</b>
+                                </NavLink>
+                            </t>
                         }
                         else
                         {
