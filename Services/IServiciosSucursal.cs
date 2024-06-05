@@ -15,5 +15,6 @@ namespace TruequeTools.Services
 		public Task<Sucursal> ReadSucursalById(int id);
 		public Task UpdateSucursal(Sucursal sucursal, int id);
 		public Task DeleteSucursal(int id);
+		public Task<bool> ExisteSucursal(string nombreSucursal, int? id = null);
 	}
 }

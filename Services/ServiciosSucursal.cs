@@ -22,7 +22,7 @@ namespace TruequeTools.Services
         //DEVUELVE UNA LISTA CON TODAS LAS SUCURSALES
         public async Task<List<Sucursal>> ReadAllSucursales()
 		{
-			var result = await contexto.Sucursales.ToListAsync();
+			var result = await contexto.Sucursales.Where(s => !s.Deleted).ToListAsync();
 			return result;
 		}
 
@@ -36,7 +36,7 @@ namespace TruequeTools.Services
 		//RECIBE UN ID Y DEVUELVE LA SUCURSAL CORRESPONDIENTE A DICHO ID
 		public async Task<Sucursal> ReadSucursalById(int id)
 		{
-            var sucursal = await contexto.Sucursales.FindAsync(id);
+            var sucursal = await contexto.Sucursales.FirstOrDefaultAsync(s => s.Id == id && !s.Deleted);
 			if (sucursal != null)
 			{
 				return sucursal;
@@ -66,11 +66,15 @@ namespace TruequeTools.Services
 			var sucursal = await contexto.Sucursales.FindAsync(id);
 			if (sucursal != null)
 			{
-				contexto.Sucursales.Remove(sucursal);
+				sucursal.Deleted = true;
 				await contexto.SaveChangesAsync();
 			}
 		}
 
+		public async Task<bool> ExisteSucursal(string nombreSucursal, int? id = null)
+		{
+			return await contexto.Sucursales.AnyAsync(x => x.Nombre == nombreSucursal && !x.Deleted && (!id.HasValue || x.Id != id.Value));
+		}
 	}
 
 }

@@ -12,8 +12,8 @@ using TruequeTools.Data;
 namespace TruequeTools.Migrations
 {
     [DbContext(typeof(TruequeToolsDataContext))]
-    [Migration("20240528010041_BajasLogicas")]
-    partial class BajasLogicas
+    [Migration("20240605021633_MK2")]
+    partial class MK2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -228,6 +228,10 @@ namespace TruequeTools.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("deleted");
+
                     b.Property<string>("Direccion")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
@@ -251,6 +255,7 @@ namespace TruequeTools.Migrations
                         new
                         {
                             Id = 1,
+                            Deleted = false,
                             Direccion = "Calle 13 y 38",
                             Localidad = "La Plata",
                             Nombre = "Central"
@@ -258,6 +263,7 @@ namespace TruequeTools.Migrations
                         new
                         {
                             Id = 2,
+                            Deleted = false,
                             Direccion = "Calle 66 y 137",
                             Localidad = "La Plata",
                             Nombre = "Los Hornos"
@@ -265,6 +271,7 @@ namespace TruequeTools.Migrations
                         new
                         {
                             Id = 3,
+                            Deleted = false,
                             Direccion = "Jorge Bell y Cantilo",
                             Localidad = "La Plata",
                             Nombre = "City Bell"

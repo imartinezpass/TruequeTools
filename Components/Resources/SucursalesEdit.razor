@@ -45,7 +45,7 @@
 									</div>
 								}
 								<div class="form-floating mb-3">
-									<InputText id="nombre" @bind-Value="Modelo.Nombre" class="form-control" placeholder="" maxlength="100" />
+									<InputText id="nombre" @bind-Value="Modelo.Nombre" class="form-control" placeholder="" maxlength="100" disabled="@IsDisabled" />
 									<label for="nombre">Nombre</label>
 									<ValidationMessage For="() => Modelo.Nombre" class="text-danger" />
 								</div>
@@ -85,6 +85,7 @@
 
 	string? MensajeError;
 	public bool exito { get; set; } = false;
+	private bool IsDisabled => Id == 1;
 
 	protected override async Task OnParametersSetAsync()
 	{
@@ -109,6 +110,13 @@
 			Direccion = Modelo.Direccion,
 			Localidad = Modelo.Localidad,
 		};
+
+		var existe = await SucursalService.ExisteSucursal(sucursal.Nombre, Id);
+		if (existe)
+		{
+			MensajeError = "Error: ya existe una sucursal con ese nombre";
+			return;
+		}
 
 		if (Id != 0)
 		{
