@@ -1,0 +1,152 @@
+﻿@page "/nuevoempleado"
+
+@using Microsoft.AspNetCore.Identity
+@using System.ComponentModel.DataAnnotations
+@using System.Text
+@using System.Text.Encodings.Web
+@using Microsoft.AspNetCore.WebUtilities
+@using Microsoft.Extensions.Logging
+@using TruequeTools.Data
+@using TruequeTools.Entities
+
+@inject TruequeToolsDataContext appDbContext
+@inject NavigationManager NavMan
+@inject IServiciosUsuario UsuariosService
+@inject IServiciosSucursal SucursalService
+@inject IJSRuntime JS
+
+@attribute [Authorize(Roles = "Admin")]
+
+@rendermode InteractiveServer
+
+<PageTitle>Nuevo Empleado</PageTitle>
+
+<div class="row">
+    <div class="col-lg-4 offset-lg-4 pt-4 pb-4 border" style="margin-bottom:1.1rem">
+        <h1 style="text-align:center">Registrar nuevo empleado</h1>
+        <EditForm Model="@Modelo" OnValidSubmit="RegistrarEmpleado" FormName="RegisterForm">
+            <DataAnnotationsValidator />
+            <hr />
+            <ValidationSummary class="text-danger" role="alert" />
+            @if (!string.IsNullOrEmpty(MensajeError))
+            {
+                <div class="alert alert-danger mt-3" role="alert">
+                    @MensajeError
+                </div>
+            }
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Modelo.Nombre" class="form-control" autocomplete="nombre" aria-required="true" placeholder="" maxlength="50" />
+                <label for="nombre">Nombre</label>
+                <ValidationMessage For="() => Modelo.Nombre" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Modelo.Apellido" class="form-control" autocomplete="apellido" aria-required="true" placeholder="" maxlength="50" />
+                <label for="apellido">Apellido</label>
+                <ValidationMessage For="() => Modelo.Apellido" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputDate @bind-Value="Modelo.FechaNacimiento" class="form-control" autocomplete="fecha-nacimiento" aria-required="true" placeholder="" maxlength="50" />
+                <label for="fecha-nacimiento">Fecha de Nacimiento</label>
+                <ValidationMessage For="() => Modelo.FechaNacimiento" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputSelect @bind-Value="@Modelo.SucursalId" class="form-control" autocomplete="sucursal" aria-required="true" placeholder="" maxlength="50">
+                    @foreach (var suc in sucursales)
+                    {
+                        <option value="@suc.Id">@suc.Nombre</option>
+                    }
+                </InputSelect>
+                <label for="sucursal">Sucursal</label>
+                <ValidationMessage For="() => Modelo.SucursalId" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Modelo.Correo" class="form-control" autocomplete="correo" aria-required="true" placeholder="name@example.com" maxlength="50" />
+                <label for="correo">Correo Electronico</label>
+                <ValidationMessage For="() => Modelo.Correo" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText type="password" @bind-Value="Modelo.Contraseña" class="form-control" autocomplete="contraseña" aria-required="true" placeholder="password" maxlength="50" />
+                <label for="contraseña">Contraseña</label>
+                <ValidationMessage For="() => Modelo.Contraseña" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText type="password" @bind-Value="Modelo.ConfirmarContraseña" class="form-control" autocomplete="confirmar-contraseña" aria-required="true" placeholder="password" maxlength="50" />
+                <label for="confirmar-contraseña">Confirmar Contraseña</label>
+                <ValidationMessage For="() => Modelo.ConfirmarContraseña" class="text-danger" />
+            </div>
+            <button type="submit" class="w-100 btn btn-lg btn-dark">Registrar empleado</button>
+        </EditForm>
+    </div>
+</div>
+<div class="modal fade" data-bs-backdrop='static' tabindex="-1" role="dialog" id="ModalMensaje">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <p style="text-align:center;margin:0;">Se registró al empleado !</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @onclick="@(()=> recargarPagina())">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function toggleModal() {
+        bootstrap.Modal.getOrCreateInstance("#ModalMensaje").toggle();
+    }
+    function refreshPage() {
+        location.reload();
+    }
+</script>
+
+@code {
+    List<Sucursal> sucursales = new List<Sucursal>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        sucursales = await SucursalService.ReadAllSucursales(); //LECTURA DE TODAS LAS SUCURSALES
+    }
+
+    private String? MensajeError;
+    [SupplyParameterFromForm]
+    private RegisterViewModel Modelo { get; set; } = new();
+
+    public async Task RegistrarEmpleado(EditContext editContext)
+    {
+        var fechaMinima = DateOnly.FromDateTime(DateTime.Today.AddYears(-18).AddDays(1));
+        if (Modelo.FechaNacimiento >= fechaMinima)
+        {
+            MensajeError = "Error: el empleado debe de tener al menos 18 años.";
+            return;
+        }
+
+        if (await UsuariosService.SeEncuentraRegistrado(Modelo.Correo))
+        {
+            MensajeError = "Error: el correo electrónico ya se encuentra registrado.";
+            return;
+        }
+        var usuario = new Usuario();
+        usuario.Nombre = Modelo.Nombre;
+        usuario.Apellido = Modelo.Apellido;
+        usuario.Email = Modelo.Correo;
+        usuario.Contraseña = Modelo.Contraseña;
+        usuario.FechaNacimiento = Modelo.FechaNacimiento;
+        usuario.SucursalId = Modelo.SucursalId;
+        usuario.Rol = "Employee";
+        await UsuariosService.RegisterUsuario(usuario);
+        try // necesaria por un problema del iterops de javascript
+        {
+            await JS.InvokeVoidAsync("toggleModal");
+        }
+        catch (Exception e)           // ignorar
+        {
+        }
+
+
+    }
+    private async void recargarPagina()
+    {
+        await JS.InvokeVoidAsync("refreshPage");
+    }
+
+}
