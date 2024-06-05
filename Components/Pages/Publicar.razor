@@ -159,6 +159,7 @@
 
         if (imageFiles.Count + imageDataUrls.Count > 5)
         {
+            ClearInputFile();
             MensajeError = "Solo puedes elegir hasta un máximo de 5 imágenes";
             return;
         }
