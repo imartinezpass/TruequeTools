@@ -6,6 +6,7 @@
 @inject TruequeToolsDataContext context
 @inject IServiciosUsuario UsuarioService
 @inject NavigationManager NavManager
+@inject IJSRuntime JS
 
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
 
@@ -62,7 +63,7 @@
                                             <div class="d-flex justify-content-end">
                                                 <div class="btn-group" style="margin-right: 1rem;">
                                                     <button class="btn btn-secondary rounded" style="margin-right: 0.5rem;">Editar</button>
-                                                    <button class="btn btn-danger rounded">Eliminar</button>
+                                                    <button class="btn btn-danger rounded" @onclick="@(() => BorrarEmpleado(@emp.Id))">Eliminar</button>
                                                 </div>
                                             </div>
                                         </td>
@@ -79,7 +80,26 @@
         <button class="w-30 btn btn-lg btn-dark d-block mx-auto text-center" onclick="@(()=>redirigirANuevoEmpleado())">Nuevo Empleado</button>
     </div>
 </div>
-
+<div class="modal fade" data-bs-backdrop='static' tabindex="-1" role="dialog" id="ModalMensaje">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <p style="text-align:center;margin:0;">Se eliminó al empleado !</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @onclick="@(()=> recargarPagina())">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function toggleModal() {
+        bootstrap.Modal.getOrCreateInstance("#ModalMensaje").toggle();
+    }
+    function refreshPage() {
+        location.reload();
+    }
+</script>
 @code {
 
     List<Usuario> empleados = new List<Usuario>();
@@ -96,5 +116,23 @@
     private void redirigirANuevoEmpleado()
     {
         NavManager.NavigateTo("/nuevoempleado");
+    }
+    private async void BorrarEmpleado(int empleadoId)
+    {
+        var empleadoElegido = await UsuarioService.FindEmpleado(empleadoId);
+        empleadoElegido.Deleted = true;
+        await UsuarioService.OverwriteUsuarioById(empleadoElegido);
+        try // necesaria por un problema del iterops de javascript
+        {
+            await JS.InvokeVoidAsync("toggleModal");
+        }
+        catch (Exception e)           // ignorar
+        {
+        }
+
+    }
+    private async void recargarPagina()
+    {
+        await JS.InvokeVoidAsync("refreshPage");
     }
 }

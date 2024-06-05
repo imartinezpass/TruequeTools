@@ -19,6 +19,28 @@ namespace TruequeTools.Services
 
         private readonly TruequeToolsDataContext contexto = context;
 
+        public async Task<Usuario> FindEmpleado(int userId)
+        {
+            return await contexto.Usuarios.FindAsync(userId);
+        }
+
+        public async Task<Usuario> OverwriteUsuarioById(Usuario usuario)
+        {
+            var usuarioExistente = await FindEmpleado(usuario.Id);  // Buscar la publicación existente por su ID
+
+            if (usuarioExistente != null)
+            {
+                usuarioExistente = usuario;
+                await contexto.SaveChangesAsync();
+
+                return usuarioExistente;
+            }
+            else
+            {
+                throw new Exception("El usuario no existe.");
+            }
+        }
+
         public async Task<List<Usuario>> ReadAllEmpleados()
         {
             return await contexto.Usuarios.Where(x => x.Rol == "Employee").ToListAsync();
