@@ -81,6 +81,7 @@
                     <InputFile id="fileInput" multiple OnChange="OnInputFileChange" accept="image/*" class="form-control" />          
                 </div>
                 <ValidationMessage For="() => Modelo.FileSize" class="text-danger" />
+                <ValidationMessage For="() => Modelo.CantidadImagenes" class="text-danger" />
             </div>
             @if (selectedImages != null)
             {
@@ -156,10 +157,12 @@
     {
         imageDataUrls.Clear();
         var imageFiles = e.GetMultipleFiles();
+        Modelo.CantidadImagenes = imageDataUrls.Count;
 
         if (imageFiles.Count + imageDataUrls.Count > 5)
         {
             MensajeError = "Solo puedes elegir hasta un máximo de 5 imágenes";
+            ClearInputFile();
             return;
         }
 

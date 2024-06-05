@@ -28,7 +28,8 @@ namespace TruequeTools.Models
         [Display(Name = "Categoria")]
         public int CategoriaId { get; set; } = 0;
 
-        public string? FotoUrl { get; set; }
+        [Range(0, 5, ErrorMessage = "Solo puedes elegir hasta un máximo de 5 imágenes")]
+        public int CantidadImagenes { get; set; }
 
         [Range(0, 1024*1024*5, ErrorMessage = "Imagen demasiado grande(5MB máximo), seleccione otra si lo desea." )]
         public long FileSize { get; set; } = 0;

@@ -100,22 +100,22 @@ else
                     </div>
                     <ValidationMessage For="() => Modelo.FileSize" class="text-danger" />
                 </div>
-                @if (selectedImages != null)
+                @if (imageDataUrls != null)
                 {
-                    <div class="form-floating mb-3">
-                        <button type="button" class="btn btn-danger mt-2 d-block mx-auto text-center" @onclick="ClearInputFile">Limpiar</button>
-                    </div>
                     <div class="table-responsive" style="display:flex; justify-content:center">
                         <table class="table table-bordered" style="text-align:center">
                             <tr>
                                 @foreach (var imageDataUrl in imageDataUrls)
                                 {
                                     <td>
-                                        <img src="@imageDataUrl" />
+                                        <img src="@imageDataUrl" style="width: 100px; height: 100px;" />
                                     </td>
                                 }
                             </tr>
                         </table>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <button type="button" class="btn btn-danger mt-2 d-block mx-auto text-center" @onclick="ClearInputFile">Limpiar</button>
                     </div>
                 }
                 @***********NACHO - MANEJO DE IMAGENES***********@
@@ -140,6 +140,7 @@ else
     private ClaimsPrincipal? user;
     bool autorizado = false;
     bool cargando = true;
+    bool eliminar = false;
 
     Publicacion publicacionVieja = new Publicacion();
     List<Sucursal> sucursales = new List<Sucursal>();
@@ -188,7 +189,7 @@ else
         // Limpiar el input file y la lista de imágenes seleccionadas
         if(selectedImages==null && imageDataUrls != null)
         {
-            await ImagenService.BajaImagenesPorIdPublicacion(Id);
+            eliminar = true;
             publicacionVieja.HasImages = false;
         }
         imageDataUrls!.Clear();
@@ -200,7 +201,7 @@ else
     {
         if (selectedImages == null && imageDataUrls != null)
         {
-            await ImagenService.BajaImagenesPorIdPublicacion(Id);
+            eliminar = true;
             publicacionVieja.HasImages = false;
         }
         imageDataUrls!.Clear();
@@ -209,6 +210,7 @@ else
         if (imageFiles.Count + imageDataUrls.Count > 5)
         {
             MensajeError = "Solo puedes elegir hasta un máximo de 5 imágenes";
+            await ClearInputFile();
             return;
         }
 
@@ -283,8 +285,13 @@ else
         {
             publicacionVieja.HasImages = false;
         }
-        
+
         await PublicacionService.OverwritePublicacionById(publicacionVieja);
+
+        if (eliminar)
+        {
+            await ImagenService.BajaImagenesPorIdPublicacion(Id);
+        }
 
         if (result)
         {
