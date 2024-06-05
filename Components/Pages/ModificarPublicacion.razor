@@ -100,6 +100,12 @@ else
                     </div>
                     <ValidationMessage For="() => Modelo.FileSize" class="text-danger" />
                 </div>
+                @if (publicacionVieja.HasImages || imageDataUrls.Count > 0)
+                {
+                    <div class="form-floating mb-3">
+                        <button type="button" class="btn btn-danger mt-2 d-block mx-auto text-center" @onclick="ClearInputFile">Limpiar Imagenes</button>
+                    </div>
+                }
                 @if (imageDataUrls != null)
                 {
                     <div class="table-responsive" style="display:flex; justify-content:center">
@@ -113,10 +119,7 @@ else
                                 }
                             </tr>
                         </table>
-                    </div>
-                    <div class="form-floating mb-3">
-                        <button type="button" class="btn btn-danger mt-2 d-block mx-auto text-center" @onclick="ClearInputFile">Limpiar</button>
-                    </div>
+                    </div>    
                 }
                 @***********NACHO - MANEJO DE IMAGENES***********@
                 <button type="submit" class="w-100 btn btn-lg btn-dark">Modificar Publicacion</button>
