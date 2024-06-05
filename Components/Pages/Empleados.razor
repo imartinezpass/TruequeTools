@@ -89,7 +89,7 @@
     protected override async Task OnInitializedAsync()
     {
         await Task.Delay(500);
-        empleados = await UsuarioService.ReadAllEmpleados(); //LECTURA DE TODAS LAS SUCURSALES
+        empleados = await UsuarioService.ReadAllNotDeletedEmpleados(); //LECTURA DE TODAS los empleados
         cargando = false;
     }
 

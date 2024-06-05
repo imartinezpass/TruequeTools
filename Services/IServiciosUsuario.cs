@@ -12,6 +12,7 @@ namespace TruequeTools.Services
     {
         public Task RegisterUsuario(Usuario usuario);
         public Task<bool> SeEncuentraRegistrado(string email);
-		public Task<List<Usuario>> ReadAllEmpleados();
-	}
+        public Task<List<Usuario>> ReadAllEmpleados();
+        public Task<List<Usuario>> ReadAllNotDeletedEmpleados();
+    }
 }

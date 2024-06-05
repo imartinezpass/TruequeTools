@@ -1,5 +1,5 @@
-﻿using TruequeTools.Data;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using TruequeTools.Data;
 using TruequeTools.Entities;
 
 /*
@@ -19,14 +19,19 @@ namespace TruequeTools.Services
 
         private readonly TruequeToolsDataContext contexto = context;
 
-		public async Task<List<Usuario>> ReadAllEmpleados()
-		{
-			var usuarios = await contexto.Usuarios.Where(x => x.Rol == "Employee").ToListAsync();
-			return usuarios;
-		}
+        public async Task<List<Usuario>> ReadAllEmpleados()
+        {
+            return await contexto.Usuarios.Where(x => x.Rol == "Employee").ToListAsync();
+        }
 
-		//RECIBE UN USUARIO COMO PARAMETRO Y LO AGREGA A LA BASE DE DATOS
-		public async Task RegisterUsuario(Usuario usuario)
+        public async Task<List<Usuario>> ReadAllNotDeletedEmpleados()
+        {
+            return await contexto.Usuarios.Where(x => x.Rol == "Employee" & x.Deleted != true).ToListAsync();
+
+        }
+
+        //RECIBE UN USUARIO COMO PARAMETRO Y LO AGREGA A LA BASE DE DATOS
+        public async Task RegisterUsuario(Usuario usuario)
         {
             contexto.Usuarios.Add(usuario);
             await contexto.SaveChangesAsync();
