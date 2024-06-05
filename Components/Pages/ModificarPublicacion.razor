@@ -71,7 +71,7 @@ else
                     <ValidationMessage For="() => Modelo.Descripcion" class="text-danger" />
                 </div>
                 <div class="form-floating mb-3">
-                    <InputSelect @bind-Value="@Modelo.SucursalId" class="form-control" autocomplete="sucursal" aria-required="true" placeholder="" maxlength="50">
+                    <InputSelect @bind-Value="Modelo.SucursalId" class="form-control" autocomplete="sucursal" aria-required="true" placeholder="" maxlength="50">
                         @foreach (var suc in sucursales)
                         {
                             <option value="@suc.Id">@suc.Nombre</option>
@@ -81,7 +81,7 @@ else
                     <ValidationMessage For="() => Modelo.SucursalId" class="text-danger" />
                 </div>
                 <div class="form-floating mb-3">
-                    <InputSelect @bind-Value="@Modelo.CategoriaId" class="form-control" autocomplete="categoria" aria-required="true" placeholder="" maxlength="50">
+                    <InputSelect @bind-Value="Modelo.CategoriaId" class="form-control" autocomplete="categoria" aria-required="true" placeholder="" maxlength="50">
                         <option value=0>Seleccione una categoría</option>
                         @foreach (var cat in categorias)
                         {
@@ -176,16 +176,11 @@ else
             }
         }
 
-        cargando = false;
-    }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        await base.OnParametersSetAsync();
         Modelo.SucursalId = publicacionVieja.SucursalId;
         Modelo.CategoriaId = publicacionVieja.CategoriaId;
         Modelo.Descripcion = publicacionVieja.Descripcion!;
         Modelo.Nombre = publicacionVieja.Nombre!;
+        cargando = false;
     }
 
     async Task ClearInputFile()
@@ -278,7 +273,7 @@ else
         publicacionVieja.Nombre = Modelo.Nombre;
         publicacionVieja.Descripcion = Modelo.Descripcion;
         publicacionVieja.CategoriaId = Modelo.CategoriaId;
-        publicacionVieja.CategoriaId = Modelo.SucursalId;
+        publicacionVieja.SucursalId = Modelo.SucursalId;
 
         if (imageDataUrls.Count() != 0)
         {
