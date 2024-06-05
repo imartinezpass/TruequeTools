@@ -81,7 +81,7 @@
                                                                                     <button class="btn btn-dark rounded" disabled style="margin-right: 0.5rem;">Ofertar</button>
                                                                                 </span>
                                                                             }
-                                                                            else if (OfertasPublicacionActual!.Where(o => o.PublicacionQueOfertoId == publi.Id).Count() > 0)
+                                                                            else if (OfertasPublicacionActual!.Where(o => o.PublicacionQueOfertoId == publi.Id && o.Estado == 0).Count() > 0)
                                                                             {
                                                                                 <i style="margin-block:auto;padding-inline-end: 10%;">Actualmente ofertado a esta publicación</i>
                                                                                 <span class="disabledbutton">
