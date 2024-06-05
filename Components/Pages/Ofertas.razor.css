@@ -28,3 +28,19 @@
     margin-block-end: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
+
+.oferta-cuerpo-aceptada {
+    background-color: #00cc66;
+    padding: 10px;
+    border-radius: 15px;
+    margin-block-end: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.oferta-cuerpo-rechazada {
+    background-color: #bf4c41;
+    padding: 10px;
+    border-radius: 15px;
+    margin-block-end: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}

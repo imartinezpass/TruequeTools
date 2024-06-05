@@ -17,15 +17,7 @@
 			</div>
 			<div class="modal-body">
 				<ul class="list-group">
-					@if (exito)
-					{
-						<div>
-							<div class="alert alert-success" role="alert">
-								Se eliminó la sucursal !
-							</div>
-						</div>
-					}
-					else
+					@if (Id == 1)
 					{
 						<div>
 							<div class="alert alert-warning" role="alert">
@@ -33,7 +25,27 @@
 							</div>
 						</div>
 					}
-				</ul>
+					else
+					{
+						if (exito)
+						{
+							<div>
+								<div class="alert alert-success" role="alert">
+									Se eliminó la sucursal !
+								</div>
+							</div>
+						}
+						else
+						{
+							<div>
+								<div class="alert alert-warning" role="alert">
+									Al eliminar una sucursal todas las ofertas y truqeues pendientes que dependan de la misma seran eliminadas. Los usuarios y publicaciones seran reasignados a la sucursal "Central"". ¿Desea continuar?
+								</div>
+							</div>
+							<button class="w-100 btn btn-lg btn-dark" @onclick="Confirmar">Eliminar Sucursal</button>
+						}	
+					}	
+				</ul>		
 			</div>
 		</div>
 	</div>
@@ -52,17 +64,16 @@
 
 	public bool exito { get; set; } = false;
 
-	protected override async Task OnParametersSetAsync()
+	public async Task Confirmar()
 	{
-		if(Id != 1)
-		{
-			await SucursalService.DeleteSucursal(Id); //BAJA DE SUCURSAL
-			exito = true;
-		}
-		else
-		{
-			exito = false;
-		}
+		await SucursalService.DeleteSucursal(Id); //Baja Logica
+		/*
+		 * Pendiente definir las acciones post borrado,
+		 * que hago con las Ofertas,Trueques,Usuarios y Publicaciones
+		 * que dependen de la sucursal borrada
+		 */
+		exito = true;
+		StateHasChanged();
 	}
 
 	public async void CerrarModal()

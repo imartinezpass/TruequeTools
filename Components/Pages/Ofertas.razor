@@ -23,6 +23,7 @@
                 @foreach (var ofertaR in OfertasRealizadas)
                 {
                     var estado = "";
+                    var cuerpo = "oferta-cuerpo";
                     @if (ofertaR.Estado == 0)
                     {
                         estado = "Pendiente";
@@ -30,15 +31,17 @@
                     else if (ofertaR.Estado == -1)
                     {
                         estado = "Rechazada";
+                        cuerpo += "-rechazada";
                     }
                     else
                     {
                         estado = "Aceptada";
+                        cuerpo += "-aceptada";
                     }
                     context?.Entry(ofertaR).Reference(x => x.PublicacionQueOferto).Load();
                     context?.Entry(ofertaR).Reference(x => x.PublicacionQueOfrezco).Load();
                     context?.Entry(ofertaR.PublicacionQueOfrezco!).Reference(x => x.Usuario).Load();
-                    <div class="oferta-cuerpo">
+                    <div class="@cuerpo">
                         <p><span class="fw-bold">Usuario: </span>@ofertaR?.PublicacionQueOfrezco?.Usuario?.Nombre</p>
                         <p><span class="fw-bold">Mi Oferta: </span>@ofertaR?.PublicacionQueOfrezco!.Nombre</p>
                         <p><span class="fw-bold">Su Producto: </span>@ofertaR?.PublicacionQueOferto!.Nombre</p>
@@ -121,13 +124,20 @@
                 OfertasRecibidas.Add(oferta);
             }
         }
+
+        // Ordenar OfertasRealizadas en orden descendente por estado
+        OfertasRealizadas = OfertasRealizadas.OrderByDescending(oferta => oferta.Estado).ToList();
+
+        // Ordenar OfertasRecibidas en orden descendente por estado
+        OfertasRecibidas = OfertasRecibidas.OrderByDescending(oferta => oferta.Estado).ToList();
+        
     }
 
     public async Task AceptarOferta(Oferta oferta)
     {
         oferta.Estado = 1;
-        oferta.PublicacionQueOferto.IsOculta = true;
-        oferta.PublicacionQueOfrezco.IsOculta = true;
+        oferta.PublicacionQueOferto!.IsOculta = true;
+        oferta.PublicacionQueOfrezco!.IsOculta = true;
         await OfertaService.OverwriteOfertaById(oferta);
         await PublicacionService.OverwritePublicacionById(oferta.PublicacionQueOfrezco);
         await PublicacionService.OverwritePublicacionById(oferta.PublicacionQueOferto);

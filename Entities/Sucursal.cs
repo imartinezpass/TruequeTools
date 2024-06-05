@@ -36,6 +36,11 @@ namespace TruequeTools.Entities
         [MaxLength(50)]
         public string? Localidad { get; set; }
 
-    }
+		//MARCA DE BORRADO LOGICO
+
+		[Column("deleted")]
+		public bool Deleted { get; set; } = false;
+
+	}
 
 }
