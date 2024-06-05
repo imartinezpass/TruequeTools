@@ -61,6 +61,7 @@
                 @foreach (var recibida in OfertasRecibidas)
                 {
                     var estado = "";
+                    var cuerpo = "oferta-cuerpo";
                     @if (recibida.Estado == 0)
                     {
                         estado = "Pendiente";
@@ -68,14 +69,16 @@
                     else if (recibida.Estado == -1)
                     {
                         estado = "Rechazada";
+                        cuerpo += "-rechazada";
                     }
                     else
                     {
                         estado = "Aceptada";
+                        cuerpo += "-aceptada";
                     }
                     context?.Entry(recibida).Reference(p => p.Usuario).Load();
                     context?.Entry(recibida).Reference(p => p.PublicacionQueOferto).Load();
-                    <div class="oferta-cuerpo">
+                    <div class="@cuerpo">
                         <p><span class="fw-bold">Ofertante: </span>@recibida.Usuario!.Nombre</p>
                         <p><span class="fw-bold">Su Oferta: </span>@recibida.PublicacionQueOferto!.Nombre</p>
                         <p><span class="fw-bold">Mi Producto: </span>@recibida.PublicacionQueOfrezco!.Nombre</p>
