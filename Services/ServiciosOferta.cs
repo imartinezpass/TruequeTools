@@ -71,6 +71,17 @@ namespace TruequeTools.Services
 
             await contexto.SaveChangesAsync();
         }
+
+        //BUSCA SI UNA PUBLICACION ESTA INVOLUCRADA EN UNA OFERTA ACEPTADA
+        public async Task<bool> PublicacionComprometida(int publicacionId)
+        {
+            var ofertaAceptada = await contexto.Ofertas
+                .AnyAsync(oferta =>
+                    (oferta.PublicacionQueOfertoId == publicacionId || oferta.PublicacionQueOfrezcoId == publicacionId)
+                    && oferta.Estado == 1);
+
+            return ofertaAceptada;
+        }
     }
 
 }
