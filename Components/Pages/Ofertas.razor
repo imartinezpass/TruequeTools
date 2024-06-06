@@ -6,6 +6,7 @@
 @inject TruequeToolsDataContext context
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavMan
+@inject IJSRuntime JS
 @inject IServiciosPublicacion PublicacionService
 @inject IServiciosOferta OfertaService
 @inject IServiciosPublicacion PublicacionService
@@ -116,10 +117,89 @@
     </ul>
 </div>
 
+<div class="modal fade" id="ModalMotivoRechazo" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Motivo de Rechazo</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CerrarModal"></button>
+            </div>
+            <div class="modal-body">
+                @if (exito)
+                {
+                    <div class="alert alert-success" role="alert">
+                        Se rechazó la oferta !
+                    </div>
+                }
+                else
+                {
+                    <EditForm Model="@Modelo" OnValidSubmit="CargarMotivo" FormName="MotivoForm">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary class="text-danger" role="alert" />
+                        @if (!string.IsNullOrEmpty(MensajeError))
+                        {
+                            <div class="alert alert-danger mt-3" role="alert">
+                                @MensajeError
+                            </div>
+                        }
+                        <div class="form-floating mb-3">
+                            <InputSelect @bind-Value="Modelo.Motivo" class="form-control" aria-required="true">
+                                <option value="">Selecciona una opción</option>
+                                <option value="Horario no conveniente">Horario no conveniente</option>
+                                <option value="Fecha no conveniente">Fecha no conveniente</option>
+                                <option value="No es lo que estoy buscando">No es lo que estoy buscando</option>
+                            </InputSelect>
+                            <label for="motivo">Selecciona una opción...</label>
+                            <ValidationMessage For="() => Modelo.Motivo" class="text-danger" />
+                        </div>
+                        <button type="submit" class="w-100 btn btn-lg btn-dark">Responder</button>
+                    </EditForm>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleModal() {
+        bootstrap.Modal.getOrCreateInstance("#ModalMotivoRechazo").toggle();
+    }
+</script>
+
 @code {
 
     List<Oferta> OfertasRealizadas { get; set; } = new();
     List<Oferta> OfertasRecibidas { get; set; } = new();
+
+    [SupplyParameterFromForm]
+    private MotivoViewModel Modelo { get; set; } = new();
+
+    bool exito = false;
+    string? MensajeError;
+    Oferta ofertaActual = new();
+
+    public async Task CargarMotivo(EditContext editContext)
+    {
+        exito = true;
+        ofertaActual.Estado = -1;
+        ofertaActual.Motivo = Modelo.Motivo;
+        await OfertaService.OverwriteOfertaById(ofertaActual);
+    }
+
+    public async void CerrarModal()
+    {
+        if (exito)
+        {
+            await JS.InvokeVoidAsync("refreshPage");
+        }
+        else
+        {
+            Modelo = new MotivoViewModel();
+            MensajeError = null;
+            exito = false;
+            StateHasChanged();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -179,8 +259,8 @@
 
     public async Task RechazarOferta(Oferta oferta)
     {
-        oferta.Estado = -1;
-        await OfertaService.OverwriteOfertaById(oferta);
+        ofertaActual = oferta;
+        await JS.InvokeVoidAsync("toggleModal");
         StateHasChanged();
     }
 
