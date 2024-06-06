@@ -27,6 +27,12 @@ namespace TruequeTools.Entities
         [Column("estado")] // -1 rechazada, 0 pendiente, 1 aceptada
         public int Estado { get; set; }
 
+        [Column("fecha")] 
+        public DateTime Fecha { get; set; } = DateTime.Now;
+
+        [Column("motivo")] 
+        public string? Motivo { get; set; }
+
         //CLAVES EXTERNAS
 
         [Column("usuarioId")] // esto es redundante, lo sacamos con publicacionOfrecidaId usando sql queries
