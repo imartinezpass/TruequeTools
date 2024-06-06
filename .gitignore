@@ -405,3 +405,6 @@ FodyWeavers.xsd
 /Migrations/20240605021633_MK2.Designer.cs
 /Migrations/20240605142703_nombre_migracion80.cs
 /Migrations/20240605142703_nombre_migracion80.Designer.cs
+/Migrations/20240606222734_nombre_migracion XXX.cs
+/Migrations/20240606222734_nombre_migracion XXX.Designer.cs
+/Migrations/TruequeToolsDataContextModelSnapshot.cs
