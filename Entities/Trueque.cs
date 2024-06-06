@@ -27,9 +27,6 @@ namespace TruequeTools.Entities
         [Column("estado")]
         public int Estado { get; set; } = 0; //0 pendiente, -1 no concretado, 1 concretado sin ventas, 2 concretado con ventas
 
-        [Column("productos")]
-        public string? Productos { get; set; }
-
         //CLAVES EXTERNAS
 
         [Column("ofertaId")]
@@ -39,6 +36,9 @@ namespace TruequeTools.Entities
 
         public Oferta? Oferta { get; set; }
 
+        //REVERSE RELATIONSHIP
+
+        public List<Producto>? Productos { get; set; }
     }
 
 }

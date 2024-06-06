@@ -24,7 +24,7 @@ namespace TruequeTools.Entities
 
         //METADATA
 
-        [Column("estado")] // -1 rechazada, 0 pendiente, 1 aceptada
+        [Column("estado")] // -1 rechazada, 0 pendiente, 1 aceptada, 2 completada
         public int Estado { get; set; }
 
         [Column("fecha")] 
