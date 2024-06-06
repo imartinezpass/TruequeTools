@@ -44,3 +44,11 @@
     margin-block-end: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
+
+.oferta-cuerpo-completada {
+    background-color: #00bfff;
+    padding: 10px;
+    border-radius: 15px;
+    margin-block-end: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}

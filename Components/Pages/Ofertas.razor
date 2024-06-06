@@ -9,6 +9,7 @@
 @inject IServiciosPublicacion PublicacionService
 @inject IServiciosOferta OfertaService
 @inject IServiciosPublicacion PublicacionService
+@inject IServiciosTrueque TruequeService
 
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
 
@@ -167,6 +168,11 @@
             await OfertaService.OverwriteOfertaById(oferta);
             await PublicacionService.OverwritePublicacionById(oferta.PublicacionQueOfrezco);
             await PublicacionService.OverwritePublicacionById(oferta.PublicacionQueOferto);
+            Trueque t = new Trueque
+            {
+                OfertaId = oferta.Id
+            };
+            await TruequeService.CreateTrueque(t);
             StateHasChanged();
         }
     }

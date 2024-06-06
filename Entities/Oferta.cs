@@ -24,8 +24,17 @@ namespace TruequeTools.Entities
 
         //METADATA
 
-        [Column("estado")] // -1 rechazada, 0 pendiente, 1 aceptada
+        [Column("estado")] // -1 rechazada, 0 pendiente, 1 aceptada, 2 completada
         public int Estado { get; set; }
+
+        [Column("fecha")] 
+        public DateTime Fecha { get; set; } = DateTime.Now;
+
+        [Column("motivo")] 
+        public string? Motivo { get; set; }
+
+        [Column("isOculta")]
+        public bool IsOculta { get; set; } = false;
 
         //CLAVES EXTERNAS
 

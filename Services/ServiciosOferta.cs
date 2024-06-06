@@ -44,17 +44,11 @@ namespace TruequeTools.Services
         {
             var ofertaExistente = await contexto.Ofertas.FindAsync(oferta.Id);  // Buscar la publicación existente por su ID
 
-            if (ofertaExistente != null)
-            {
-                ofertaExistente = oferta;
-                await contexto.SaveChangesAsync();
+            ofertaExistente = oferta;
+            await contexto.SaveChangesAsync();
 
-                return ofertaExistente;
-            }
-            else
-            {
-                throw new Exception("La oferta no existe.");
-            }
+            return ofertaExistente;
+             
         }
 
         //CAMBIA EL ESTADO DE TODAS LAS OFERTAS CON CIERTO ID DE PUBLICACION OFERTADA O OFRECIDA A RECHAZADA
@@ -81,6 +75,12 @@ namespace TruequeTools.Services
                     && oferta.Estado == 1);
 
             return ofertaAceptada;
+        }
+
+        public async Task<Oferta> ReadOfertaById(int id)
+        {
+            var result = await contexto.Ofertas.Where(s => s.Id == id).FirstOrDefaultAsync();
+            return result;
         }
     }
 
