@@ -78,18 +78,23 @@
         </EditForm>
     </div>
 </div>
+
 <div class="modal fade" data-bs-backdrop='static' tabindex="-1" role="dialog" id="ModalMensaje">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-body">
-                <p style="text-align:center;margin:0;">Se registró al empleado !</p>
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Nuevo Empleado</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> recargarPagina())"></button>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" @onclick="@(()=> recargarPagina())">Cerrar</button>
+            <div class="modal-body">
+                <div class="alert alert-success" role="alert">
+                    Empleado registrado exitosamente !
+                </div>
             </div>
         </div>
     </div>
 </div>
+
 <script>
     function toggleModal() {
         bootstrap.Modal.getOrCreateInstance("#ModalMensaje").toggle();
@@ -140,13 +145,14 @@
         }
         catch (Exception e)           // ignorar
         {
+            
         }
-
 
     }
     private async void recargarPagina()
     {
-        await JS.InvokeVoidAsync("refreshPage");
+        //await JS.InvokeVoidAsync("refreshPage");
+        NavMan.NavigateTo("/empleados");
     }
 
 }
