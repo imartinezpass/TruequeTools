@@ -369,8 +369,8 @@
         if (!(publicRecibComp || (publicMiaComp)))
         {
             oferta.Estado = 1;
-            oferta.PublicacionQueOferto!.IsOculta = true;
-            oferta.PublicacionQueOfrezco!.IsOculta = true;
+            oferta.PublicacionQueOferto!.Deleted = true;
+            oferta.PublicacionQueOfrezco!.Deleted = true;
             await OfertaService.OverwriteOfertaById(oferta);
             await PublicacionService.OverwritePublicacionById(oferta.PublicacionQueOfrezco);
             await PublicacionService.OverwritePublicacionById(oferta.PublicacionQueOferto);

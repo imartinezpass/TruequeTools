@@ -44,14 +44,14 @@ namespace TruequeTools.Services
         //DEVUELVE UNA LISTA CON LAS PUBLICACIONES ACTIVAS
         public async Task<List<Publicacion>> ReadAllPublicacionesActivas()
         {
-            var result = await contexto.Publicaciones.Where(p => p.Deleted == false & p.IsOculta == false).ToListAsync();
+            var result = await contexto.Publicaciones.Where(p => p.Deleted == false).ToListAsync();
             return result;
         }
 
         //DEVUELVE UNA LISTA CON LAS PRIMERAS 12 PUBLICACIONES ACTIVAS
         public async Task<List<Publicacion>> ReadAllPublicacionesActivas12()
         {
-            var result = await contexto.Publicaciones.Where(p => p.Deleted == false & p.IsOculta == false).Take(12).ToListAsync();
+            var result = await contexto.Publicaciones.Where(p => p.Deleted == false).Take(12).ToListAsync();
             return result;
         }
 
@@ -65,7 +65,7 @@ namespace TruequeTools.Services
         //DEVUELVE UNA LISTA CON TODAS LAS PUBLICACIONES ACTIVAS DEL USUARIO PASADO COMO PARAMETRO
         public async Task<List<Publicacion>> ReadAllPublicacionesActivasCurrentUser(int userId)
         {
-            var publicaciones = await contexto.Publicaciones.Where(p => p.UsuarioId == userId & p.Deleted==false & p.IsOculta==false).ToListAsync();
+            var publicaciones = await contexto.Publicaciones.Where(p => p.UsuarioId == userId & p.Deleted==false).ToListAsync();
             return publicaciones!;
         }
 
@@ -106,7 +106,7 @@ namespace TruequeTools.Services
         //DEVUELVE UNA LISTA CON PUBLICACIONES ACTIVAS QUE POSEAN EL STRING "unTitulo" EN EL TITULO DE LA PUBLCIACION
         public async Task<List<Publicacion>> ReadPublicacionesActivasByNombre(string unTitulo)
         {
-            var result = await contexto.Publicaciones.Where(p => p.Nombre!.Contains(unTitulo) & p.Deleted == false & p.IsOculta == false).ToListAsync();
+            var result = await contexto.Publicaciones.Where(p => p.Nombre!.Contains(unTitulo) & p.Deleted == false).ToListAsync();
             return result;
         }
 

@@ -42,9 +42,9 @@ namespace TruequeTools.Services
         //SOBREESCRIBE UNA OFERTA BUSCANDOLA POR EL ID
         public async Task<Oferta> OverwriteOfertaById(Oferta oferta)
         {
-            var ofertaExistente = await contexto.Ofertas.FindAsync(oferta.Id);  // Buscar la publicación existente por su ID
+            //var ofertaExistente = await contexto.Ofertas.FindAsync(oferta.Id);  // Buscar la publicación existente por su ID
 
-            ofertaExistente = oferta;
+            var ofertaExistente = oferta;
             await contexto.SaveChangesAsync();
 
             return ofertaExistente;
@@ -80,7 +80,7 @@ namespace TruequeTools.Services
         public async Task<Oferta> ReadOfertaById(int id)
         {
             var result = await contexto.Ofertas.Where(s => s.Id == id).FirstOrDefaultAsync();
-            return result;
+            return result!;
         }
     }
 

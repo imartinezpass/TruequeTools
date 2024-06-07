@@ -131,6 +131,7 @@
         }
         catch (Exception e)           // ignorar
         {
+            await JS.InvokeVoidAsync("alert", e.ToString());
         }
 
     }

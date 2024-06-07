@@ -41,9 +41,6 @@ namespace TruequeTools.Entities
         [Column("isPremium")]
         public bool IsPremium { get; set; } = false;
 
-        [Column("isOculta")]
-        public bool IsOculta { get; set; } = false;
-
         [Column("hasImages")]
         public bool HasImages { get; set; } = false;
 

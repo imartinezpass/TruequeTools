@@ -95,7 +95,7 @@
         if (selectedFilter != 0)
         {
             publicaciones = publicaciones
-            .Where(p => p.Nombre != null && p.CategoriaId == selectedFilter && p.Deleted == false && p.IsOculta == false)
+            .Where(p => p.Nombre != null && p.CategoriaId == selectedFilter && p.Deleted == false)
             .ToList();
         }
         busquedaRealizada = true;

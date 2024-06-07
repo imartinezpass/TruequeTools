@@ -33,9 +33,6 @@ namespace TruequeTools.Entities
         [Column("motivo")] 
         public string? Motivo { get; set; }
 
-        [Column("isOculta")]
-        public bool IsOculta { get; set; } = false;
-
         //CLAVES EXTERNAS
 
         [Column("usuarioId")] // esto es redundante, lo sacamos con publicacionOfrecidaId usando sql queries

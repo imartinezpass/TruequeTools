@@ -145,11 +145,11 @@
         }
         catch (Exception e)           // ignorar
         {
-            
+            await JS.InvokeVoidAsync("alert", e.ToString());
         }
 
     }
-    private async void recargarPagina()
+    private void recargarPagina()
     {
         //await JS.InvokeVoidAsync("refreshPage");
         NavMan.NavigateTo("/empleados");

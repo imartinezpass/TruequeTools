@@ -34,7 +34,7 @@ namespace TruequeTools.Services
         public async Task<List<Pregunta>> ReadAllPreguntasRealizadasByUser(int userId)
         {
             var preguntas = await contexto.Preguntas.Where(p => p.UsuarioId == userId).ToListAsync();
-			List<Pregunta> preguntasFiltered = new();
+            List<Pregunta> preguntasFiltered = [];
 			foreach (var pregunta in preguntas)
 			{
                 await context.Entry(pregunta).Reference(p => p.Publicacion).LoadAsync();

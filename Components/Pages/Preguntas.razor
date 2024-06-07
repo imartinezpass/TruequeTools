@@ -163,6 +163,14 @@
                 }
             }   
         }
+
+        // Ordenar OfertasRealizadas en orden descendente por estado
+        PreguntasRealizadas = PreguntasRealizadas.OrderByDescending(oferta => oferta.Respuesta == null).ToList();
+
+        // Ordenar OfertasRecibidas en orden descendente por estado
+        PreguntasRecibidas = PreguntasRecibidas.OrderByDescending(oferta => oferta.Respuesta == null).ToList();
+
+
     }
 
     void Responder(int preguntaId, int publicacionId, string preguntaTexto)

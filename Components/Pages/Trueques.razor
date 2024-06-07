@@ -154,9 +154,9 @@
         Trueque trueque = await TruequeService.ReadTruequeById(truequeId);
         Oferta oferta = await OfertaService.ReadOfertaById(trueque.OfertaId);
 
-        trueque.Estado = 1;
+        trueque.Estado = 1; //trueque pasa a estado completo sin productos
         await TruequeService.OverwriteTruequeById(trueque);
-        oferta.Estado = 2;
+        oferta.Estado = 2; //oferta pasa a completada
         await OfertaService.OverwriteOfertaById(oferta);
         StateHasChanged();
         await JS.InvokeVoidAsync("refreshPage");
@@ -164,6 +164,16 @@
 
     private async Task RechazarTrueque(int truequeId)
     {
+        Trueque trueque = await TruequeService.ReadTruequeById(truequeId);
+        Oferta oferta = await OfertaService.ReadOfertaById(trueque.OfertaId);
+
+        trueque.Estado = -1; //trueque pasa a rechazado
+        await TruequeService.OverwriteTruequeById(trueque);
+        oferta.Estado = -1; //oferta pasa a rechazada
+        oferta.Motivo = "No se concretó el trueque";
+        await OfertaService.OverwriteOfertaById(oferta);
+        StateHasChanged();
+
         await JS.InvokeVoidAsync("refreshPage");
     }
 

@@ -27,6 +27,9 @@ namespace TruequeTools.Entities
         [Column("estado")]
         public int Estado { get; set; } = 0; //0 pendiente, -1 no concretado, 1 concretado sin ventas, 2 concretado con ventas
 
+        [Column("hasVentas")]
+        public bool HasVentas { get; set; } = false;
+
         //CLAVES EXTERNAS
 
         [Column("ofertaId")]
