@@ -13,60 +13,120 @@
 
 @attribute [Authorize(Roles = "Admin,User")]
 
-<div>
-    <ul class="list-group" style="padding-bottom:1.1rem">
-        <li class="list-group-item"><h3>Preguntas Realizadas: @PreguntasRealizadas.Count</h3></li>
-        @if (PreguntasRealizadas.Count != 0)
-        {
-            <li class="list-group-item">
-                @foreach (var pregunta in PreguntasRealizadas)
-                {
-                    context?.Entry(pregunta).Reference(x => x.Publicacion).Load();
-                    <div class="oferta-cuerpo">
-                        <p><span class="fw-bold">Publicacion: </span>@pregunta?.Publicacion!.Nombre</p>
-                        <p><span class="fw-bold">Pregunta: </span>@pregunta?.Texto</p>
-                        @if (pregunta!.Respuesta == null)
-                        {
-                            <p>Esperando respuesta...</p>
-                        }
-                        else
-                        {
-                            <p><span class="fw-bold">Respuesta: </span>@pregunta?.Respuesta</p>
-                        }
-                        
-                    </div>
-                }
-            </li>
-        }
-    </ul>
-</div>
+<div class="row">
+    <div class="col-lg-12 pt-4 pb-4 border">
+        <h1 style="text-align:center">Preguntas</h1>
+        <hr />
+        <div class="form-floating mb-3">
+            @if (PreguntasRealizadas.Count > 0)
+            {
+                <div class="table-responsive">
+                    <!-- Añade esta clase para hacer la tabla responsiva -->
+                    <table class="table table-bordered caption-top">
+                        <caption>Realizadas</caption>
+                        <thead>
+                            <tr>
+                                <th>Publicacion</th>
+                                <th>Pregunta</th>
+                                <th>Respuesta</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var realizada in PreguntasRealizadas)
+                            {                               
+                                var estilo = "";
+                             
+                                @if (realizada.Respuesta == null)
+                                {
+                                    estilo = "table-secondary";   
+                                }
+                                else
+                                {
+                                    estilo = "table-success";
+                                }
+                                <tr class="@estilo">
+                                    <td>@realizada?.Publicacion!.Nombre</td>
+                                    <td>@realizada?.Texto</td>
+                                    @if (realizada!.Respuesta == null)
+                                    {
+                                        <td>Esperando respuesta...</td>
+                                    }
+                                    else
+                                    {
+                                        <td>@realizada?.Respuesta</td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning" role="alert">
+                    No hay preguntas realizadas para mostrar...
+                </div>
+            }
+        </div>
+        <hr />
+        <div class="form-floating mb-3">
+            @if (PreguntasRecibidas.Count > 0)
+            {
+                <div class="table-responsive">
+                    <!-- Añade esta clase para hacer la tabla responsiva -->
+                    <table class="table table-bordered caption-top">
+                        <caption>Recibidas</caption>
+                        <thead>
+                            <tr>
+                                <th>Publicacion</th>
+                                <th>Pregunta</th>
+                                <th>Respuesta</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var recibida in PreguntasRecibidas)
+                            {
+                                var estilo = "";
 
-<div>
-    <ul class="list-group" style="padding-bottom:1.1rem">
-        <li class="list-group-item"><h3>Preguntas Recibidas: @PreguntasRecibidas.Count</h3></li>
-        @if (PreguntasRecibidas.Count != 0)
-        {
-            <li class="list-group-item">
-                @foreach (var pregunta in PreguntasRecibidas)
-                {
-                    context?.Entry(pregunta).Reference(x => x.Publicacion).Load();
-                    <div class="oferta-cuerpo">
-                        <p><span class="fw-bold">Publicacion: </span>@pregunta?.Publicacion!.Nombre</p>
-                        <p><span class="fw-bold">Pregunta: </span>@pregunta?.Texto</p>
-                        @if (pregunta!.Respuesta == null)
-                        {
-                            <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#ModalResponder" @onclick="@(() =>Responder(pregunta.Id, pregunta.PublicacionId, pregunta.Texto!))">Responder</button>
-                        }
-                        else
-                        {
-                            <p><span class="fw-bold">Respuesta: </span>@pregunta?.Respuesta</p>
-                        }
-
-                    </div>
-                }
-            </li>
-        }
-    </ul>
+                                @if (recibida.Respuesta == null)
+                                {
+                                    estilo = "table-secondary";
+                                }
+                                else
+                                {
+                                    estilo = "table-success";
+                                }
+                                <tr class="@estilo">
+                                    <td>@recibida?.Publicacion!.Nombre</td>
+                                    <td>@recibida?.Texto</td>
+                                    @if (recibida!.Respuesta == null)
+                                    {
+                                        <td style="text-align: right;">
+                                            <div class="d-flex justify-content-end">
+                                                <div class="btn-group" style="margin-right: 1rem;">
+                                                    <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#ModalResponder" @onclick="@(() =>Responder(recibida.Id, recibida.PublicacionId, recibida.Texto!))">Responder</button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td>@recibida?.Respuesta</td>
+                                    }
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning" role="alert">
+                    No hay preguntas recibidas para mostrar...
+                </div>
+            }
+        </div>
+    </div>
 </div>
 
 <Responder 
