@@ -16,105 +16,164 @@
 
 @attribute [Authorize(Roles = "Admin,User")]
 
-<div>
-    <ul class="list-group" style="padding-bottom:1.1rem">
-        <li class="list-group-item"><h3>Ofertas Realizadas: @OfertasRealizadas.Count</h3></li>
-        @if(OfertasRealizadas.Count != 0)
-        {
-            <li class="list-group-item">
-                @foreach (var realizada in OfertasRealizadas)
-                {
-                    var estado = "";
-                    var cuerpo = "oferta-cuerpo";
-                    @if (realizada.Estado == 0)
-                    {
-                        estado = "Pendiente";
-                    }
-                    else if (realizada.Estado == -1)
-                    {
-                        estado = "Rechazada";
-                        cuerpo += "-rechazada";
-                    }
-                    else if(realizada.Estado == 1)
-                    {
-                        estado = "Aceptada";
-                        cuerpo += "-aceptada";
-                    }
-                    else
-                    {
-                        estado = "Completada";
-                        cuerpo += "-completada";
-                    }
-                    context?.Entry(realizada).Reference(x => x.PublicacionQueOferto).Load();
-                    context?.Entry(realizada).Reference(x => x.PublicacionQueOfrezco).Load();
-                    context?.Entry(realizada.PublicacionQueOfrezco!).Reference(x => x.Usuario).Load();
-                    <div class="@cuerpo">
-                        <p><span class="fw-bold">Usuario: </span>@realizada?.PublicacionQueOfrezco?.Usuario?.Nombre</p>
-                        <p><span class="fw-bold">Mi Oferta: </span>@realizada?.PublicacionQueOfrezco!.Nombre <a class="btn btn-secondary" @onclick="@(() => VerPublicacion(realizada!.PublicacionQueOfrezcoId!))">Ver</a></p>
-                        <p><span class="fw-bold">Su Producto: </span>@realizada?.PublicacionQueOferto!.Nombre <a class="btn btn-secondary" @onclick="@(() => VerPublicacion(realizada!.PublicacionQueOfertoId!))">Ver</a></p>
-                        <p><span class="fw-bold">Estado: </span>@estado</p>
-                    </div>
-                }
-            </li>
-        }   
-    </ul>
-</div>
-<div>
-    <ul class="list-group" style="padding-bottom:1.1rem">
-        <li class="list-group-item"><h3>Ofertas Recibidas: @OfertasRecibidas.Count</h3></li>
-        @if (OfertasRecibidas.Count != 0)
-        {
-            <li class="list-group-item">
-                @foreach (var recibida in OfertasRecibidas)
-                {
-                    var estado = "";
-                    var cuerpo = "oferta-cuerpo";
-                    @if (recibida.Estado == 0)
-                    {
-                        estado = "Pendiente";
-                    }
-                    else if (recibida.Estado == -1)
-                    {
-                        estado = "Rechazada";
-                        cuerpo += "-rechazada";
-                    }
-                    else if (recibida.Estado == 1)
-                    {
-                        estado = "Aceptada";
-                        cuerpo += "-aceptada";
-                    }
-                    else
-                    {
-                        estado = "Completada";
-                        cuerpo += "-completada";
-                    }
-                    context?.Entry(recibida).Reference(p => p.Usuario).Load();
-                    context?.Entry(recibida).Reference(p => p.PublicacionQueOferto).Load();
-                    <div class="@cuerpo">
-                        <p><span class="fw-bold">Ofertante: </span>@recibida.Usuario!.Nombre</p>
-                        <p><span class="fw-bold">Su Oferta: </span>@recibida.PublicacionQueOferto!.Nombre <a class="btn btn-secondary" @onclick="@(() => VerPublicacion(recibida.PublicacionQueOfertoId))">Ver</a></p>
-                        <p><span class="fw-bold">Mi Producto: </span>@recibida.PublicacionQueOfrezco!.Nombre <a class="btn btn-secondary" @onclick="@(() => VerPublicacion(recibida.PublicacionQueOfrezcoId))">Ver</a></p>
-                        <p><span class="fw-bold">Estado: </span>@estado</p>
-                        @if (recibida.Estado == 0)
+<div class="row">
+    <div class="col-lg-12 pt-4 pb-4 border">
+        <h1 style="text-align:center">Ofertas</h1>
+        <hr />
+        <div class="form-floating mb-3">          
+            <div class="table-responsive">
+                <!-- Añade esta clase para hacer la tabla responsiva -->
+                <table class="table table-bordered caption-top">
+                    <caption>Realizadas</caption>
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Mi Oferta</th>
+                            <th>Su Producto</th>
+                            <th>Sucursal</th>
+                            <th>Fecha y Hora</th>
+                            <th>Estado</th>      
+                            <th>Comentarios</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var realizada in OfertasRealizadas)
                         {
-                            <button class="btn btn-success" @onclick="@(() => AceptarOferta(recibida))">
-                                Aceptar
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-check" viewBox="0 0 16 16">
-                                    <path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-4 4.5a.75.75 0 0 1-1.08 0l-2-2.25a.75.75 0 0 1 1.08-1.05l1.47 1.65 3.47-3.9z" />
-                                </svg>
-                            </button>
-                            <button class="btn btn-danger" @onclick="@(() => RechazarOferta(recibida))">
-                                Rechazar
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x" viewBox="0 0 16 16">
-                                    <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
-                                </svg>
-                            </button>
+                            var estado = "";
+                            var estilo = "";
+                            var ofrezco = "publicacion/" + realizada!.PublicacionQueOfrezcoId!;
+                            var oferto = "publicacion/" + realizada!.PublicacionQueOfertoId!;
+                            var comentario = "";
+
+                            @if (realizada.Estado == 0)
+                            {
+                                estado = "Pendiente";
+                                estilo = "table-secondary";
+                                comentario = "Esperando respuesta...";
+                            }
+                            else if (realizada.Estado == -1)
+                            {
+                                estado = "Rechazada";
+                                estilo = "table-danger";
+                                comentario = "Motivo: " + realizada.Motivo;
+                            }
+                            else if (realizada.Estado == 1)
+                            {
+                                estado = "Aceptada";
+                                estilo = "table-success";
+                                comentario = "Trueque pendiente...";
+                            }
+                            else
+                            {
+                                estado = "Completada";
+                                estilo = "table-info";
+                                comentario = "Trueque completado";
+                            }
+                            context?.Entry(realizada).Reference(x => x.PublicacionQueOferto).Load();
+                            context?.Entry(realizada).Reference(x => x.PublicacionQueOfrezco).Load();
+                            context?.Entry(realizada.PublicacionQueOfrezco!).Reference(x => x.Usuario).Load();
+                            context?.Entry(realizada.PublicacionQueOfrezco!).Reference(x => x.Sucursal).Load();
+                            <tr class="@estilo">
+                                <td>@realizada?.PublicacionQueOfrezco?.Usuario?.Nombre</td>
+                                <td><NavLink href="@ofrezco">@realizada?.PublicacionQueOfrezco!.Nombre</NavLink></td>
+                                <td><NavLink href="@oferto">@realizada?.PublicacionQueOferto!.Nombre</NavLink></td>
+                                <td>@realizada?.PublicacionQueOferto!.Sucursal!.Nombre</td>
+                                <td>@realizada?.Fecha.ToShortDateString() @realizada?.Fecha.ToShortTimeString()</td>
+                                <td><b>@estado</b></td>
+                                <td>@comentario</td>
+                            </tr>
                         }
-                    </div>
-                }
-            </li>
-        }    
-    </ul>
+                    </tbody>
+                </table>
+            </div>         
+        </div>
+        <hr />
+        <div class="form-floating mb-3">
+            <div class="table-responsive">
+                <!-- Añade esta clase para hacer la tabla responsiva -->
+                <table class="table table-bordered caption-top">
+                    <caption>Recibidas</caption>
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Mi Producto</th>
+                            <th>Su Oferta</th>
+                            <th>Sucursal</th>
+                            <th>Fecha y Hora</th>
+                            <th>Estado</th>
+                            <th>Comentarios</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var recibida in OfertasRecibidas)
+                        {
+                            var estado = "";
+                            var estilo = "";
+                            var ofrezco = "publicacion/" + recibida!.PublicacionQueOfrezcoId!;
+                            var oferto = "publicacion/" + recibida!.PublicacionQueOfertoId!;
+                            var comentario = "";
+
+                            @if (recibida.Estado == 0)
+                            {
+                                estado = "Pendiente";
+                                estilo = "table-secondary";
+                                comentario = "Esperando respuesta...";
+                            }
+                            else if (recibida.Estado == -1)
+                            {
+                                estado = "Rechazada";
+                                estilo = "table-danger";
+                                comentario = "Motivo: " + recibida.Motivo;
+                            }
+                            else if (recibida.Estado == 1)
+                            {
+                                estado = "Aceptada";
+                                estilo = "table-success";
+                                comentario = "Trueque pendiente...";
+                            }
+                            else
+                            {
+                                estado = "Completada";
+                                estilo = "table-info";
+                                comentario = "Trueque completado";
+                            }
+
+                            context?.Entry(recibida).Reference(x => x.PublicacionQueOferto).Load();
+                            context?.Entry(recibida).Reference(x => x.PublicacionQueOfrezco).Load();
+                            context?.Entry(recibida.PublicacionQueOfrezco!).Reference(x => x.Usuario).Load();
+                            context?.Entry(recibida.PublicacionQueOfrezco!).Reference(x => x.Sucursal).Load();
+
+                            <tr class="@estilo">
+                                <td>@recibida?.PublicacionQueOfrezco?.Usuario?.Nombre</td>
+                                <td><NavLink href="@ofrezco">@recibida?.PublicacionQueOfrezco!.Nombre</NavLink></td>
+                                <td><NavLink href="@oferto">@recibida?.PublicacionQueOferto!.Nombre</NavLink></td>
+                                <td>@recibida?.PublicacionQueOferto!.Sucursal!.Nombre</td>
+                                <td>@recibida?.Fecha.ToShortDateString() @recibida?.Fecha.ToShortTimeString()</td>
+                                <td>
+                                    @if (recibida!.Estado == 0)
+                                    {
+                                    <td style="text-align: right;">
+                                        <div class="d-flex justify-content-end">
+                                            <div class="btn-group" style="margin-right: 1rem;">
+                                                <button class="btn btn-success rounded" style="margin-right: 0.5rem;" @onclick="@(() => AceptarOferta(recibida))">Aceptar</button>
+                                                <button class="btn btn-danger rounded" @onclick="@(() => RechazarOferta(recibida))">Rechazar</button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    }
+                                    else
+                                    {
+                                    <td><b>@estado</b></td>
+                                    }                             
+                                </td>         
+                                <td>@comentario</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="modal fade" id="ModalMotivoRechazo" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
