@@ -160,9 +160,51 @@
     </div>
 </div>
 
+<div class="modal fade" id="ModalAceptar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CerrarModalAceptar"></button>
+            </div>
+            <div class="modal-body">
+                @if (publicRecibComp || publicMiaComp)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        No es posible aceptar la oferta:
+                    </div>
+                    if (publicMiaComp)
+                    {
+                        <div class="alert alert-custom" role="alert">
+                            - Su producto ya tiene un trueque pendiente.
+                        </div>
+                    }
+                    if (publicRecibComp)
+                    {
+                        <div class="alert alert-custom" role="alert">
+                            - El producto que le ofrecieron ya tiene un trueque pendiente.
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="alert alert-success" role="alert">
+                        Se ha aceptado la oferta!
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-    function toggleModal() {
+    function toggleModalRechazar() {
         bootstrap.Modal.getOrCreateInstance("#ModalMotivoRechazo").toggle();
+    }
+    function toggleModalAceptar() {
+        bootstrap.Modal.getOrCreateInstance("#ModalAceptar").toggle();
+    }
+    function refreshPage() {
+        location.reload();
     }
 </script>
 
@@ -201,6 +243,11 @@
         }
     }
 
+    public async void CerrarModalAceptar()
+    {
+        await JS.InvokeVoidAsync("refreshPage");
+    }
+
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
@@ -227,20 +274,23 @@
 
     }
 
+    bool publicRecibComp;
+    bool publicMiaComp;
+
     public async Task AceptarOferta(Oferta oferta)
     {
-        if (await OfertaService.PublicacionComprometida(oferta.PublicacionQueOfertoId) && await OfertaService.PublicacionComprometida(oferta.PublicacionQueOfrezcoId))
+        publicRecibComp = await OfertaService.PublicacionComprometida(oferta.PublicacionQueOfertoId);
+        publicMiaComp = await OfertaService.PublicacionComprometida(oferta.PublicacionQueOfrezcoId);
+        
+        try // necesaria por un problema del iterops de javascript
         {
-
+            await JS.InvokeVoidAsync("toggleModalAceptar");
         }
-        else if (await OfertaService.PublicacionComprometida(oferta.PublicacionQueOfertoId)) {
-
-        }
-        else if (await OfertaService.PublicacionComprometida(oferta.PublicacionQueOfrezcoId))
+        catch           // ignorar
         {
-
         }
-        else
+
+        if (!(publicRecibComp || (publicMiaComp)))
         {
             oferta.Estado = 1;
             oferta.PublicacionQueOferto!.IsOculta = true;
@@ -249,9 +299,9 @@
             await PublicacionService.OverwritePublicacionById(oferta.PublicacionQueOfrezco);
             await PublicacionService.OverwritePublicacionById(oferta.PublicacionQueOferto);
             Trueque t = new Trueque
-            {
-                OfertaId = oferta.Id
-            };
+                {
+                    OfertaId = oferta.Id
+                };
             await TruequeService.CreateTrueque(t);
             StateHasChanged();
         }
@@ -259,8 +309,14 @@
 
     public async Task RechazarOferta(Oferta oferta)
     {
-        ofertaActual = oferta;
-        await JS.InvokeVoidAsync("toggleModal");
+        try // necesaria por un problema del iterops de javascript
+        {
+            ofertaActual = oferta;
+            await JS.InvokeVoidAsync("toggleModalRechazar");
+        }
+        catch           // ignorar
+        {
+        }
         StateHasChanged();
     }
 
