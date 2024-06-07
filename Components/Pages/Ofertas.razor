@@ -20,158 +20,176 @@
     <div class="col-lg-12 pt-4 pb-4 border">
         <h1 style="text-align:center">Ofertas</h1>
         <hr />
-        <div class="form-floating mb-3">          
-            <div class="table-responsive">
-                <!-- Añade esta clase para hacer la tabla responsiva -->
-                <table class="table table-bordered caption-top">
-                    <caption>Realizadas</caption>
-                    <thead>
-                        <tr>
-                            <th>Usuario</th>
-                            <th>Mi Oferta</th>
-                            <th>Su Producto</th>
-                            <th>Sucursal</th>
-                            <th>Fecha y Hora</th>
-                            <th>Estado</th>      
-                            <th>Comentarios</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var realizada in OfertasRealizadas)
-                        {
-                            var estado = "";
-                            var estilo = "";
-                            var ofrezco = "publicacion/" + realizada!.PublicacionQueOfrezcoId!;
-                            var oferto = "publicacion/" + realizada!.PublicacionQueOfertoId!;
-                            var comentario = "";
-
-                            @if (realizada.Estado == 0)
-                            {
-                                estado = "Pendiente";
-                                estilo = "table-secondary";
-                                comentario = "Esperando respuesta...";
-                            }
-                            else if (realizada.Estado == -1)
-                            {
-                                estado = "Rechazada";
-                                estilo = "table-danger";
-                                comentario = "Motivo: " + realizada.Motivo;
-                            }
-                            else if (realizada.Estado == 1)
-                            {
-                                estado = "Aceptada";
-                                estilo = "table-success";
-                                comentario = "Trueque pendiente...";
-                            }
-                            else
-                            {
-                                estado = "Completada";
-                                estilo = "table-info";
-                                comentario = "Trueque completado";
-                            }
-                            context?.Entry(realizada).Reference(x => x.PublicacionQueOferto).Load();
-                            context?.Entry(realizada).Reference(x => x.PublicacionQueOfrezco).Load();
-                            context?.Entry(realizada.PublicacionQueOfrezco!).Reference(x => x.Usuario).Load();
-                            context?.Entry(realizada.PublicacionQueOfrezco!).Reference(x => x.Sucursal).Load();
-                            <tr class="@estilo">
-                                <td>@realizada?.PublicacionQueOfrezco?.Usuario?.Nombre</td>
-                                <td><NavLink href="@ofrezco">@realizada?.PublicacionQueOfrezco!.Nombre</NavLink></td>
-                                <td><NavLink href="@oferto">@realizada?.PublicacionQueOferto!.Nombre</NavLink></td>
-                                <td>@realizada?.PublicacionQueOferto!.Sucursal!.Nombre</td>
-                                <td>@realizada?.Fecha.ToShortDateString() @realizada?.Fecha.ToShortTimeString()</td>
-                                <td><b>@estado</b></td>
-                                <td>@comentario</td>
+        <div class="form-floating mb-3">
+            @if (OfertasRealizadas.Count > 0)
+            {
+                <div class="table-responsive">
+                    <!-- Añade esta clase para hacer la tabla responsiva -->
+                    <table class="table table-bordered caption-top">
+                        <caption>Realizadas</caption>
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Mi Oferta</th>
+                                <th>Su Producto</th>
+                                <th>Sucursal</th>
+                                <th>Fecha y Hora</th>
+                                <th>Estado</th>
+                                <th>Comentarios</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>         
+                        </thead>
+                        <tbody>
+                            @foreach (var realizada in OfertasRealizadas)
+                            {
+                                var estado = "";
+                                var estilo = "";
+                                var ofrezco = "publicacion/" + realizada!.PublicacionQueOfrezcoId!;
+                                var oferto = "publicacion/" + realizada!.PublicacionQueOfertoId!;
+                                var comentario = "";
+
+                                @if (realizada.Estado == 0)
+                                {
+                                    estado = "Pendiente";
+                                    estilo = "table-secondary";
+                                    comentario = "Esperando respuesta...";
+                                }
+                                else if (realizada.Estado == -1)
+                                {
+                                    estado = "Rechazada";
+                                    estilo = "table-danger";
+                                    comentario = "Motivo: " + realizada.Motivo;
+                                }
+                                else if (realizada.Estado == 1)
+                                {
+                                    estado = "Aceptada";
+                                    estilo = "table-success";
+                                    comentario = "Trueque pendiente...";
+                                }
+                                else
+                                {
+                                    estado = "Completada";
+                                    estilo = "table-info";
+                                    comentario = "Trueque completado";
+                                }
+                                context?.Entry(realizada).Reference(x => x.PublicacionQueOferto).Load();
+                                context?.Entry(realizada).Reference(x => x.PublicacionQueOfrezco).Load();
+                                context?.Entry(realizada.PublicacionQueOfrezco!).Reference(x => x.Usuario).Load();
+                                context?.Entry(realizada.PublicacionQueOfrezco!).Reference(x => x.Sucursal).Load();
+                                <tr class="@estilo">
+                                    <td>@realizada?.PublicacionQueOfrezco?.Usuario?.Nombre</td>
+                                    <td><NavLink href="@ofrezco">@realizada?.PublicacionQueOfrezco!.Nombre</NavLink></td>
+                                    <td><NavLink href="@oferto">@realizada?.PublicacionQueOferto!.Nombre</NavLink></td>
+                                    <td>@realizada?.PublicacionQueOferto!.Sucursal!.Nombre</td>
+                                    <td>@realizada?.Fecha.ToShortDateString() @realizada?.Fecha.ToShortTimeString()</td>
+                                    <td><b>@estado</b></td>
+                                    <td>@comentario</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning" role="alert">
+                    No hay ofertas realizadas para mostrar...
+                </div>
+            } 
         </div>
         <hr />
         <div class="form-floating mb-3">
-            <div class="table-responsive">
-                <!-- Añade esta clase para hacer la tabla responsiva -->
-                <table class="table table-bordered caption-top">
-                    <caption>Recibidas</caption>
-                    <thead>
-                        <tr>
-                            <th>Usuario</th>
-                            <th>Mi Producto</th>
-                            <th>Su Oferta</th>
-                            <th>Sucursal</th>
-                            <th>Fecha y Hora</th>
-                            <th>Estado</th>
-                            <th>Comentarios</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var recibida in OfertasRecibidas)
-                        {
-                            var estado = "";
-                            var estilo = "";
-                            var ofrezco = "publicacion/" + recibida!.PublicacionQueOfrezcoId!;
-                            var oferto = "publicacion/" + recibida!.PublicacionQueOfertoId!;
-                            var comentario = "";
-
-                            @if (recibida.Estado == 0)
-                            {
-                                estado = "Pendiente";
-                                estilo = "table-secondary";
-                                comentario = "Esperando respuesta...";
-                            }
-                            else if (recibida.Estado == -1)
-                            {
-                                estado = "Rechazada";
-                                estilo = "table-danger";
-                                comentario = "Motivo: " + recibida.Motivo;
-                            }
-                            else if (recibida.Estado == 1)
-                            {
-                                estado = "Aceptada";
-                                estilo = "table-success";
-                                comentario = "Trueque pendiente...";
-                            }
-                            else
-                            {
-                                estado = "Completada";
-                                estilo = "table-info";
-                                comentario = "Trueque completado";
-                            }
-
-                            context?.Entry(recibida).Reference(x => x.PublicacionQueOferto).Load();
-                            context?.Entry(recibida).Reference(x => x.PublicacionQueOfrezco).Load();
-                            context?.Entry(recibida.PublicacionQueOfrezco!).Reference(x => x.Usuario).Load();
-                            context?.Entry(recibida.PublicacionQueOfrezco!).Reference(x => x.Sucursal).Load();
-
-                            <tr class="@estilo">
-                                <td>@recibida?.PublicacionQueOfrezco?.Usuario?.Nombre</td>
-                                <td><NavLink href="@ofrezco">@recibida?.PublicacionQueOfrezco!.Nombre</NavLink></td>
-                                <td><NavLink href="@oferto">@recibida?.PublicacionQueOferto!.Nombre</NavLink></td>
-                                <td>@recibida?.PublicacionQueOferto!.Sucursal!.Nombre</td>
-                                <td>@recibida?.Fecha.ToShortDateString() @recibida?.Fecha.ToShortTimeString()</td>
-                                <td>
-                                    @if (recibida!.Estado == 0)
-                                    {
-                                    <td style="text-align: right;">
-                                        <div class="d-flex justify-content-end">
-                                            <div class="btn-group" style="margin-right: 1rem;">
-                                                <button class="btn btn-success rounded" style="margin-right: 0.5rem;" @onclick="@(() => AceptarOferta(recibida))">Aceptar</button>
-                                                <button class="btn btn-danger rounded" @onclick="@(() => RechazarOferta(recibida))">Rechazar</button>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    }
-                                    else
-                                    {
-                                    <td><b>@estado</b></td>
-                                    }                             
-                                </td>         
-                                <td>@comentario</td>
+            @if(OfertasRecibidas.Count > 0)
+            {
+                <div class="table-responsive">
+                    <!-- Añade esta clase para hacer la tabla responsiva -->
+                    <table class="table table-bordered caption-top">
+                        <caption>Recibidas</caption>
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Mi Producto</th>
+                                <th>Su Oferta</th>
+                                <th>Sucursal</th>
+                                <th>Fecha y Hora</th>
+                                <th>Estado</th>
+                                <th>Comentarios</th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            @foreach (var recibida in OfertasRecibidas)
+                            {
+                                var estado = "";
+                                var estilo = "";
+                                var ofrezco = "publicacion/" + recibida!.PublicacionQueOfrezcoId!;
+                                var oferto = "publicacion/" + recibida!.PublicacionQueOfertoId!;
+                                var comentario = "";
+
+                                @if (recibida.Estado == 0)
+                                {
+                                    estado = "Pendiente";
+                                    estilo = "table-secondary";
+                                    comentario = "Esperando respuesta...";
+                                }
+                                else if (recibida.Estado == -1)
+                                {
+                                    estado = "Rechazada";
+                                    estilo = "table-danger";
+                                    comentario = "Motivo: " + recibida.Motivo;
+                                }
+                                else if (recibida.Estado == 1)
+                                {
+                                    estado = "Aceptada";
+                                    estilo = "table-success";
+                                    comentario = "Trueque pendiente...";
+                                }
+                                else
+                                {
+                                    estado = "Completada";
+                                    estilo = "table-info";
+                                    comentario = "Trueque completado";
+                                }
+
+                                context?.Entry(recibida).Reference(x => x.PublicacionQueOferto).Load();
+                                context?.Entry(recibida).Reference(x => x.PublicacionQueOfrezco).Load();
+                                context?.Entry(recibida.PublicacionQueOfrezco!).Reference(x => x.Usuario).Load();
+                                context?.Entry(recibida.PublicacionQueOfrezco!).Reference(x => x.Sucursal).Load();
+
+                                <tr class="@estilo">
+                                    <td>@recibida?.PublicacionQueOfrezco?.Usuario?.Nombre</td>
+                                    <td><NavLink href="@ofrezco">@recibida?.PublicacionQueOfrezco!.Nombre</NavLink></td>
+                                    <td><NavLink href="@oferto">@recibida?.PublicacionQueOferto!.Nombre</NavLink></td>
+                                    <td>@recibida?.PublicacionQueOferto!.Sucursal!.Nombre</td>
+                                    <td>@recibida?.Fecha.ToShortDateString() @recibida?.Fecha.ToShortTimeString()</td>
+                                    <td>
+                                        @if (recibida!.Estado == 0)
+                                        {
+                                        <td style="text-align: right;">
+                                            <div class="d-flex justify-content-end">
+                                                <div class="btn-group" style="margin-right: 1rem;">
+                                                    <button class="btn btn-success rounded" style="margin-right: 0.5rem;" @onclick="@(() => AceptarOferta(recibida))">Aceptar</button>
+                                                    <button class="btn btn-danger rounded" @onclick="@(() => RechazarOferta(recibida))">Rechazar</button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        }
+                                        else
+                                        {
+                                        <td><b>@estado</b></td>
+                                        }
+                                    </td>
+                                    <td>@comentario</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning" role="alert">
+                    No hay ofertas recibidas para mostrar...
+                </div>
+            }    
         </div>
     </div>
 </div>
@@ -180,7 +198,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="staticBackdropLabel">Motivo de Rechazo</h1>
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Motivo de rechazo</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CerrarModal"></button>
             </div>
             <div class="modal-body">
@@ -208,10 +226,10 @@
                                 <option value="Fecha no conveniente">Fecha no conveniente</option>
                                 <option value="No es lo que estoy buscando">No es lo que estoy buscando</option>
                             </InputSelect>
-                            <label for="motivo">Selecciona una opción...</label>
+                            <label for="motivo">Motivo...</label>
                             <ValidationMessage For="() => Modelo.Motivo" class="text-danger" />
                         </div>
-                        <button type="submit" class="w-100 btn btn-lg btn-dark">Responder</button>
+                        <button type="submit" class="w-100 btn btn-lg btn-dark">Rechazar</button>
                     </EditForm>
                 }
             </div>
@@ -223,31 +241,32 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
+                <h1 class="modal-title fs-5">Aceptar Oferta</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CerrarModalAceptar"></button>
             </div>
             <div class="modal-body">
                 @if (publicRecibComp || publicMiaComp)
                 {
-                    <div class="alert alert-danger" role="alert">
-                        No es posible aceptar la oferta:
+                    <div class="alert alert-secondary" role="alert">
+                        No es posible aceptar la oferta en este momento. Si lo desea puede esperar a la resolucion o rechazar la oferta
                     </div>
                     if (publicMiaComp)
                     {
-                        <div class="alert alert-custom" role="alert">
+                        <div class="alert alert-warning" role="alert">
                             - Su producto ya tiene un trueque pendiente.
                         </div>
                     }
                     if (publicRecibComp)
                     {
-                        <div class="alert alert-custom" role="alert">
+                        <div class="alert alert-warning" role="alert">
                             - El producto que le ofrecieron ya tiene un trueque pendiente.
                         </div>
-                    }
+                    }    
                 }
                 else
                 {
                     <div class="alert alert-success" role="alert">
-                        Se ha aceptado la oferta!
+                        Oferta aceptada exitosamente !
                     </div>
                 }
             </div>
