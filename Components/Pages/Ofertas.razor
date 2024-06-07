@@ -34,8 +34,8 @@
                                 <th>Su Producto</th>
                                 <th>Sucursal</th>
                                 <th>Fecha y Hora</th>
-                                <th>Estado</th>
                                 <th>Comentarios</th>
+                                <th>Estado</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -160,24 +160,22 @@
                                     <td><NavLink href="@oferto">@recibida?.PublicacionQueOferto!.Nombre</NavLink></td>
                                     <td>@recibida?.PublicacionQueOferto!.Sucursal!.Nombre</td>
                                     <td>@recibida?.Fecha.ToShortDateString() @recibida?.Fecha.ToShortTimeString()</td>
-                                    <td>
-                                        @if (recibida!.Estado == 0)
-                                        {
-                                        <td style="text-align: right;">
-                                            <div class="d-flex justify-content-end">
-                                                <div class="btn-group" style="margin-right: 1rem;">
-                                                    <button class="btn btn-success rounded" style="margin-right: 0.5rem;" @onclick="@(() => AceptarOferta(recibida))">Aceptar</button>
-                                                    <button class="btn btn-danger rounded" @onclick="@(() => RechazarOferta(recibida))">Rechazar</button>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        }
-                                        else
-                                        {
-                                        <td><b>@estado</b></td>
-                                        }
-                                    </td>
                                     <td>@comentario</td>
+                                    @if (recibida!.Estado == 0)
+                                    {
+                                    <td style="text-align: right;">
+                                        <div class="d-flex justify-content-end">
+                                            <div class="btn-group" style="margin-right: 1rem;">
+                                                <button class="btn btn-success rounded" style="margin-right: 0.5rem;" @onclick="@(() => AceptarOferta(recibida))">Aceptar</button>
+                                                <button class="btn btn-danger rounded" @onclick="@(() => RechazarOferta(recibida))">Rechazar</button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    }
+                                    else
+                                    {
+                                    <td><b>@estado</b></td>
+                                    }       
                                 </tr>
                             }
                         </tbody>

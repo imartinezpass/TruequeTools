@@ -9,6 +9,8 @@
 @inject IServiciosUsuario UsuarioService
 @inject IServiciosTrueque TruequeService
 @inject IServiciosOferta OfertaService
+@inject IServiciosSucursal SucursalService
+@inject IJSRuntime JS
 
 @attribute [Authorize(Roles = "Admin,Employee")]
 
@@ -17,7 +19,7 @@
 <div class="row">
     <div class="col-lg-12 pt-4 pb-4 border">
         <h1 style="text-align:center">Trueques</h1>
-        <h2 style="text-align:center">Sucursal X</h2>
+        <h2 style="text-align:center">@nombreSucursal</h2>
         <hr />
         <div class="form-floating mb-3">
             @if (cargando)
@@ -40,35 +42,70 @@
                 {
                     <div class="table-responsive">
                         <!-- Añade esta clase para hacer la tabla responsiva -->
-                        <table class="table">
+                        <table class="table table-bordered caption-top">
                             <thead>
                                 <tr>
                                     <th>Id</th>
                                     <th>Fecha</th>
                                     <th>Hora</th>
-                                    <th>Estado</th>
-                                    <th style="min-width: 120px;"></th> <!-- Utiliza min-width para asegurar un ancho mínimo -->
+                                    <th>Comentarios</th>
+                                    <th>Estado</th>                               
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach (var t in trueques)
                                 {
+                                    var estado = "";
+                                    var estilo = "";
+                                    var comentario = "";
+
+                                    if(t.Estado == -1)
+                                    {
+                                        estado = "No completado";
+                                        estilo = "table-danger";
+                                        comentario = "Aca va el motivo";
+                                    }
+                                    else if(t.Estado == 0)
+                                    {
+                                        estado = "Pendiente";
+                                        estilo = "table-secondary";
+                                        comentario = "Trueque pendiente";
+                                    }
+                                    else if(t.Estado == 1)
+                                    {
+                                        estado = "Completado";
+                                        estilo = "table-success";
+                                        comentario = "Trueque completado sin ventas";
+                                    }
+                                    else
+                                    {
+                                        estado = "Completado";
+                                        estilo = "table-success";
+                                        comentario = "Trueque completado con ventas";
+                                    }
+
                                     context.Entry(t).Reference(p => p.Oferta).Load();
-                                    <tr>
+                                    <tr class="@estilo">
                                         <td>@t.Id</td>
                                         <td>@t.Oferta!.Fecha.ToShortDateString()</td>
                                         <td>@t.Oferta!.Fecha.ToShortTimeString()</td>
-                                        <td>@t.Estado</td>
-                                        <td style="text-align: right;">
-                                            <div class="d-flex justify-content-end">
-                                                <div class="btn-group" style="margin-right: 1rem;">
-                                                    <button class="btn btn-secondary rounded" style="margin-right: 0.5rem;" @onclick="@(() =>ConfirmarTrueque(t.Id))">Confirmar</button>
-                                                    <button class="btn btn-danger rounded">Rechazar</button>
+                                        <td>@comentario</td> 
+                                        @if (t.Estado == 0)
+                                        {
+                                            <td style="text-align: right;">
+                                                <div class="d-flex justify-content-end">
+                                                    <div class="btn-group" style="margin-right: 1rem;">
+                                                        <button class="btn btn-success rounded" style="margin-right: 0.5rem;" @onclick="@(() =>ConfirmarTrueque(t.Id))">Confirmar</button>
+                                                        <button class="btn btn-danger rounded" @onclick="@(() =>RechazarTrueque(t.Id))">Rechazar</button>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            <td>@estado</td>
+                                        }                                   
                                     </tr>
-
                                 }
                             </tbody>
                         </table>
@@ -79,18 +116,36 @@
     </div>
 </div>
 
+<script>
+    function refreshPage() {
+        location.reload();
+    }
+</script>
+
 @code {
 
     List<Trueque> trueques = new List<Trueque>();
 
     bool cargando = true;
+    string? nombreSucursal;
 
     protected override async Task OnInitializedAsync()
     {
         await Task.Delay(500);
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var sucursalId = int.Parse(authState.User!.FindFirst("SucursalId")!.Value);
-        trueques = await TruequeService.ReadTruequesPendientesBySucursal(sucursalId);
+        var userId = int.Parse(authState.User!.FindFirst("UsuarioId")!.Value);
+        if(userId == 1)
+        {
+            trueques = await TruequeService.ReadAllTrueques();
+            nombreSucursal = "Todas las Sucursales";
+        }
+        else
+        {
+            trueques = await TruequeService.ReadTruequesBySucursal(sucursalId);
+            Sucursal suc = await SucursalService.ReadSucursalById(sucursalId);
+            nombreSucursal = "Sucursal " + suc.Nombre;
+        }
         cargando = false;
     }
 
@@ -104,7 +159,12 @@
         oferta.Estado = 2;
         await OfertaService.OverwriteOfertaById(oferta);
         StateHasChanged();
-        NavMan.NavigateTo("/");
+        await JS.InvokeVoidAsync("refreshPage");
+    }
+
+    private async Task RechazarTrueque(int truequeId)
+    {
+        await JS.InvokeVoidAsync("refreshPage");
     }
 
 }

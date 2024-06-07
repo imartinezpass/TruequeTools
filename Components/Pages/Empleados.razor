@@ -40,7 +40,7 @@
                 {
                     <div class="table-responsive">
                         <!-- Añade esta clase para hacer la tabla responsiva -->
-                        <table class="table">
+                        <table class="table table-bordered caption-top">
                             <thead>
                                 <tr>
                                     <th>Id</th>
@@ -54,7 +54,7 @@
                                 @foreach (var emp in empleados)
                                 {
                                     context.Entry(emp).Reference(p => p.Sucursal).Load();
-                                    <tr>
+                                    <tr class="table-secondary">
                                         <td>@emp.Id</td>
                                         <td>@emp.Nombre</td>
                                         <td>@emp.Apellido</td>
@@ -67,7 +67,6 @@
                                             </div>
                                         </td>
                                     </tr>
-
                                 }
                             </tbody>
                         </table>

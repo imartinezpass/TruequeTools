@@ -54,12 +54,12 @@ namespace TruequeTools.Services
         public async Task<Trueque> ReadTruequeById(int id)
         {
             var result = await contexto.Trueques.Where(s => s.Id == id).FirstOrDefaultAsync();
-            return result;
+            return result!;
         }
 
-        public async Task<List<Trueque>> ReadTruequesPendientesBySucursal(int sucursalId)
+        public async Task<List<Trueque>> ReadTruequesBySucursal(int sucursalId)
         {
-            var result = await contexto.Trueques.Where(s => s.Oferta!.Usuario!.SucursalId == sucursalId && s.Estado == 0).ToListAsync();
+            var result = await contexto.Trueques.Where(s => s.Oferta!.Usuario!.SucursalId == sucursalId).ToListAsync();
             return result;
         }
     }
