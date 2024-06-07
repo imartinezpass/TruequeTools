@@ -10,6 +10,7 @@
 @inject IServiciosTrueque TruequeService
 @inject IServiciosOferta OfertaService
 @inject IServiciosSucursal SucursalService
+@inject IServiciosPublicacion PublicacionService
 @inject IJSRuntime JS
 
 @attribute [Authorize(Roles = "Admin,Employee")]
@@ -61,9 +62,9 @@
 
                                     if(t.Estado == -1)
                                     {
-                                        estado = "No completado";
+                                        estado = "Rechazado";
                                         estilo = "table-danger";
-                                        comentario = "Aca va el motivo";
+                                        comentario = "Trueque rechazado";
                                     }
                                     else if(t.Estado == 0)
                                     {
@@ -151,27 +152,38 @@
 
     private async Task ConfirmarTrueque(int truequeId)
     {
-        Trueque trueque = await TruequeService.ReadTruequeById(truequeId);
-        Oferta oferta = await OfertaService.ReadOfertaById(trueque.OfertaId);
-
+        Trueque trueque = await TruequeService.ReadTruequeById(truequeId); //Leo el trueque que voy a modificar
+        Oferta oferta = await OfertaService.ReadOfertaById(trueque.OfertaId); //Leo la oferta del trueque que voy a modificar
+       
         trueque.Estado = 1; //trueque pasa a estado completo sin productos
+        oferta.Estado = 2; //oferta pasa a completada     
+
         await TruequeService.OverwriteTruequeById(trueque);
-        oferta.Estado = 2; //oferta pasa a completada
         await OfertaService.OverwriteOfertaById(oferta);
+       
         StateHasChanged();
+
         await JS.InvokeVoidAsync("refreshPage");
     }
 
     private async Task RechazarTrueque(int truequeId)
     {
-        Trueque trueque = await TruequeService.ReadTruequeById(truequeId);
-        Oferta oferta = await OfertaService.ReadOfertaById(trueque.OfertaId);
+        Trueque trueque = await TruequeService.ReadTruequeById(truequeId); //Leo el trueque que voy a modificar
+        Oferta oferta = await OfertaService.ReadOfertaById(trueque.OfertaId); //Leo la oferta del trueque que voy a modificar
+        Publicacion publi1 = await PublicacionService.ReadPublicacionById(oferta.PublicacionQueOfertoId); //Leo la publicacion de la oferta a modificar
+        Publicacion publi2 = await PublicacionService.ReadPublicacionById(oferta.PublicacionQueOfrezcoId); //Leo la publicacion de la oferta a modificar
 
         trueque.Estado = -1; //trueque pasa a rechazado
-        await TruequeService.OverwriteTruequeById(trueque);
         oferta.Estado = -1; //oferta pasa a rechazada
         oferta.Motivo = "No se concretó el trueque";
+        publi1.Deleted = false; //se activa nuevamente la publicacion
+        publi2.Deleted = false; //se activa nuevamente la publicacion
+        
+        await TruequeService.OverwriteTruequeById(trueque);
         await OfertaService.OverwriteOfertaById(oferta);
+        await PublicacionService.OverwritePublicacionById(publi1);
+        await PublicacionService.OverwritePublicacionById(publi2);
+
         StateHasChanged();
 
         await JS.InvokeVoidAsync("refreshPage");
