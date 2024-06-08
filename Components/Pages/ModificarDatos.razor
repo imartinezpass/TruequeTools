@@ -1,7 +1,127 @@
 ﻿@page "/modificar"
 
+@using TruequeTools.Entities
+
+@inject NavigationManager NavMan
+@inject IserviciosUsuario ServiciosUsuario
+@inject IJSRuntime JS
+
+@rendermode @(new InteractiveServerRenderMode(prerender:false))
+
 <h3>Modificar Datos del Usuario</h3>
 
+<div class="modal fade" id="ModalUsuario" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog custom-modal-width">
+        <div class="modal-content">
+            <div class="modal-body">
+                <ul class="list-group">
+                    @if (exito)
+                    {
+						<div>
+							<div class="alert alert-success" role="alert">
+								Se guardaron los cambios!
+							</div>
+						</div>
+                    }
+                    else
+                    {
+						<div class="row">
+							<EditForm Model="@Modelo" OnValidSubmit="HandleSubmit" FormName="UsuarioFrom">
+								<DataAnnotationsValidator />
+								<ValidationSummary class="text-danger" role="alert" />
+								@if (!string.IsNullOrEmpty(MensajeError))
+								{
+									<div class="alert alert-danger mt-3" role="alert">
+										@MensajeError
+									</div>
+								}
+								<div class="form-floating mb-3">
+									<InputText id="nombre" @bind-Value="Modelo.Nombre" class="form-control" placeholder="" maxlength="100" disabled="@IsDisabled" />
+									<label for="nombre">Nombre</label>
+									<ValidationMessage For="() => Modelo.Nombre" class="text-danger" />
+								</div>
+								<div class="form-floating mb-3">
+									<InputText id="apellido" @bind-Value="Modelo.Apellido" class="form-control" placeholder="" maxlength="100" disabled="@IsDisabled" />
+									<label for="apellido">Apellido</label>
+									<ValidationMessage For="() => Modelo.Apellido" class="text-danger" />
+								</div>
+								<div class="form-floating mb-3">
+									<InputText id="sucursal" @bind-Value="Modelo.Sucursal" class="form-control" placeholder="" maxlength="100" />
+									<label for="sucursal">Sucursal</label>
+									<ValidationMessage For="() => Modelo.Sucursal" class="text-danger" />
+								</div>
+								<div class="form-floating mb-3">
+									<InputDate @bind-Value="Modelo.FechaNacimiento" class="form-control" autocomplete="fecha-nacimiento" aria-required="true" placeholder="" maxlength="50" />
+									<label for="fecha-nacimiento">Fecha de Nacimiento</label>
+									<ValidationMessage For="() => Modelo.FechaNacimiento" class="text-danger" />
+								</div>
+								<button type="submit" class="w-100 btn btn-lg btn-dark">Guardar</button>
+							</EditForm>
+						</div>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function refreshPage() {
+        location.reload();
+    }
+</script>
+
 @code {
+
+	[Parameter]
+	public int? Id { get; set; }
+
+	[SupplyParameterFromForm]
+	public UsuarioViewModel Modelo { get; set; } = new();
+
+	string? MensajeError;
+	public bool exito { get; set; } = false;
+	private bool IsDisabled => Id == 1;
+
+	protected override async Task OnParametersSetAsync()
+	{
+			var usuarioActual = await ServiciosUsuario.ReadUsuarioById((int)Id!); 
+			Modelo.Nombre = usuarioActual.Nombre!;
+			Modelo.Apellido = usuarioActual.Apellido!;
+			Modelo.Sucursal = usuaruiActual.Sucursal!;
+			Modelo.FechaNacimiento = usuarioActual.FechaNacimiento!;
+
+	}          //ServiciosUsuario
+
+	async Task HandleSubmit()
+	{
+		var usuario = new Usuario
+		{
+			Nombre = Modelo.Nombre,
+			Apellido = Modelo.Apellido,
+			FechaNacimiento = Modelo.FechaNacimiento,
+			Sucursal = Modelo.Sucursal,
+		};
+
+		var existe = await ServiciosUsuario.ExisteSucursal(usuario.Nombre, Id);
+		
+		exito = true;
+	}
+
+	public async void CerrarModal()
+	{
+		if (exito)
+		{
+			await JS.InvokeVoidAsync("refreshPage");
+		}
+		else
+		{	
+			var SucursalActual = await SucursalService.ReadSucursalById((int)Id!);
+			Modelo.Nombre = SucursalActual.Nombre!;
+			Modelo.Direccion = SucursalActual.Direccion!;
+			Modelo.Localidad = SucursalActual.Localidad!;
+	
+		}
+	}
 
 }
