@@ -1,0 +1,58 @@
+﻿@inject IServiciosUsuario UsuarioService
+@inject IJSRuntime JS
+
+@rendermode InteractiveServer
+
+<!-- Modal -->
+<div class="modal fade" id="ModalEliminar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="staticBackdropLabel">Eliminar al empleado #@EmpleadoId</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CerrarModal"></button>
+			</div>
+			<div class="modal-body">
+				@if (exito)
+				{
+					<div class="alert alert-success" role="alert">
+						Se eliminó al empleado !
+					</div>
+				}
+				else
+				{
+					<div class="alert alert-warning" role="alert">
+						¿Confirma que desea eliminar al empleado? Esta accion no se puede deshacer
+					</div>
+					<button class="w-100 btn btn-lg btn-dark" @onclick="@(() =>BorrarEmpleado(EmpleadoId))">Confirmar</button>
+				}
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+
+	[Parameter]
+	public int EmpleadoId { get; set; }
+
+	public bool exito = false;
+
+	private async void BorrarEmpleado(int empleadoId)
+	{
+		var empleadoElegido = await UsuarioService.FindEmpleado(empleadoId);
+		empleadoElegido.Deleted = true;
+		await UsuarioService.OverwriteUsuarioById(empleadoElegido);
+		exito = true;
+		StateHasChanged();
+
+	}
+
+	public async void CerrarModal()
+	{
+		if (exito)
+		{
+			await JS.InvokeVoidAsync("refreshPage");
+		}		
+	}
+
+}

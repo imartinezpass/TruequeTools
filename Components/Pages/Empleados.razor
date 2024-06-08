@@ -62,52 +62,31 @@
                                         <td style="text-align: right;">
                                             <div class="d-flex justify-content-end">
                                                 <div class="btn-group" style="margin-right: 1rem;">
-                                                    <button class="btn btn-danger rounded" @onclick="@(() => BorrarEmpleado(@emp.Id))">Eliminar</button>
+                                                    <button class="btn btn-danger rounded" data-bs-toggle="modal" data-bs-target="#ModalEliminar" @onclick="@(() =>BorrarEmpleado(emp.Id))">Eliminar</button>
                                                 </div>
                                             </div>
                                         </td>
-                                    </tr>
+                                    </tr>                
                                 }
                             </tbody>
                         </table>
                     </div>
-
                 }
             }
         </div>
-        <button class="w-30 btn btn-lg btn-dark d-block mx-auto text-center" onclick="@(()=>redirigirANuevoEmpleado())">Nuevo Empleado</button>
+        <button class="w-30 btn btn-lg btn-dark d-block mx-auto text-center" data-bs-toggle="modal" data-bs-target="#ModalNuevo">Nuevo Empleado</button>
     </div>
 </div>
 
-<div class="modal fade" data-bs-backdrop='static' tabindex="-1" role="dialog" id="ModalMensaje">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5">Eliminar Empleado</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="@(()=> recargarPagina())"></button>
-            </div>
-            <div class="modal-body">
-                <div class="alert alert-success" role="alert">
-                    Empleado eliminado exitosamente !
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<EmpleadosEdit />
+<EmpleadosEliminar EmpleadoId="EmpleadoId" />
 
-<script>
-    function toggleModal() {
-        bootstrap.Modal.getOrCreateInstance("#ModalMensaje").toggle();
-    }
-    function refreshPage() {
-        location.reload();
-    }
-</script>
 @code {
 
     List<Usuario> empleados = new List<Usuario>();
 
     bool cargando = true;
+    public int EmpleadoId;
 
     protected override async Task OnInitializedAsync()
     {
@@ -116,27 +95,33 @@
         cargando = false;
     }
 
-    private void redirigirANuevoEmpleado()
+    void BorrarEmpleado(int id)
     {
-        NavManager.NavigateTo("/nuevoempleado");
+        EmpleadoId = id;
     }
-    private async void BorrarEmpleado(int empleadoId)
-    {
-        var empleadoElegido = await UsuarioService.FindEmpleado(empleadoId);
-        empleadoElegido.Deleted = true;
-        await UsuarioService.OverwriteUsuarioById(empleadoElegido);
-        try // necesaria por un problema del iterops de javascript
-        {
-            await JS.InvokeVoidAsync("toggleModal");
-        }
-        catch (Exception e)           // ignorar
-        {
-            await JS.InvokeVoidAsync("alert", e.ToString());
-        }
 
-    }
-    private async void recargarPagina()
-    {
-        await JS.InvokeVoidAsync("refreshPage");
-    }
 }
+
+@*
+disparar un modal desde codigo - no borrar
+
+try
+{
+	await JS.InvokeVoidAsync("toggleModal");
+}
+catch (Exception e)
+{
+	await JS.InvokeVoidAsync("alert", e.ToString());
+}
+
+<!-- 
+<script>
+function toggleModal() {
+
+    bootstrap.Modal.getOrCreateInstance("#ModalMensaje").toggle();
+}
+</script>
+-->
+
+disparar un modal desde codigo - no borrar 
+*@
