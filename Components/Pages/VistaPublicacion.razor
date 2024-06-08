@@ -1,16 +1,13 @@
 ﻿@page "/publicacion/{Id:int}"
 
 @using TruequeTools.Data
-@using TruequeTools.Components.Resources
 @using TruequeTools.Entities
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject TruequeToolsDataContext context
-@inject NavigationManager NavMan
 @inject IServiciosPublicacion PublicacionService
-@inject IServiciosUsuario UsuarioService
-@inject IServiciosPregunta PreguntaService
 @inject IServiciosSucursal SucursalService
+@inject IServiciosCategoria CategoriaService
 
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
 
@@ -90,14 +87,14 @@
                 <li class="list-group-item">
                     @if (PublicacionActual.Usuario!.Id == UsuarioId)
                     {
-                        <button class="btn btn-dark" @onclick="@(() => ModificarPublicacion(Id))">
+                        <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#ModalModificar">
                             Modificar
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                                 <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
                                 <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
                             </svg>
                         </button>
-                        <button class="btn btn-danger" @onclick="@(() => EliminarPublicacion())">
+                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#ModalEliminar">
                             Eliminar
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
                                 <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5m-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5M4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06m6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528M8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5" />
@@ -133,17 +130,22 @@
     </ul>
 </div>
 
-<Ofertar 
-    PublicacionId="PublicacionActual.Id"
-    UserRequesterId="UsuarioId"
-    PublicacionActual="PublicacionActual"
-    MisPublicaciones="MisPublicaciones"
-    OfertasPublicacionActual="OfertasPublicacionActual"/> @*MODAL CON LA FUNCION OFERTAR*@
+<PublicacionEliminar PublicacionActual="PublicacionActual" /> @*MODAL CON LA FUNCION ELIMINAR*@
 
-<Preguntar 
-    PublicacionId="PublicacionActual.Id"
-    UserRequesterId="UsuarioId"
-    PublicacionOwnerId="PublicacionActual.UsuarioId"/> @*MODAL CON LA FUNCION PREGUNTAR*@
+<PublicacionModificar PublicacionId="PublicacionActual.Id"
+            PublicacionActual="PublicacionActual" 
+            ListaSucursales="ListaSucursales"
+            ListaCategorias="ListaCategorias"/> @*MODAL CON LA FUNCION MODIFICAR*@
+
+<PublicacionOfertar PublicacionId="PublicacionActual.Id"
+            UserRequesterId="UsuarioId"
+            PublicacionActual="PublicacionActual"
+            MisPublicaciones="MisPublicaciones"
+            OfertasPublicacionActual="OfertasPublicacionActual" /> @*MODAL CON LA FUNCION OFERTAR*@
+
+<PublicacionPreguntar PublicacionId="PublicacionActual.Id"
+            UserRequesterId="UsuarioId"
+            PublicacionOwnerId="PublicacionActual.UsuarioId" /> @*MODAL CON LA FUNCION PREGUNTAR*@
 
 @code {
 
@@ -155,6 +157,9 @@
     public Publicacion PublicacionActual { get; set; } = new();
     public List<Publicacion> MisPublicaciones { get; set; } = new();
     public List<Oferta> OfertasPublicacionActual { get; set; } = new();
+    public List<Sucursal>? ListaSucursales { get; set; } = new();
+    public List<Categoria>? ListaCategorias { get; set; } = new();
+
     public int UsuarioId;
 
     protected override async Task OnInitializedAsync()
@@ -169,22 +174,10 @@
         PublicacionActual = await PublicacionService.ReadPublicacionById(Id); //LEE LA PUBLICACION ACTUAL
         MisPublicaciones = await PublicacionService.ReadAllPublicacionesActivasCurrentUser(UsuarioId); //TRAE LAS PUBLICACIONES DEL USUARIO
         OfertasPublicacionActual = await PublicacionService.ReadAllOfertasOfPublicacion(PublicacionActual.Id);
+        ListaSucursales = await SucursalService.ReadAllSucursales();
+        ListaCategorias = await CategoriaService.ReadAllCategorias();
         await Task.Delay(500);
         cargando = false;
-    }
-
-    public async Task EliminarPublicacion()
-    {
-
-        PublicacionActual.Deleted = true;
-
-        await PublicacionService.OverwritePublicacionById(PublicacionActual);
-        NavMan.NavigateTo($"/misPublicaciones");
-    }
-
-    void ModificarPublicacion(int id)
-    {
-        NavMan.NavigateTo($"/modificarPublicacion/{id}");
     }
 
 }

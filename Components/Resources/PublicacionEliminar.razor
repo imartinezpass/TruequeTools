@@ -1,0 +1,56 @@
+﻿@using TruequeTools.Entities
+
+@inject NavigationManager NavMan
+@inject IServiciosPublicacion PublicacionService
+@inject IJSRuntime JS
+
+<!-- Modal -->
+<div class="modal fade" id="ModalEliminar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="staticBackdropLabel">Eliminar la publicacion #@PublicacionActual!.Id</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CerrarModal"></button>
+			</div>
+			<div class="modal-body">
+				@if (exito)
+				{
+					<div class="alert alert-success" role="alert">
+						Se eliminó la publicacion !
+					</div>
+				}
+				else
+				{
+					<div class="alert alert-warning" role="alert">
+						¿Confirma que desea eliminar la publicacion? Esta accion no se puede deshacer
+					</div>
+					<button class="w-100 btn btn-lg btn-dark" @onclick="EliminarPublicacion">Confirmar</button>
+				}
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+
+	[Parameter]
+	public Publicacion? PublicacionActual { get; set; }
+
+	bool exito = false;
+
+	public async Task EliminarPublicacion()
+	{
+		exito = true;
+		PublicacionActual!.Deleted = true;
+		await PublicacionService.OverwritePublicacionById(PublicacionActual);
+	}
+
+	public void CerrarModal()
+	{
+		if (exito)
+		{
+			NavMan.NavigateTo("/");
+		}
+	}
+
+}
