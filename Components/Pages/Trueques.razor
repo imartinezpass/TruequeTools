@@ -154,13 +154,16 @@
     {
         Trueque trueque = await TruequeService.ReadTruequeById(truequeId); //Leo el trueque que voy a modificar
         Oferta oferta = await OfertaService.ReadOfertaById(trueque.OfertaId); //Leo la oferta del trueque que voy a modificar
-       
+
         trueque.Estado = 1; //trueque pasa a estado completo sin productos
         oferta.Estado = 2; //oferta pasa a completada     
 
         await TruequeService.OverwriteTruequeById(trueque);
         await OfertaService.OverwriteOfertaById(oferta);
-       
+
+        await OfertaService.RechazarOfertasTruequeCompletado(oferta.PublicacionQueOfertoId);
+        await OfertaService.RechazarOfertasTruequeCompletado(oferta.PublicacionQueOfrezcoId);
+
         StateHasChanged();
 
         await JS.InvokeVoidAsync("refreshPage");
@@ -170,23 +173,31 @@
     {
         Trueque trueque = await TruequeService.ReadTruequeById(truequeId); //Leo el trueque que voy a modificar
         Oferta oferta = await OfertaService.ReadOfertaById(trueque.OfertaId); //Leo la oferta del trueque que voy a modificar
-        Publicacion publi1 = await PublicacionService.ReadPublicacionById(oferta.PublicacionQueOfertoId); //Leo la publicacion de la oferta a modificar
-        Publicacion publi2 = await PublicacionService.ReadPublicacionById(oferta.PublicacionQueOfrezcoId); //Leo la publicacion de la oferta a modificar
+        Publicacion publi1 = await PublicacionService.ReadPublicacionById(oferta.PublicacionQueOfertoId, true); //Leo la publicacion de la oferta a modificar
+        Publicacion publi2 = await PublicacionService.ReadPublicacionById(oferta.PublicacionQueOfrezcoId, true); //Leo la publicacion de la oferta a modificar
 
-        trueque.Estado = -1; //trueque pasa a rechazado
-        oferta.Estado = -1; //oferta pasa a rechazada
-        oferta.Motivo = "No se concretó el trueque";
-        publi1.Deleted = false; //se activa nuevamente la publicacion
-        publi2.Deleted = false; //se activa nuevamente la publicacion
-        
-        await TruequeService.OverwriteTruequeById(trueque);
-        await OfertaService.OverwriteOfertaById(oferta);
-        await PublicacionService.OverwritePublicacionById(publi1);
-        await PublicacionService.OverwritePublicacionById(publi2);
+        try
+        {
+            trueque.Estado = -1; //trueque pasa a rechazado
+            oferta.Estado = -1; //oferta pasa a rechazada
+            oferta.Motivo = "No se concretó el trueque";
+            publi1.Deleted = false; //se activa nuevamente la publicacion
+            publi2.Deleted = false; //se activa nuevamente la publicacion
 
-        StateHasChanged();
+            await TruequeService.OverwriteTruequeById(trueque);
+            await OfertaService.OverwriteOfertaById(oferta);
+            await PublicacionService.OverwritePublicacionById(publi1);
+            await PublicacionService.OverwritePublicacionById(publi2);
 
-        await JS.InvokeVoidAsync("refreshPage");
+            StateHasChanged();
+
+            await JS.InvokeVoidAsync("refreshPage");
+        }
+        catch  (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", ex.ToString());
+        }
+
     }
 
 }

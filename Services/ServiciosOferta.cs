@@ -52,7 +52,7 @@ namespace TruequeTools.Services
         }
 
         //CAMBIA EL ESTADO DE TODAS LAS OFERTAS CON CIERTO ID DE PUBLICACION OFERTADA O OFRECIDA A RECHAZADA
-        public async Task RechazarOfertas(int publicacionId)
+        public async Task RechazarOfertasTruequeCompletado(int publicacionId)
         {
             var ofertas = await contexto.Ofertas
                 .Where(oferta => (oferta.PublicacionQueOfertoId == publicacionId || oferta.PublicacionQueOfrezcoId == publicacionId) && oferta.Estado == 0)
@@ -61,6 +61,7 @@ namespace TruequeTools.Services
             foreach (var oferta in ofertas)
             {
                 oferta.Estado = -1;
+                oferta.Motivo = "El producto fue intercambiado";
             }
 
             await contexto.SaveChangesAsync();

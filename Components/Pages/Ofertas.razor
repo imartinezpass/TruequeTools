@@ -77,8 +77,8 @@
                                 context?.Entry(realizada.PublicacionQueOfrezco!).Reference(x => x.Sucursal).Load();
                                 <tr class="@estilo">
                                     <td>@realizada?.PublicacionQueOfrezco?.Usuario?.Nombre</td>
-                                    <td><NavLink href="@ofrezco">@realizada?.PublicacionQueOfrezco!.Nombre</NavLink></td>
                                     <td><NavLink href="@oferto">@realizada?.PublicacionQueOferto!.Nombre</NavLink></td>
+                                    <td><NavLink href="@ofrezco">@realizada?.PublicacionQueOfrezco!.Nombre</NavLink></td> 
                                     <td>@realizada?.PublicacionQueOferto!.Sucursal!.Nombre</td>
                                     <td>@realizada?.Fecha.ToShortDateString() @realizada?.Fecha.ToShortTimeString()</td>
                                     <td>@comentario</td>

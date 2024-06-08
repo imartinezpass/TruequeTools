@@ -11,7 +11,7 @@ namespace TruequeTools.Services
     public interface IServiciosPublicacion
     {
         public Task<int> CreatePublicacion(Publicacion publicacion);
-        public Task<Publicacion> ReadPublicacionById(int id);
+        public Task<Publicacion> ReadPublicacionById(int id, bool includeDeleted = false);
         public Task<List<Publicacion>> ReadPublicacionesByNombre(string titulo);
         public Task<List<Publicacion>> ReadPublicacionesActivasByNombre(string titulo);
         public Task<List<Publicacion>> ReadAllPublicaciones();

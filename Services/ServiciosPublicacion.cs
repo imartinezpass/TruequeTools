@@ -70,9 +70,19 @@ namespace TruequeTools.Services
         }
 
         //DEVUELVE LA PUBLICACION CON EL ID PASADO COMO PARAMETRO O UNA PUBLICACION VACIA EN CASO DE NO ENCONTRARLA
-        public async Task<Publicacion> ReadPublicacionById(int id)
+        public async Task<Publicacion> ReadPublicacionById(int id, bool includeDeleted)
         {
-            IQueryable<Publicacion> query = contexto.Publicaciones.Where(p => p.Id == id && p.Deleted == false);
+            IQueryable<Publicacion> query;
+
+            if (includeDeleted) 
+            {
+                query = contexto.Publicaciones.Where(p => p.Id == id);
+            }
+            else
+            {
+                query = contexto.Publicaciones.Where(p => p.Id == id && p.Deleted == false);
+            }
+           
             var publicacion = await query.FirstOrDefaultAsync();
 
             if (publicacion != null)
