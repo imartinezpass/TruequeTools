@@ -1,15 +1,49 @@
-﻿@using TruequeTools.Entities
+﻿@using TruequeTools.Data
+@using TruequeTools.Entities
+
+@inject TruequeToolsDataContext context
 
 <!-- Modal -->
 <div class="modal fade" id="ModalPublicacion" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
 	<div class="modal-dialog modal-xl">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h1 class="modal-title fs-5" id="staticBackdropLabel">Publicacion #@PublicacionActual.Id</h1>
+				<h1 class="modal-title fs-5" id="staticBackdropLabel">Publicacion #@PublicacionActual!.Id</h1>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
-				PRUEBA DE MODAL PUBLICACION BORRADA O INTERCAMBIADA
+                <ul class="list-group" style="padding-bottom:1.1rem">                 
+                    @if (PublicacionActual.Nombre != null)
+                    {
+                        context.Entry(PublicacionActual).Reference(p => p.Usuario).Load();
+                        context.Entry(PublicacionActual).Reference(p => p.Sucursal).Load();
+                        context.Entry(PublicacionActual).Reference(p => p.Categoria).Load();
+
+                        <li class="list-group-item"><h3>@PublicacionActual.Nombre</h3></li>
+                        <li class="list-group-item">
+                            @if (PublicacionActual.HasImages)
+                            {
+                                context.Entry(PublicacionActual).Collection(p => p.Imagenes!).Load();
+                                <div class="row">
+                                    @foreach (var img in PublicacionActual.Imagenes!)
+                                    {
+                                        <div class="col-md-4 col-sm-6 mb-3 d-flex justify-content-center">
+                                            <img src="images/@img.FotoUrl" class="card-img-top-vp" />
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <img class="card-img-top-svg-vp" src="resources/blank.svg" alt="Foto del Producto">
+                            }
+                        </li>
+                        <li class="list-group-item">@PublicacionActual.Descripcion</li>
+                        <li class="list-group-item">Publicado el <b>@PublicacionActual.FechaPublicacion</b> por <b>@PublicacionActual.Usuario!.Nombre</b></li>
+                        <li class="list-group-item">Sucursal de intercambio <b>@PublicacionActual.Sucursal!.Nombre</b></li>
+                        <li class="list-group-item">Categoría <b>@PublicacionActual.Categoria!.Nombre</b></li>                    
+                    }                                          
+                </ul>
 			</div>
 		</div>
 	</div>
