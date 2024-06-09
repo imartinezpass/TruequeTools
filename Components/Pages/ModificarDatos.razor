@@ -3,7 +3,7 @@
 @using TruequeTools.Entities
 
 @inject NavigationManager NavMan
-@inject IserviciosUsuario ServiciosUsuario
+@inject IServiciosUsuario UsuarioService
 @inject IJSRuntime JS
 
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
@@ -36,24 +36,29 @@
 									</div>
 								}
 								<div class="form-floating mb-3">
-									<InputText id="nombre" @bind-Value="Modelo.Nombre" class="form-control" placeholder="" maxlength="100" disabled="@IsDisabled" />
+									<InputText @bind-Value="Modelo.Nombre" class="form-control" autocomplete="nombre" aria-required="true" placeholder="" maxlength="50" />
 									<label for="nombre">Nombre</label>
 									<ValidationMessage For="() => Modelo.Nombre" class="text-danger" />
 								</div>
 								<div class="form-floating mb-3">
-									<InputText id="apellido" @bind-Value="Modelo.Apellido" class="form-control" placeholder="" maxlength="100" disabled="@IsDisabled" />
+									<InputText @bind-Value="Modelo.Apellido" class="form-control" autocomplete="apellido" aria-required="true" placeholder="" maxlength="50" />
 									<label for="apellido">Apellido</label>
 									<ValidationMessage For="() => Modelo.Apellido" class="text-danger" />
-								</div>
-								<div class="form-floating mb-3">
-									<InputText id="sucursal" @bind-Value="Modelo.Sucursal" class="form-control" placeholder="" maxlength="100" />
-									<label for="sucursal">Sucursal</label>
-									<ValidationMessage For="() => Modelo.Sucursal" class="text-danger" />
 								</div>
 								<div class="form-floating mb-3">
 									<InputDate @bind-Value="Modelo.FechaNacimiento" class="form-control" autocomplete="fecha-nacimiento" aria-required="true" placeholder="" maxlength="50" />
 									<label for="fecha-nacimiento">Fecha de Nacimiento</label>
 									<ValidationMessage For="() => Modelo.FechaNacimiento" class="text-danger" />
+								</div>
+								<div class="form-floating mb-3">
+									<InputSelect @bind-Value="@Modelo.SucursalId" class="form-control" autocomplete="sucursal" aria-required="true" placeholder="" maxlength="50">
+										@*@foreach (var suc in sucrusales)
+										{
+											<option value="@suc.Id">@suc.Nombre</option>
+										}*@
+									</InputSelect>
+									<label for="sucursal">Sucursal</label>
+									<ValidationMessage For="() => Modelo.SucursalId" class="text-danger" />
 								</div>
 								<button type="submit" class="w-100 btn btn-lg btn-dark">Guardar</button>
 							</EditForm>
@@ -85,11 +90,11 @@
 
 	protected override async Task OnParametersSetAsync()
 	{
-			var usuarioActual = await ServiciosUsuario.ReadUsuarioById((int)Id!); 
+			/*var usuarioActual = await ServiciosUsuario.ReadUsuarioById((int)Id!); 
 			Modelo.Nombre = usuarioActual.Nombre!;
 			Modelo.Apellido = usuarioActual.Apellido!;
 			Modelo.Sucursal = usuaruiActual.Sucursal!;
-			Modelo.FechaNacimiento = usuarioActual.FechaNacimiento!;
+			Modelo.FechaNacimiento = usuarioActual.FechaNacimiento!;*/
 
 	}          //ServiciosUsuario
 
@@ -97,13 +102,13 @@
 	{
 		var usuario = new Usuario
 		{
-			Nombre = Modelo.Nombre,
+			/*Nombre = Modelo.Nombre,
 			Apellido = Modelo.Apellido,
 			FechaNacimiento = Modelo.FechaNacimiento,
-			Sucursal = Modelo.Sucursal,
+			Sucursal = Modelo.Sucursal,*/
 		};
 
-		var existe = await ServiciosUsuario.ExisteSucursal(usuario.Nombre, Id);
+		//var existe = await ServiciosUsuario.ExisteSucursal(usuario.Nombre, Id);
 		
 		exito = true;
 	}
@@ -116,11 +121,10 @@
 		}
 		else
 		{	
-			var SucursalActual = await SucursalService.ReadSucursalById((int)Id!);
+			/*var SucursalActual = await SucursalService.ReadSucursalById((int)Id!);
 			Modelo.Nombre = SucursalActual.Nombre!;
 			Modelo.Direccion = SucursalActual.Direccion!;
-			Modelo.Localidad = SucursalActual.Localidad!;
-	
+			Modelo.Localidad = SucursalActual.Localidad!;*/
 		}
 	}
 

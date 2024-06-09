@@ -11,20 +11,20 @@ namespace TruequeTools.Models
 {
 	public class UsuarioViewModel
 	{
-		[Required(ErrorMessage = "Debe ingresar el nombre del usuario.")]
+		[Required(ErrorMessage = "Debe ingresar su nombre")]
 		[Display(Name = "Nombre")]
 		public string Nombre { get; set; } = "";
 
-		[Required(ErrorMessage = "Debe ingresar el apellido del usuario.")]
+		[Required(ErrorMessage = "Debe ingresar su apellido")]
 		[Display(Name = "Apellido")]
-		public string Direccion { get; set; } = "";
+		public string Apellido { get; set; } = "";
 
-		[Required(ErrorMessage = "Debe ingresar la Fecha de nacimiento.")]
-		[Display(Name = "FechaNacimiento")]
-		public string Localidad { get; set; } = "";
+		[Required(ErrorMessage = "Debe ingresar su fecha de nacimiento")]
+		[Display(Name = "Fecha de Nacimiento")]
+		public DateOnly FechaNacimiento { get; set; } = DateOnly.FromDateTime(DateTime.Today).AddYears(-18);
 
-		[Required(ErrorMessage = "Debe ingresar una sucursal.")]
-		[Display(Name = "Sucursal")]
-		public string Localidad { get; set; } = "";
+		[Required(ErrorMessage = "Debe ingresar una sucrusal de preferencia")]
+		[Display(Name = "Sucrusal")]
+		public int SucursalId { get; set; } = 1;
 	}
 }
