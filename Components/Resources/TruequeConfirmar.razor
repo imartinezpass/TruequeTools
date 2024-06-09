@@ -1,0 +1,69 @@
+﻿@using TruequeTools.Entities
+
+@inject IJSRuntime JS
+@inject IServiciosTrueque TruequeService
+@inject IServiciosOferta OfertaService
+
+@rendermode InteractiveServer
+
+<!-- Modal -->
+<div class="modal fade" id="ModalConfirmar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="staticBackdropLabel">Confirmar el trueque #@TruequeId</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CerrarModal"></button>
+			</div>
+			<div class="modal-body">
+				@if (exito)
+				{
+					<div class="alert alert-success" role="alert">
+						Se confirmó el trueque !
+					</div>
+				}
+				else
+				{
+					<div class="alert alert-warning" role="alert">
+						¿Confirma que se realizó el trueque?
+					</div>
+					<button class="w-100 btn btn-lg btn-dark" @onclick="@(() =>ConfirmarTrueque())">Confirmar</button>
+				}
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+
+	[Parameter]
+	public int TruequeId { get; set; }
+
+	bool exito = false;
+
+	private async Task ConfirmarTrueque()
+	{
+		Trueque trueque = await TruequeService.ReadTruequeById(TruequeId); //Leo el trueque que voy a modificar
+		Oferta oferta = await OfertaService.ReadOfertaById(trueque.OfertaId); //Leo la oferta del trueque que voy a modificar
+
+		trueque.Estado = 1; //trueque pasa a estado completo sin productos
+		oferta.Estado = 2; //oferta pasa a completada
+
+		await TruequeService.OverwriteTruequeById(trueque);
+		await OfertaService.OverwriteOfertaById(oferta);
+
+		await OfertaService.RechazarOfertasTruequeCompletado(oferta.PublicacionQueOfertoId);
+		await OfertaService.RechazarOfertasTruequeCompletado(oferta.PublicacionQueOfrezcoId);
+
+		exito = true;
+		StateHasChanged();
+	}
+
+	public async void CerrarModal()
+	{
+		if (exito)
+		{
+			await JS.InvokeVoidAsync("refreshPage");
+		}
+	}
+
+}

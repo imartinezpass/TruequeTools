@@ -47,11 +47,13 @@
                             <thead>
                                 <tr>
                                     <th>Id</th>
-                                    <th>Fecha</th>
-                                    <th>Hora</th>
+                                    <th>Sucursal</th>
+                                    <th>Fecha y Hora</th>
+                                    <th>Producto 1</th>
+                                    <th>Producto 2</th>
                                     <th>Comentarios</th>
                                     <th>Estado</th>                               
-                                </tr>
+                                </tr> 
                             </thead>
                             <tbody>
                                 @foreach (var t in trueques)
@@ -86,18 +88,31 @@
                                     }
 
                                     context.Entry(t).Reference(p => p.Oferta).Load();
+                                    context.Entry(t.Oferta!).Reference(p => p.PublicacionQueOfrezco).Load();
+                                    context.Entry(t.Oferta!).Reference(p => p.PublicacionQueOferto).Load();
+                                    context.Entry(t.Oferta!.PublicacionQueOferto!).Reference(p => p.Sucursal).Load();
                                     <tr class="@estilo">
                                         <td>@t.Id</td>
-                                        <td>@t.Oferta!.Fecha.ToShortDateString()</td>
-                                        <td>@t.Oferta!.Fecha.ToShortTimeString()</td>
+                                        <td>@t.Oferta!.PublicacionQueOferto!.Sucursal!.Nombre</td>
+                                        <td>@t.Oferta!.Fecha.ToShortDateString() @t.Oferta!.Fecha.ToShortTimeString()</td>
+                                        <td>
+                                            <NavLink class="text-primary" data-bs-toggle="modal" data-bs-target="#ModalPublicacion" @onclick="@(() => SwitchPublicacion(@t.Oferta!.PublicacionQueOferto!))">
+                                                @t.Oferta!.PublicacionQueOferto!.Nombre
+                                            </NavLink>
+                                        </td>
+                                        <td>
+                                            <NavLink class="text-primary" data-bs-toggle="modal" data-bs-target="#ModalPublicacion" @onclick="@(() => SwitchPublicacion(@t.Oferta!.PublicacionQueOfrezco!))">
+                                                @t.Oferta!.PublicacionQueOfrezco!.Nombre
+                                            </NavLink> 
+                                        </td>
                                         <td>@comentario</td> 
                                         @if (t.Estado == 0)
                                         {
                                             <td style="text-align: right;">
                                                 <div class="d-flex justify-content-end">
                                                     <div class="btn-group" style="margin-right: 1rem;">
-                                                        <button class="btn btn-success rounded" style="margin-right: 0.5rem;" @onclick="@(() =>ConfirmarTrueque(t.Id))">Confirmar</button>
-                                                        <button class="btn btn-danger rounded" @onclick="@(() =>RechazarTrueque(t.Id))">Rechazar</button>
+                                                        <button class="btn btn-success rounded" style="margin-right: 0.5rem;" @onclick="@(() =>AceptarTrueque(t.Id))" data-bs-toggle="modal" data-bs-target="#ModalConfirmar">Confirmar</button>
+                                                        <button class="btn btn-danger rounded" @onclick="@(() =>RechazarTrueque(t.Id))" data-bs-toggle="modal" data-bs-target="#ModalRechazar">Rechazar</button>
                                                     </div>
                                                 </div>
                                             </td>
@@ -123,12 +138,23 @@
     }
 </script>
 
+<TruequeConfirmar TruequeId="TruequeId" />
+<TruequeEliminar TruequeId="TruequeId" />
+<PublicacionModal PublicacionActual="publicacion" />
+
 @code {
 
     List<Trueque> trueques = new List<Trueque>();
 
     bool cargando = true;
     string? nombreSucursal;
+    int TruequeId;
+    Publicacion publicacion = new();
+
+    void SwitchPublicacion(Publicacion p)
+    {
+        publicacion = p;
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -150,54 +176,14 @@
         cargando = false;
     }
 
-    private async Task ConfirmarTrueque(int truequeId)
+    private void AceptarTrueque(int truequeId)
     {
-        Trueque trueque = await TruequeService.ReadTruequeById(truequeId); //Leo el trueque que voy a modificar
-        Oferta oferta = await OfertaService.ReadOfertaById(trueque.OfertaId); //Leo la oferta del trueque que voy a modificar
-
-        trueque.Estado = 1; //trueque pasa a estado completo sin productos
-        oferta.Estado = 2; //oferta pasa a completada     
-
-        await TruequeService.OverwriteTruequeById(trueque);
-        await OfertaService.OverwriteOfertaById(oferta);
-
-        await OfertaService.RechazarOfertasTruequeCompletado(oferta.PublicacionQueOfertoId);
-        await OfertaService.RechazarOfertasTruequeCompletado(oferta.PublicacionQueOfrezcoId);
-
-        StateHasChanged();
-
-        await JS.InvokeVoidAsync("refreshPage");
+        TruequeId = truequeId;
     }
 
-    private async Task RechazarTrueque(int truequeId)
-    {
-        Trueque trueque = await TruequeService.ReadTruequeById(truequeId); //Leo el trueque que voy a modificar
-        Oferta oferta = await OfertaService.ReadOfertaById(trueque.OfertaId); //Leo la oferta del trueque que voy a modificar
-        Publicacion publi1 = await PublicacionService.ReadPublicacionById(oferta.PublicacionQueOfertoId, true); //Leo la publicacion de la oferta a modificar
-        Publicacion publi2 = await PublicacionService.ReadPublicacionById(oferta.PublicacionQueOfrezcoId, true); //Leo la publicacion de la oferta a modificar
-
-        try
-        {
-            trueque.Estado = -1; //trueque pasa a rechazado
-            oferta.Estado = -1; //oferta pasa a rechazada
-            oferta.Motivo = "No se concretó el trueque";
-            publi1.Deleted = false; //se activa nuevamente la publicacion
-            publi2.Deleted = false; //se activa nuevamente la publicacion
-
-            await TruequeService.OverwriteTruequeById(trueque);
-            await OfertaService.OverwriteOfertaById(oferta);
-            await PublicacionService.OverwritePublicacionById(publi1);
-            await PublicacionService.OverwritePublicacionById(publi2);
-
-            StateHasChanged();
-
-            await JS.InvokeVoidAsync("refreshPage");
-        }
-        catch  (Exception ex)
-        {
-            await JS.InvokeVoidAsync("alert", ex.ToString());
-        }
-
+    private void RechazarTrueque(int truequeId)
+    { 
+        TruequeId = truequeId;
     }
 
 }

@@ -43,8 +43,6 @@
                             {
                                 var estado = "";
                                 var estilo = "";
-                                var ofrezco = "publicacion/" + realizada!.PublicacionQueOfrezcoId!;
-                                var oferto = "publicacion/" + realizada!.PublicacionQueOfertoId!;
                                 var comentario = "";
 
                                 @if (realizada.Estado == 0)
@@ -77,8 +75,16 @@
                                 context?.Entry(realizada.PublicacionQueOfrezco!).Reference(x => x.Sucursal).Load();
                                 <tr class="@estilo">
                                     <td>@realizada?.PublicacionQueOfrezco?.Usuario?.Nombre</td>
-                                    <td><NavLink href="@oferto">@realizada?.PublicacionQueOferto!.Nombre</NavLink></td>
-                                    <td><NavLink href="@ofrezco">@realizada?.PublicacionQueOfrezco!.Nombre</NavLink></td> 
+                                    <td>
+                                        <NavLink class="text-primary" data-bs-toggle="modal" data-bs-target="#ModalPublicacion" @onclick="@(() => SwitchPublicacion(realizada!.PublicacionQueOfrezco!))">
+                                            @realizada?.PublicacionQueOfrezco!.Nombre
+                                        </NavLink>
+                                    </td>
+                                    <td>
+                                        <NavLink class="text-primary" data-bs-toggle="modal" data-bs-target="#ModalPublicacion" @onclick="@(() => SwitchPublicacion(realizada!.PublicacionQueOferto!))">
+                                            @realizada?.PublicacionQueOferto!.Nombre
+                                        </NavLink>
+                                    </td>
                                     <td>@realizada?.PublicacionQueOferto!.Sucursal!.Nombre</td>
                                     <td>@realizada?.Fecha.ToShortDateString() @realizada?.Fecha.ToShortTimeString()</td>
                                     <td>@comentario</td>
@@ -119,9 +125,7 @@
                             @foreach (var recibida in OfertasRecibidas)
                             {
                                 var estado = "";
-                                var estilo = "";
-                                var ofrezco = "publicacion/" + recibida!.PublicacionQueOfrezcoId!;
-                                var oferto = "publicacion/" + recibida!.PublicacionQueOfertoId!;
+                                var estilo = "";        
                                 var comentario = "";
 
                                 @if (recibida.Estado == 0)
@@ -156,8 +160,16 @@
 
                                 <tr class="@estilo">
                                     <td>@recibida?.PublicacionQueOfrezco?.Usuario?.Nombre</td>
-                                    <td><NavLink href="@ofrezco">@recibida?.PublicacionQueOfrezco!.Nombre</NavLink></td>
-                                    <td><NavLink href="@oferto">@recibida?.PublicacionQueOferto!.Nombre</NavLink></td>
+                                    <td>
+                                        <NavLink class="text-primary" data-bs-toggle="modal" data-bs-target="#ModalPublicacion" @onclick="@(() => SwitchPublicacion(recibida!.PublicacionQueOfrezco!))">
+                                            @recibida?.PublicacionQueOfrezco!.Nombre
+                                        </NavLink>
+                                    </td>
+                                    <td>
+                                        <NavLink class="text-primary" data-bs-toggle="modal" data-bs-target="#ModalPublicacion" @onclick="@(() => SwitchPublicacion(recibida!.PublicacionQueOferto!))">
+                                            @recibida?.PublicacionQueOferto!.Nombre
+                                        </NavLink>
+                                    </td>
                                     <td>@recibida?.PublicacionQueOferto!.Sucursal!.Nombre</td>
                                     <td>@recibida?.Fecha.ToShortDateString() @recibida?.Fecha.ToShortTimeString()</td>
                                     <td>@comentario</td>
@@ -272,6 +284,8 @@
     </div>
 </div>
 
+<PublicacionModal PublicacionActual="publicacion" />
+
 <script>
     function toggleModalRechazar() {
         bootstrap.Modal.getOrCreateInstance("#ModalMotivoRechazo").toggle();
@@ -295,6 +309,12 @@
     bool exito = false;
     string? MensajeError;
     Oferta ofertaActual = new();
+    Publicacion publicacion = new();
+
+    void SwitchPublicacion(Publicacion p)
+    {
+        publicacion = p;
+    }
 
     public async Task CargarMotivo(EditContext editContext)
     {
