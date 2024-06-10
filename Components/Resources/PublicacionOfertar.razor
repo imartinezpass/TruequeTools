@@ -230,6 +230,10 @@
         {
             return "El horario debe ser entre las 8:00 y las 19:00";
         }
+        if (fechaTentativa.DayOfWeek == DayOfWeek.Sunday)
+        {
+            return "La ferretería está cerrada durante los domingos.";
+        }
         fecha = fechaTentativa;
         return "";
     }
