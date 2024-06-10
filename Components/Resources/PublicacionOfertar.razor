@@ -57,6 +57,15 @@
                                         <li class="list-group-item">
                                             <div style="margin-block-start:10px" class="table-responsive">
                                                 <h5>Mis Productos</h5>
+
+                                                <div class="d-flex align-items-center flex-column">
+                                                    <div>
+                                                        <input style="width:180px" type="datetime-local" asp-for="StartDate" name="StartDate" id="Fecha" data-date-format="{0:yyyy-MM-dd HH}" asp-format="{0:yyyy-MM-dd HH}" class="form-control" />
+                                                    </div>
+                                                    <div>
+                                                        <p style="margin:0px;text-align:center;">Elige una fecha y una hora</p>
+                                                    </div>
+                                                </div>
                                                 <table class="table">
                                                     <thead>
                                                         <tr>
@@ -97,15 +106,6 @@
                                                                                                 Ofertar
                                                                                             </button>
                                                                                         </span>
-                                                                                    </div>
-                                                                                    <div class="d-flex align-items-center flex-column">
-                                                                                        <div>
-                                                                                            <p style="margin:0px;text-align:center;">Elige una fecha y una hora</p>
-                                                                                        </div>
-                                                                                        <div>
-                                                                                            <input style="width:180px" type="datetime-local" asp-for="StartDate" name="StartDate" id="Fecha" data-date-format="{0:yyyy-MM-dd HH}" asp-format="{0:yyyy-MM-dd HH}" class="form-control" />
-                                                                                        </div>
-
                                                                                     </div>
                                                                                 </div>
                                                                             }
@@ -203,7 +203,6 @@
                 Fecha = fecha
             };
         await OfertaService.CreateOferta(oferta);
-        mostrarSuceso("Se ha realizado la oferta !");
         StateHasChanged();
     }
 
@@ -242,13 +241,6 @@
         tituloMsj = "Error";
         alertMsj = "info";
         contenidoMsj = alerta;
-        await JS.InvokeVoidAsync("toggleModal");
-    }
-    private async void mostrarSuceso(String? mensaje)
-    {
-        tituloMsj = "Éxito";
-        alertMsj = "success";
-        contenidoMsj = mensaje;
         await JS.InvokeVoidAsync("toggleModal");
     }
 }
