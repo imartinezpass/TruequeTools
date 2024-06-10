@@ -15,7 +15,8 @@ namespace TruequeTools.Services
         public Task<List<Oferta>> ReadAllOfertasRealizadasByUser(int userId);
         public Task<Oferta> OverwriteOfertaById(Oferta oferta);
         public Task<Oferta> ReadOfertaById(int id);
-        public Task RechazarOfertasTruequeCompletado(int publicacionId);
+        public Task RechazarOfertasTruequeCompletado(int publicacionId, string motivo);
         public Task<bool> PublicacionComprometida(int publicacionId);
-    }
+
+	}
 }

@@ -51,8 +51,8 @@
 		await TruequeService.OverwriteTruequeById(trueque);
 		await OfertaService.OverwriteOfertaById(oferta);
 
-		await OfertaService.RechazarOfertasTruequeCompletado(oferta.PublicacionQueOfertoId);
-		await OfertaService.RechazarOfertasTruequeCompletado(oferta.PublicacionQueOfrezcoId);
+		await OfertaService.RechazarOfertasTruequeCompletado(oferta.PublicacionQueOfertoId,"El producto fue intercambiado");
+		await OfertaService.RechazarOfertasTruequeCompletado(oferta.PublicacionQueOfrezcoId, "El producto fue intercambiado");
 
 		exito = true;
 		StateHasChanged();

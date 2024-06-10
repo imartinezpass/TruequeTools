@@ -42,7 +42,6 @@ namespace TruequeTools.Services
         //SOBREESCRIBE UNA OFERTA BUSCANDOLA POR EL ID
         public async Task<Oferta> OverwriteOfertaById(Oferta oferta)
         {
-            //var ofertaExistente = await contexto.Ofertas.FindAsync(oferta.Id);  // Buscar la publicación existente por su ID
 
             var ofertaExistente = oferta;
             await contexto.SaveChangesAsync();
@@ -52,19 +51,23 @@ namespace TruequeTools.Services
         }
 
         //CAMBIA EL ESTADO DE TODAS LAS OFERTAS CON CIERTO ID DE PUBLICACION OFERTADA O OFRECIDA A RECHAZADA
-        public async Task RechazarOfertasTruequeCompletado(int publicacionId)
+        public async Task RechazarOfertasTruequeCompletado(int publicacionId, string motivo)
         {
-            var ofertas = await contexto.Ofertas
-                .Where(oferta => (oferta.PublicacionQueOfertoId == publicacionId || oferta.PublicacionQueOfrezcoId == publicacionId) && oferta.Estado == 0)
-                .ToListAsync();
+            var ofertas1 = await contexto.Ofertas
+                .Where(oferta => oferta.PublicacionQueOfertoId == publicacionId && oferta.Estado == 0).ToListAsync();
 
-            foreach (var oferta in ofertas)
+			var ofertas2 = await contexto.Ofertas
+				.Where(oferta => oferta.PublicacionQueOfrezcoId == publicacionId && oferta.Estado == 0).ToListAsync();
+
+			foreach (var oferta in ofertas2)
             {
                 oferta.Estado = -1;
-                oferta.Motivo = "El producto fue intercambiado";
+                oferta.Motivo = motivo;
             }
 
-            await contexto.SaveChangesAsync();
+			contexto.Ofertas.RemoveRange(ofertas1);
+
+			await contexto.SaveChangesAsync();
         }
 
         //BUSCA SI UNA PUBLICACION ESTA INVOLUCRADA EN UNA OFERTA ACEPTADA
