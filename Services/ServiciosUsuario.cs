@@ -66,6 +66,16 @@ namespace TruequeTools.Services
             await contexto.SaveChangesAsync();
         }
 
+        public async Task RestablecerContraseña(string email)
+        {
+            var usuarioExistente = await contexto.Usuarios.FirstOrDefaultAsync(u => u.Email == email);
+            if(usuarioExistente != null)
+            {
+                usuarioExistente.Contraseña = "12345678";
+                await contexto.SaveChangesAsync();
+            }
+        }
+
         //RECIBE UN CORREO ELECTRONICO Y DEVUELVE SI SE ENCUENTRA REGISTRADO O NO
         public async Task<bool> SeEncuentraRegistrado(string email)
         {

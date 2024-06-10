@@ -1,66 +1,57 @@
 ﻿@page "/recuperar"
 
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Identity;
+@using Microsoft.AspNetCore.Mvc;
+@using Microsoft.AspNetCore.Mvc.RazorPages;
+@using Microsoft.AspNetCore.Identity;
+@using System.ComponentModel.DataAnnotations;
 
-<h3>Recuperar Contraseña</h3>
+@inject IServiciosUsuario UsuarioService
 
-<form method="post">
-    <div class="form-group">
-        <label for="Email">Correo electrónico</label>
-        <input type="email" id="Email" name="Email" class="form-control" required />
+@if (exito)
+{
+    <div class="alert alert-success" role="alert">
+        Exito: Si el correo corresponde a una cuenta registrada se le enviará un codigo de acceso !
     </div>
-    <button type="submit" class="btn btn-primary">Restablecer contraseña</button>
-</form>
+}
+else
+{
+    <EditForm Model="@Modelo" OnValidSubmit="RestablecerContraseña" FormName="ContraseñaForm">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="text-danger" role="alert" />
+        @if (!string.IsNullOrEmpty(MensajeError))
+        {
+            <div class="alert alert-danger mt-3" role="alert">
+                @MensajeError
+            </div>
+        }
+        <div class="form-floating mb-3">
+            <InputText @bind-Value="Modelo.Email" class="form-control" autocomplete="correo" aria-required="true" placeholder="" maxlength="100" />
+            <label for="correo">Correo</label>
+            <ValidationMessage For="() => Modelo.Email" class="text-danger" />
+        </div>
+        <button type="submit" class="w-100 btn btn-lg btn-dark">Recuperar Contraseña</button>
+    </EditForm>
+}
 
 @code {
 
-    /*private readonly UserManager<IdentityUser> _userManager;
-
-    public ResetPasswordModel(UserManager<IdentityUser> userManager)
-    {
-        _userManager = userManager;
-    }
-
-    [BindProperty]
-    public InputModel Input { get; set; }
-
-    public class InputModel
+    public class RestablecerViewModel
     {
         [Required]
         [EmailAddress]
-        public string Email { get; set; }
+        public string? Email { get; set; }
     }
 
-    public async Task<IActionResult> OnPostAsync()
-    {
-        if (ModelState.IsValid)
-        {
-            var user = await _userManager.FindByEmailAsync(Input.Email);
-            if (user != null)
-            {
-                var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var result = await _userManager.ResetPasswordAsync(user, resetToken, "12345678");
-                if (result.Succeeded)
-                {
+    [SupplyParameterFromForm]
+    private RestablecerViewModel Modelo { get; set; } = new();
 
-                    return RedirectToPage("Home");
-                }
-                else
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                }
-            }
-            else
-            {
-                ModelState.AddModelError(string.Empty, "El mail ingresado no se encuentra registrado.");
-            }
-        }
-        return Page();
-    }*/
+    string? MensajeError;
+    bool exito = false;
+
+    public async Task RestablecerContraseña(EditContext editContext)
+    {
+        exito = true;
+        await UsuarioService.RestablecerContraseña(Modelo.Email!);
+    }
 
 }

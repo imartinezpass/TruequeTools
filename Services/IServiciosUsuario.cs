@@ -17,5 +17,6 @@ namespace TruequeTools.Services
         public Task<List<Usuario>> ReadAllNotDeletedEmpleados();
         public Task<Usuario> OverwriteUsuarioById(Usuario usuario);
         public Task<Usuario> FindEmpleado(int userId);
+        public Task RestablecerContraseña(string email);
     }
 }
