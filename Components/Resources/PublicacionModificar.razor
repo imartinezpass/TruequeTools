@@ -8,6 +8,7 @@
 @inject IServiciosCategoria CategoriaService
 @inject IServiciosPublicacion PublicacionService
 @inject IServiciosImagen ImagenService
+@inject IServiciosOferta OfertaService
 @inject IJSRuntime JS
 
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
@@ -20,84 +21,102 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5" id="staticBackdropLabel">Modificar Publicacion #@PublicacionId</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" ></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CerrarModal"></button>
             </div>
-            <div class="modal-body">     
-                <div class="row">
-                    <EditForm Model="@Modelo" enctype="multipart/form-data" OnValidSubmit="Modificar" FormName="ModificarPublicacion">
-                        <DataAnnotationsValidator />
-                        <ValidationSummary class="text-danger" role="alert" />
-                        @if (!string.IsNullOrEmpty(MensajeError))
-                        {
-                            <div class="alert alert-danger mt-3" role="alert">
-                                @MensajeError
-                            </div>
-                        }
-                        <div class="form-floating mb-3">
-                            <InputText @bind-Value="Modelo.Nombre" class="form-control" autocomplete="off" aria-required="true" placeholder="Nombre del producto" maxlength="50" />
-                            <label for="nombre">Nombre del producto</label>
-                            <ValidationMessage For="() => Modelo.Nombre" class="text-danger" />
+            <div class="modal-body">
+                @if (autorizado)
+                {
+                    @if (exito)
+                    {
+                        <div class="alert alert-success" role="alert">
+                            Se modificó la publicacion !
                         </div>
-                        <div class="form-floating mb-3">
-                            <InputText @bind-Value="Modelo.Descripcion" class="form-control" autocomplete="off" aria-required="true" placeholder="Descripcion del producto" maxlength="200" />
-                            <label for="descripcion">Descripcion del producto</label>
-                            <ValidationMessage For="() => Modelo.Descripcion" class="text-danger" />
-                        </div>
-                        <div class="form-floating mb-3">
-                            <InputSelect @bind-Value="Modelo.SucursalId" class="form-control" autocomplete="sucursal" aria-required="true" placeholder="" maxlength="50">
-                                @foreach (var suc in ListaSucursales!)
+                    }
+                    else
+                    {
+                        <div class="row">
+                            <EditForm Model="@Modelo" enctype="multipart/form-data" OnValidSubmit="Modificar" FormName="ModificarPublicacion">
+                                <DataAnnotationsValidator />
+                                <ValidationSummary class="text-danger" role="alert" />
+                                @if (!string.IsNullOrEmpty(MensajeError))
                                 {
-                                    <option value="@suc.Id">@suc.Nombre</option>
+                                    <div class="alert alert-danger mt-3" role="alert">
+                                        @MensajeError
+                                    </div>
                                 }
-                            </InputSelect>
-                            <label for="sucursal">Sucursal</label>
-                            <ValidationMessage For="() => Modelo.SucursalId" class="text-danger" />
-                        </div>
-                        <div class="form-floating mb-3">
-                            <InputSelect @bind-Value="Modelo.CategoriaId" class="form-control" autocomplete="categoria" aria-required="true" placeholder="" maxlength="50">
-                                <option value=0>Seleccione una categoría</option>
-                                @foreach (var cat in ListaCategorias!)
-                                {
-                                    <option value="@cat.Id">@cat.Nombre</option>
-                                }
-                            </InputSelect>
-                            <label for="categoria">Categoria</label>
-                            <ValidationMessage For="() => Modelo.CategoriaId" class="text-danger" />
-                        </div>
-                        <hr />
-                        @***********NACHO - MANEJO DE IMAGENES***********@
-                        <label for="foto">Fotos (opcional)</label>
-                        <div class="form-floating mb-3">
-                            <div>
-                                <InputFile id="fileInput" multiple OnChange="OnInputFileChange" accept="image/*" class="form-control" />
-                            </div>
-                            <ValidationMessage For="() => Modelo.FileSize" class="text-danger" />
-                        </div>
-                        @if (PublicacionActual!.HasImages || imageDataUrls.Count > 0)
-                        {
-                            <div class="form-floating mb-3">
-                                <button type="button" class="btn btn-danger mt-2 d-block mx-auto text-center" @onclick="ClearInputFile">Limpiar Imagenes</button>
-                            </div>
-                        }
-                        @if (imageDataUrls != null)
-                        {
-                            <div class="table-responsive" style="display:flex; justify-content:center">
-                                <table class="table table-bordered" style="text-align:center">
-                                    <tr>
-                                        @foreach (var imageDataUrl in imageDataUrls)
+                                <div class="form-floating mb-3">
+                                    <InputText @bind-Value="Modelo.Nombre" class="form-control" autocomplete="off" aria-required="true" placeholder="Nombre del producto" maxlength="50" />
+                                    <label for="nombre">Nombre del producto</label>
+                                    <ValidationMessage For="() => Modelo.Nombre" class="text-danger" />
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <InputText @bind-Value="Modelo.Descripcion" class="form-control" autocomplete="off" aria-required="true" placeholder="Descripcion del producto" maxlength="200" />
+                                    <label for="descripcion">Descripcion del producto</label>
+                                    <ValidationMessage For="() => Modelo.Descripcion" class="text-danger" />
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <InputSelect @bind-Value="Modelo.SucursalId" class="form-control" autocomplete="sucursal" aria-required="true" placeholder="" maxlength="50">
+                                        @foreach (var suc in ListaSucursales!)
                                         {
-                                            <td>
-                                                <img src="@imageDataUrl" style="width: 100px; height: 100px;" />
-                                            </td>
+                                            <option value="@suc.Id">@suc.Nombre</option>
                                         }
-                                    </tr>
-                                </table>
-                            </div>    
-                        }
-                        @***********NACHO - MANEJO DE IMAGENES***********@
-                        <button type="submit" class="w-100 btn btn-lg btn-dark">Modificar Publicacion</button>
-                    </EditForm>
-                </div>                
+                                    </InputSelect>
+                                    <label for="sucursal">Sucursal</label>
+                                    <ValidationMessage For="() => Modelo.SucursalId" class="text-danger" />
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <InputSelect @bind-Value="Modelo.CategoriaId" class="form-control" autocomplete="categoria" aria-required="true" placeholder="" maxlength="50">
+                                        <option value=0>Seleccione una categoría</option>
+                                        @foreach (var cat in ListaCategorias!)
+                                        {
+                                            <option value="@cat.Id">@cat.Nombre</option>
+                                        }
+                                    </InputSelect>
+                                    <label for="categoria">Categoria</label>
+                                    <ValidationMessage For="() => Modelo.CategoriaId" class="text-danger" />
+                                </div>
+                                <hr />
+                                @***********NACHO - MANEJO DE IMAGENES***********@
+                                <label for="foto">Fotos (opcional)</label>
+                                <div class="form-floating mb-3">
+                                    <div>
+                                        <InputFile id="fileInput" multiple OnChange="OnInputFileChange" accept="image/*" class="form-control" />
+                                    </div>
+                                    <ValidationMessage For="() => Modelo.FileSize" class="text-danger" />
+                                </div>
+                                @if (PublicacionActual!.HasImages || imageDataUrls.Count > 0)
+                                {
+                                    <div class="form-floating mb-3">
+                                        <button type="button" class="btn btn-danger mt-2 d-block mx-auto text-center" @onclick="ClearInputFile">Limpiar Imagenes</button>
+                                    </div>
+                                }
+                                @if (imageDataUrls != null)
+                                {
+                                    <div class="table-responsive" style="display:flex; justify-content:center">
+                                        <table class="table table-bordered" style="text-align:center">
+                                            <tr>
+                                                @foreach (var imageDataUrl in imageDataUrls)
+                                                {
+                                                    <td>
+                                                        <img src="@imageDataUrl" style="width: 100px; height: 100px;" />
+                                                    </td>
+                                                }
+                                            </tr>
+                                        </table>
+                                    </div>
+                                }
+                                @***********NACHO - MANEJO DE IMAGENES***********@
+                                <button type="submit" class="w-100 btn btn-lg btn-dark">Modificar Publicacion</button>
+                            </EditForm>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="alert alert-warning" role="alert">
+                        No puedes modificar la publicacion porque ya has hecho o recibido ofertas con ella. Si lo deseas puedes crear una nueva publicacion
+                    </div>
+                }                                    
             </div>
         </div>
     </div>
@@ -124,7 +143,8 @@
     private String? MensajeError;
     private ClaimsPrincipal? user;
 
-    bool autorizado = true;
+    bool exito = false;
+    bool autorizado = false;
     bool cargando = true;
     bool eliminar = false;
 
@@ -134,10 +154,12 @@
     [SupplyParameterFromForm]
     private PublicacionViewModel Modelo { get; set; } = new();
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         await Task.Delay(500);
-       
+
+        autorizado = !await OfertaService.PublicacionHasOfertas(PublicacionId);
+
         if (PublicacionActual!.HasImages)
         {
             context.Entry(PublicacionActual!).Collection(p => p.Imagenes!).Load();
@@ -153,6 +175,14 @@
         Modelo.Descripcion = PublicacionActual!.Descripcion!;
         Modelo.Nombre = PublicacionActual!.Nombre!;
         cargando = false;
+    }
+
+    public async void CerrarModal()
+    {
+        if (exito)
+        {
+            await JS.InvokeVoidAsync("refreshPage");
+        }
     }
 
     async Task ClearInputFile()
@@ -273,5 +303,7 @@
             await ImagenService.AltaImagenes(imagenes);
         }
 
+        exito = true;
+        StateHasChanged();
     }
 }
