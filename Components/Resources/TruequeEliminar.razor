@@ -1,0 +1,82 @@
+﻿@using TruequeTools.Entities
+
+@inject IJSRuntime JS
+@inject IServiciosTrueque TruequeService
+@inject IServiciosOferta OfertaService
+@inject IServiciosPublicacion PublicacionService
+
+@rendermode InteractiveServer
+
+<!-- Modal -->
+<div class="modal fade" id="ModalRechazar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Rechazar el trueque #@TruequeId</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CerrarModal"></button>
+            </div>
+            <div class="modal-body">
+                @if (exito)
+                {
+                    <div class="alert alert-success" role="alert">
+                        Se rechazó el trueque !
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning" role="alert">
+                        ¿Confirma que no se realizó el trueque?
+                    </div>
+                    <button class="w-100 btn btn-lg btn-dark" @onclick="@(() =>RechazarTrueque())">Confirmar</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public int TruequeId { get; set; }
+
+    bool exito = false;
+
+    private async Task RechazarTrueque()
+    {
+        Trueque trueque = await TruequeService.ReadTruequeById(TruequeId); //Leo el trueque que voy a modificar
+        Oferta oferta = await OfertaService.ReadOfertaById(trueque.OfertaId); //Leo la oferta del trueque que voy a modificar
+        Publicacion publi1 = await PublicacionService.ReadPublicacionById(oferta.PublicacionQueOfertoId, true); //Leo la publicacion de la oferta a modificar
+        Publicacion publi2 = await PublicacionService.ReadPublicacionById(oferta.PublicacionQueOfrezcoId, true); //Leo la publicacion de la oferta a modificar
+
+        try
+        {
+            trueque.Estado = -1; //trueque pasa a rechazado
+            oferta.Estado = -1; //oferta pasa a rechazada
+            oferta.Motivo = "No se concretó el trueque";
+            publi1.Deleted = false; //se activa nuevamente la publicacion
+            publi2.Deleted = false; //se activa nuevamente la publicacion
+
+            await TruequeService.OverwriteTruequeById(trueque);
+            await OfertaService.OverwriteOfertaById(oferta);
+            await PublicacionService.OverwritePublicacionById(publi1);
+            await PublicacionService.OverwritePublicacionById(publi2);
+
+            exito = true;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", ex.ToString());
+        }
+
+    }
+
+    public async void CerrarModal()
+    {
+        if (exito)
+        {
+            await JS.InvokeVoidAsync("refreshPage");
+        }
+    }
+
+}

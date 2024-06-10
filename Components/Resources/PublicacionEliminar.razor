@@ -2,6 +2,7 @@
 
 @inject NavigationManager NavMan
 @inject IServiciosPublicacion PublicacionService
+@inject IServiciosOferta OfertaService
 @inject IJSRuntime JS
 
 <!-- Modal -->
@@ -42,7 +43,10 @@
 	{
 		exito = true;
 		PublicacionActual!.Deleted = true;
+		string motivo = PublicacionActual.Nombre!;
+		motivo = "El producto " + motivo + " fue eliminado";
 		await PublicacionService.OverwritePublicacionById(PublicacionActual);
+		await OfertaService.RechazarOfertasTruequeCompletado(PublicacionActual.Id, motivo);
 	}
 
 	public void CerrarModal()
