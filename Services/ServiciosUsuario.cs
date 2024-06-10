@@ -21,12 +21,13 @@ namespace TruequeTools.Services
 
         public async Task<Usuario> FindEmpleado(int userId)
         {
-            return await contexto.Usuarios.FindAsync(userId);
+            var usuario = await contexto.Usuarios.FindAsync(userId);
+            return usuario!;
         }
 
         public async Task<Usuario> OverwriteUsuarioById(Usuario usuario)
         {
-            var usuarioExistente = await FindEmpleado(usuario.Id);  // Buscar la publicación existente por su ID
+            var usuarioExistente = await FindEmpleado(usuario.Id); 
 
             if (usuarioExistente != null)
             {
@@ -52,8 +53,14 @@ namespace TruequeTools.Services
 
         }
 
-        //RECIBE UN USUARIO COMO PARAMETRO Y LO AGREGA A LA BASE DE DATOS
-        public async Task RegisterUsuario(Usuario usuario)
+        public async Task<Usuario> ReadUsuarioById(int userId)
+        {
+            var usuario = await contexto.Usuarios.FindAsync(userId);
+            return usuario!;
+		}
+
+		//RECIBE UN USUARIO COMO PARAMETRO Y LO AGREGA A LA BASE DE DATOS
+		public async Task RegisterUsuario(Usuario usuario)
         {
             contexto.Usuarios.Add(usuario);
             await contexto.SaveChangesAsync();

@@ -11,6 +11,7 @@ namespace TruequeTools.Services
     public interface IServiciosUsuario
     {
         public Task RegisterUsuario(Usuario usuario);
+        public Task<Usuario> ReadUsuarioById(int userId);
         public Task<bool> SeEncuentraRegistrado(string email);
         public Task<List<Usuario>> ReadAllEmpleados();
         public Task<List<Usuario>> ReadAllNotDeletedEmpleados();
