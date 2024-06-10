@@ -233,6 +233,10 @@
         {
             return "La ferretería está cerrada durante los domingos.";
         }
+        if (fechaTentativa.Day == DateTime.Now.Day && (fechaTentativa.Hour < DateTime.Now.Hour || (fechaTentativa.Hour == DateTime.Now.Hour && fechaTentativa.Minute < DateTime.Now.Minute))) ;
+        {
+            return "El horario no puede ser anterior al actual";
+        }
         fecha = fechaTentativa;
         return "";
     }
