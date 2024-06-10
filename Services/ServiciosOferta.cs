@@ -86,6 +86,11 @@ namespace TruequeTools.Services
             var result = await contexto.Ofertas.Where(s => s.Id == id).FirstOrDefaultAsync();
             return result!;
         }
+
+        public Task<bool> PublicacionHasOfertas(int publicacionId)
+        {
+            return contexto.Ofertas.AnyAsync(o => o.PublicacionQueOfertoId == publicacionId || o.PublicacionQueOfrezcoId == publicacionId);
+        }
     }
 
 }

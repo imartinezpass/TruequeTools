@@ -17,6 +17,7 @@ namespace TruequeTools.Services
         public Task<Oferta> ReadOfertaById(int id);
         public Task RechazarOfertasTruequeCompletado(int publicacionId, string motivo);
         public Task<bool> PublicacionComprometida(int publicacionId);
+        public Task<bool> PublicacionHasOfertas(int publicacionId);
 
-	}
+    }
 }
