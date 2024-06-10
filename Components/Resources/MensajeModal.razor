@@ -1,0 +1,45 @@
+﻿@inject IJSRuntime JS
+@rendermode InteractiveServer
+
+<!-- Modal -->
+<div class="modal fade" id="ModalMensaje" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog custom-modal-width">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">@tituloModal</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="ToggleModal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-@alertModal">
+                    @contenidoModal
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function toggleModal() {
+        bootstrap.Modal.getOrCreateInstance("#ModalMensaje").toggle();
+    }
+</script>
+
+@code {
+    [Parameter]
+    public String? tituloModal { get; set; } = "ERROR";
+    [Parameter]
+    public String? alertModal { get; set; } = "danger";
+    [Parameter]
+    public String? contenidoModal { get; set; } = "DEFAULT MESSAGE";
+
+    private async void ToggleModal()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("toggleModal");
+        }
+        catch (Exception e)
+        {
+            await JS.InvokeVoidAsync("alert", e.ToString());
+        }
+    }
+}

@@ -90,11 +90,24 @@
                                                                             }
                                                                             else
                                                                             {
-                                                                                <span class="enabledbutton">
-                                                                                    <button class="btn btn-dark rounded" @onclick="@(() =>RealizarOferta(publi.Id))" style="margin-right: 0.5rem;">
-                                                                                        Ofertar
-                                                                                    </button>
-                                                                                </span>
+                                                                                <div>
+                                                                                    <div>
+                                                                                        <span class="enabledbutton">
+                                                                                            <button class="btn btn-dark rounded" @onclick="@(() =>RealizarOferta(publi.Id))" style="margin-right: 0.5rem;">
+                                                                                                Ofertar
+                                                                                            </button>
+                                                                                        </span>
+                                                                                    </div>
+                                                                                    <div class="d-flex align-items-center flex-column">
+                                                                                        <div>
+                                                                                            <p style="margin:0px;text-align:center;">Elige una fecha y una hora</p>
+                                                                                        </div>
+                                                                                        <div>
+                                                                                            <input style="width:180px" type="datetime-local" asp-for="StartDate" name="StartDate" id="Fecha" data-date-format="{0:yyyy-MM-dd HH}" asp-format="{0:yyyy-MM-dd HH}" class="form-control" />
+                                                                                        </div>
+
+                                                                                    </div>
+                                                                                </div>
                                                                             }
                                                                         </div>
                                                                     </div>
@@ -132,8 +145,14 @@
     function refreshPage() {
         location.reload();
     }
+    function getDateValue() {
+        return document.getElementById("Fecha").value;
+    }
+    function toggleModal() {
+        bootstrap.Modal.getOrCreateInstance("#ModalMensaje").toggle();
+    }
 </script>
-
+<MensajeModal tituloModal="@tituloMsj" alertModal="@alertMsj" contenidoModal="@contenidoMsj" />
 @code {
 
     [Parameter]
@@ -152,6 +171,12 @@
 
     AuthenticationState? authState;
 
+    public DateTime fecha;
+    // variables para controlar MensajeModal
+    public String? tituloMsj { get; set; }
+    public String? alertMsj { get; set; }
+    public String? contenidoMsj { get; set; }
+
     protected override async Task OnParametersSetAsync()
     {
         cargando = true;
@@ -161,15 +186,25 @@
 
     private async void RealizarOferta(int publiId)
     {
+        String? error = await validarFecha();
+        if (error != "")
+        {
+            mostrarError(error);
+            StateHasChanged();
+            return;
+        }
         exito = true;
         var oferta = new Oferta
-        {
-            UsuarioId = UserRequesterId,
-            PublicacionQueOfertoId = publiId,
-            PublicacionQueOfrezcoId = PublicacionActual!.Id,
-            Estado = 0
-        };
-        await OfertaService.CreateOferta(oferta); 
+            {
+                UsuarioId = UserRequesterId,
+                PublicacionQueOfertoId = publiId,
+                PublicacionQueOfrezcoId = PublicacionActual!.Id,
+                Estado = 0,
+                Fecha = fecha
+            };
+        await OfertaService.CreateOferta(oferta);
+        mostrarSuceso("Se ha realizado la oferta !");
+        StateHasChanged();
     }
 
     public async void CerrarModal()
@@ -179,5 +214,37 @@
             await JS.InvokeVoidAsync("refreshPage");
         }
     }
-
+    private async Task<String> validarFecha()
+    {
+        String? fechaHora = await JS.InvokeAsync<String>("getDateValue");
+        if (fechaHora == "")
+        {
+            return "Por favor, seleccione la fecha y hora tentativas para el treuque";
+        }
+        DateTime fechaTentativa = DateTime.Parse(fechaHora);
+        if (fechaTentativa.Month < DateTime.Now.Month || fechaTentativa.Day < DateTime.Now.Day)
+        {
+            return "La fecha tiene que ser de hoy en adelante.";
+        }
+        if (fechaTentativa.Hour < 8 || fechaTentativa.Hour > 19)
+        {
+            return "El horario debe ser entre las 8:00 y las 19:00";
+        }
+        fecha = fechaTentativa;
+        return "";
+    }
+    private async void mostrarError(String? alerta)
+    {
+        tituloMsj = "Error";
+        alertMsj = "info";
+        contenidoMsj = alerta;
+        await JS.InvokeVoidAsync("toggleModal");
+    }
+    private async void mostrarSuceso(String? mensaje)
+    {
+        tituloMsj = "Éxito";
+        alertMsj = "success";
+        contenidoMsj = mensaje;
+        await JS.InvokeVoidAsync("toggleModal");
+    }
 }
