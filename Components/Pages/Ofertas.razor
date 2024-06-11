@@ -76,13 +76,13 @@
                                 <tr class="@estilo">
                                     <td>@realizada?.PublicacionQueOfrezco?.Usuario?.Nombre</td>
                                     <td>
-                                        <NavLink class="text-primary" data-bs-toggle="modal" data-bs-target="#ModalPublicacion" @onclick="@(() => SwitchPublicacion(realizada!.PublicacionQueOfrezco!))">
-                                            @realizada?.PublicacionQueOfrezco!.Nombre
-                                        </NavLink>
-                                    </td>
-                                    <td>
                                         <NavLink class="text-primary" data-bs-toggle="modal" data-bs-target="#ModalPublicacion" @onclick="@(() => SwitchPublicacion(realizada!.PublicacionQueOferto!))">
                                             @realizada?.PublicacionQueOferto!.Nombre
+                                        </NavLink>
+                                    </td>
+                                    <td>                                     
+                                        <NavLink class="text-primary" data-bs-toggle="modal" data-bs-target="#ModalPublicacion" @onclick="@(() => SwitchPublicacion(realizada!.PublicacionQueOfrezco!))">
+                                            @realizada?.PublicacionQueOfrezco!.Nombre
                                         </NavLink>
                                     </td>
                                     <td>@realizada?.PublicacionQueOferto!.Sucursal!.Nombre</td>
@@ -269,7 +269,7 @@
                     if (publicRecibComp)
                     {
                         <div class="alert alert-warning" role="alert">
-                            - El producto que le ofrecieron ya tiene un trueque pendiente.
+                            - El producto al que ofertó / le oferecieron ya tiene un trueque pendiente.
                         </div>
                     }    
                 }

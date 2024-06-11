@@ -7,39 +7,46 @@
 
 @inject IServiciosUsuario UsuarioService
 
-@if (exito)
-{
-    <div class="alert alert-success" role="alert">
-        Exito: Si el correo corresponde a una cuenta registrada se le enviará un codigo de acceso !
-    </div>
-}
-else
-{
-    <EditForm Model="@Modelo" OnValidSubmit="RestablecerContraseña" FormName="ContraseñaForm">
-        <DataAnnotationsValidator />
-        <ValidationSummary class="text-danger" role="alert" />
-        @if (!string.IsNullOrEmpty(MensajeError))
+<div class="row">
+    <div class="col-lg-4 offset-lg-4 pt-4 pb-4 border">
+        <h1 style="text-align:center">Restablecer contraseña</h1>
+        <h2 style="text-align:center">Recuperar el acceso a la cuenta</h2>
+        <hr />
+        @if (exito)
         {
-            <div class="alert alert-danger mt-3" role="alert">
-                @MensajeError
+            <div class="alert alert-success" role="alert">
+                Exito: Si el correo ingresado corresponde a una cuenta registrada se le enviará un codigo de acceso !
             </div>
         }
-        <div class="form-floating mb-3">
-            <InputText @bind-Value="Modelo.Email" class="form-control" autocomplete="correo" aria-required="true" placeholder="" maxlength="100" />
-            <label for="correo">Correo</label>
-            <ValidationMessage For="() => Modelo.Email" class="text-danger" />
-        </div>
-        <button type="submit" class="w-100 btn btn-lg btn-dark">Recuperar Contraseña</button>
-    </EditForm>
-}
+        else
+        {
+            <EditForm Model="@Modelo" OnValidSubmit="RestablecerContraseña" FormName="ContraseñaForm">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="text-danger" role="alert" />
+                @if (!string.IsNullOrEmpty(MensajeError))
+                {
+                    <div class="alert alert-danger mt-3" role="alert">
+                        @MensajeError
+                    </div>
+                }
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="Modelo.Email" class="form-control" autocomplete="correo" aria-required="true" placeholder="" maxlength="100" />
+                    <label for="correo">Correo</label>
+                    <ValidationMessage For="() => Modelo.Email" class="text-danger" />
+                </div>
+                <button type="submit" class="w-100 btn btn-lg btn-dark">Recuperar Contraseña</button>
+            </EditForm>
+        }
+    </div>
+</div>
 
 @code {
 
     public class RestablecerViewModel
     {
-        [Required]
-        [EmailAddress]
-        public string? Email { get; set; }
+        [Required(ErrorMessage = "Debe ingresar su correo electronico")]
+        [EmailAddress(ErrorMessage = "Debe ingresar un correo electronico valido")]
+        public string? Email { get; set; } 
     }
 
     [SupplyParameterFromForm]

@@ -91,8 +91,7 @@
 
     public async Task RegistrarUsuario(EditContext editContext)
     {
-
-        var fechaMinima = DateOnly.FromDateTime(DateTime.Today.AddYears(-18));
+        var fechaMinima = DateOnly.FromDateTime(DateTime.Today.AddYears(-18).AddDays(1));
         if (Modelo.FechaNacimiento >= fechaMinima)
         {
             MensajeError = "Error: Debes tenes al menos 18 años para poder registrarte.";

@@ -1,5 +1,6 @@
 ﻿@page "/modificar"
 
+@using System.ComponentModel.DataAnnotations
 @using TruequeTools.Entities
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -12,58 +13,102 @@
 
 @attribute [Authorize(Roles = "Admin,User,Employee")]
 
-<ul class="list-group">
-    @if (exito)
-    {
-		<div>
-			<div class="alert alert-success" role="alert">
-				Se guardaron los cambios!
+<div class="row">
+	<div class="col-lg-4 offset-lg-4 pt-4 pb-4 border">
+		<h2 style="text-align:center">Modificar informacion personal</h2>
+		@if (exito1)
+		{
+			<div>
+				<div class="alert alert-success" role="alert">
+					Se guardaron los cambios!
+				</div>
 			</div>
-		</div>
-    }
-    else
-    {
-		<div class="row">
-			<EditForm Model="@Modelo" OnValidSubmit="HandleSubmit" FormName="UsuarioFrom">
-				<DataAnnotationsValidator />
-				<ValidationSummary class="text-danger" role="alert" />
-				@if (!string.IsNullOrEmpty(MensajeError))
-				{
-					<div class="alert alert-danger mt-3" role="alert">
-						@MensajeError
+		}
+		else
+		{
+			<div class="row">
+				<EditForm Model="@ModeloUsuario" OnValidSubmit="HandleSubmitUsuario" FormName="UsuarioFrom">
+					<DataAnnotationsValidator />
+					<ValidationSummary class="text-danger" role="alert" />
+					@if (!string.IsNullOrEmpty(MensajeError1))
+					{
+						<div class="alert alert-danger mt-3" role="alert">
+							@MensajeError1
+						</div>
+					}
+					<div class="form-floating mb-3">
+						<InputText @bind-Value="ModeloUsuario.Nombre" class="form-control" autocomplete="nombre" aria-required="true" placeholder="" maxlength="50" />
+						<label for="nombre">Nombre</label>
+						<ValidationMessage For="() => ModeloUsuario.Nombre" class="text-danger" />
 					</div>
-				}
-				<div class="form-floating mb-3">
-					<InputText @bind-Value="Modelo.Nombre" class="form-control" autocomplete="nombre" aria-required="true" placeholder="" maxlength="50" />
-					<label for="nombre">Nombre</label>
-					<ValidationMessage For="() => Modelo.Nombre" class="text-danger" />
+					<div class="form-floating mb-3">
+						<InputText @bind-Value="ModeloUsuario.Apellido" class="form-control" autocomplete="apellido" aria-required="true" placeholder="" maxlength="50" />
+						<label for="apellido">Apellido</label>
+						<ValidationMessage For="() => ModeloUsuario.Apellido" class="text-danger" />
+					</div>
+					<div class="form-floating mb-3">
+						<InputDate @bind-Value="ModeloUsuario.FechaNacimiento" class="form-control" autocomplete="fecha-nacimiento" aria-required="true" placeholder="" maxlength="50" />
+						<label for="fecha-nacimiento">Fecha de Nacimiento</label>
+						<ValidationMessage For="() => ModeloUsuario.FechaNacimiento" class="text-danger" />
+					</div>
+					<div class="form-floating mb-3">
+						<InputSelect @bind-Value="@ModeloUsuario.SucursalId" class="form-control" autocomplete="sucursal" aria-required="true" placeholder="" maxlength="50">
+							@foreach (var suc in sucursales)
+							{
+								<option value="@suc.Id">@suc.Nombre</option>
+							}
+						</InputSelect>
+						<label for="sucursal">Sucursal</label>
+						<ValidationMessage For="() => ModeloUsuario.SucursalId" class="text-danger" />
+					</div>
+					<button type="submit" class="w-100 btn btn-lg btn-dark">Modificar Datos</button>
+				</EditForm>
+			</div>
+				
+		}
+		<hr />
+		<h2 style="text-align:center">Modificar contraseña</h2>
+		@if(exito2)
+		{
+			<div>
+				<div class="alert alert-success" role="alert">
+					Se modificó la contraseña!
 				</div>
-				<div class="form-floating mb-3">
-					<InputText @bind-Value="Modelo.Apellido" class="form-control" autocomplete="apellido" aria-required="true" placeholder="" maxlength="50" />
-					<label for="apellido">Apellido</label>
-					<ValidationMessage For="() => Modelo.Apellido" class="text-danger" />
-				</div>
-				<div class="form-floating mb-3">
-					<InputDate @bind-Value="Modelo.FechaNacimiento" class="form-control" autocomplete="fecha-nacimiento" aria-required="true" placeholder="" maxlength="50" />
-					<label for="fecha-nacimiento">Fecha de Nacimiento</label>
-					<ValidationMessage For="() => Modelo.FechaNacimiento" class="text-danger" />
-				</div>
-				<div class="form-floating mb-3">
-					<InputSelect @bind-Value="@Modelo.SucursalId" class="form-control" autocomplete="sucursal" aria-required="true" placeholder="" maxlength="50">
-						@foreach (var suc in sucursales)
-						{
-							<option value="@suc.Id">@suc.Nombre</option>
-						}
-					</InputSelect>
-					<label for="sucursal">Sucursal</label>
-					<ValidationMessage For="() => Modelo.SucursalId" class="text-danger" />
-				</div>
-				<button type="submit" class="w-100 btn btn-lg btn-dark">Guardar</button>
-			</EditForm>
-		</div>
-    }
-</ul>
-
+			</div>
+		}
+		else
+		{	
+			<div class="row">
+				<EditForm Model="@ModeloContraseña" OnValidSubmit="HandleSubmitContraseña" FormName="ContraseñaFrom">
+					<DataAnnotationsValidator />
+					<ValidationSummary class="text-danger" role="alert" />
+					@if (!string.IsNullOrEmpty(MensajeError2))
+					{
+						<div class="alert alert-danger mt-3" role="alert">
+							@MensajeError2
+						</div>
+					}
+					<div class="form-floating mb-3">
+						<InputText @bind-Value="ModeloContraseña.ContraseñaActual" type="password" class="form-control" autocomplete="nombre" aria-required="true" placeholder="" maxlength="50" />
+						<label for="nombre">Contraseña Actual</label>
+						<ValidationMessage For="() => ModeloContraseña.ContraseñaActual" class="text-danger" />
+					</div>
+					<div class="form-floating mb-3">
+						<InputText @bind-Value="ModeloContraseña.ContraseñaNueva" type="password" class="form-control" autocomplete="nombre" aria-required="true" placeholder="" maxlength="50" />
+						<label for="nombre">Nueva Contraseña</label>
+						<ValidationMessage For="() => ModeloContraseña.ContraseñaNueva" class="text-danger" />
+					</div>
+					<div class="form-floating mb-3">
+						<InputText @bind-Value="ModeloContraseña.ConfirmarContraseña" type="password" class="form-control" autocomplete="nombre" aria-required="true" placeholder="" maxlength="50" />
+						<label for="nombre">Repetir Nueva Contraseña</label>
+						<ValidationMessage For="() => ModeloContraseña.ConfirmarContraseña" class="text-danger" />
+					</div>
+					<button type="submit" class="w-100 btn btn-lg btn-dark">Modificar Contraseña</button>
+				</EditForm>
+			</div>
+		}
+	</div>
+</div>
 
 <script>
     function refreshPage() {
@@ -74,15 +119,39 @@
 @code {
 
 	[SupplyParameterFromForm]
-	public UsuarioViewModel Modelo { get; set; } = new();
+	public UsuarioViewModel ModeloUsuario { get; set; } = new();
+
+	[SupplyParameterFromForm]
+	public ContraseñaViewModel ModeloContraseña { get; set; } = new();
 
 	List<Sucursal> sucursales = new List<Sucursal>();
 	Usuario usuarioActual = new Usuario();
 
-	string? MensajeError;
-	public bool exito = false;
+	string? MensajeError1;
+	string? MensajeError2;
+	public bool exito1 = false;
+	public bool exito2 = false;
 	public int UserId;
 	public int SucursalId;
+
+	public class ContraseñaViewModel
+	{
+		[Required(ErrorMessage = "Debe ingresar su contraseña actual")]
+		[DataType(DataType.Password)]
+		[Display(Name = "Contraseña Actual")]
+		public string ContraseñaActual { get; set; } = "";
+
+		[Required(ErrorMessage = "La nueva contraseña debe tener al menos un caracter alfanumérico, un número, una mayúscula y un caracter especial con un minimo de 6 caracteres.")]
+		[DataType(DataType.Password)]
+		[Display(Name = "Nueva Contraseña")]
+		[RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{6,}$", ErrorMessage = "La contraseña debe tener al menos un caracter alfanumérico, un número, una mayúscula y un caracter especial con un minimo de 6 caracteres.")]
+		public string ContraseñaNueva { get; set; } = "";
+
+		[DataType(DataType.Password)]
+		[Display(Name = "Repetir Nueva Contraseña")]
+		[Compare("ContraseñaNueva", ErrorMessage = "Las contraseñas no coinciden.")]
+		public string ConfirmarContraseña { get; set; } = "";
+	}
 
 	protected override async Task OnParametersSetAsync()
 	{
@@ -93,26 +162,48 @@
 		usuarioActual = await UsuarioService.ReadUsuarioById((int)UserId!);
 		SucursalId = usuarioActual.SucursalId;
 
-		Modelo.Nombre = usuarioActual.Nombre!;
-		Modelo.Apellido = usuarioActual.Apellido!;
-		Modelo.SucursalId = SucursalId;
-		Modelo.FechaNacimiento = usuarioActual.FechaNacimiento!;
+		ModeloUsuario.Nombre = usuarioActual.Nombre!;
+		ModeloUsuario.Apellido = usuarioActual.Apellido!;
+		ModeloUsuario.SucursalId = SucursalId;
+		ModeloUsuario.FechaNacimiento = usuarioActual.FechaNacimiento!;
 
 	} 
 
-	public async Task HandleSubmit()
+	public async Task HandleSubmitUsuario()
 	{
+		var fechaMinima = DateOnly.FromDateTime(DateTime.Today.AddYears(-18).AddDays(1));
+
+		if (ModeloUsuario.FechaNacimiento >= fechaMinima)
+		{
+			MensajeError1 = "Error: el usuario debe de tener al menos 18 años.";
+			return;
+		}
+
 		try
 		{
-			usuarioActual.Nombre = Modelo.Nombre;
-			usuarioActual.Apellido = Modelo.Apellido;
-			usuarioActual.FechaNacimiento = Modelo.FechaNacimiento;
-			usuarioActual.SucursalId = Modelo.SucursalId;
+			usuarioActual.Nombre = ModeloUsuario.Nombre;
+			usuarioActual.Apellido = ModeloUsuario.Apellido;
+			usuarioActual.FechaNacimiento = ModeloUsuario.FechaNacimiento;
+			usuarioActual.SucursalId = ModeloUsuario.SucursalId;
 
 			await UsuarioService.OverwriteUsuarioById(usuarioActual);
 
-			exito = true;
-			await JS.InvokeVoidAsync("refreshPage");
+			exito1 = true;
+		}
+		catch (Exception ex)
+		{
+			await JS.InvokeVoidAsync("alert", ex.ToString());
+		}
+
+	}
+
+	public async Task HandleSubmitContraseña()
+	{
+		try
+		{
+			//Logica de modificar contraseña
+
+			exito2 = true;
 		}
 		catch (Exception ex)
 		{
