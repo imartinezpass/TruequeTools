@@ -58,6 +58,8 @@
                                             <div style="margin-block-start:10px" class="table-responsive">
                                                 <h5>Mis Productos</h5>
 
+                                                <div class="text-danger" style="text-align:center">@MensajeError</div>
+
                                                 <div class="d-flex align-items-center flex-column">
                                                     <div>
                                                         <input style="width:180px" type="datetime-local" asp-for="StartDate" name="StartDate" id="Fecha" data-date-format="{0:yyyy-MM-dd HH}" asp-format="{0:yyyy-MM-dd HH}" class="form-control" />
@@ -152,7 +154,7 @@
         bootstrap.Modal.getOrCreateInstance("#ModalMensaje").toggle();
     }
 </script>
-<MensajeModal tituloModal="@tituloMsj" alertModal="@alertMsj" contenidoModal="@contenidoMsj" />
+
 @code {
 
     [Parameter]
@@ -172,10 +174,7 @@
     AuthenticationState? authState;
 
     public DateTime fecha;
-    // variables para controlar MensajeModal
-    public String? tituloMsj { get; set; }
-    public String? alertMsj { get; set; }
-    public String? contenidoMsj { get; set; }
+    public string MensajeError = "";
 
     protected override async Task OnParametersSetAsync()
     {
@@ -189,19 +188,19 @@
         String? error = await validarFecha();
         if (error != "")
         {
-            mostrarError(error);
+            MensajeError = error;
             StateHasChanged();
             return;
         }
         exito = true;
         var oferta = new Oferta
-            {
-                UsuarioId = UserRequesterId,
-                PublicacionQueOfertoId = publiId,
-                PublicacionQueOfrezcoId = PublicacionActual!.Id,
-                Estado = 0,
-                Fecha = fecha
-            };
+        {
+            UsuarioId = UserRequesterId,
+            PublicacionQueOfertoId = publiId,
+            PublicacionQueOfrezcoId = PublicacionActual!.Id,
+            Estado = 0,
+            Fecha = fecha
+        };
         await OfertaService.CreateOferta(oferta);
         StateHasChanged();
     }
@@ -212,39 +211,35 @@
         {
             await JS.InvokeVoidAsync("refreshPage");
         }
+        MensajeError = "";
     }
+
     private async Task<String> validarFecha()
     {
-        String? fechaHora = await JS.InvokeAsync<String>("getDateValue");
-        if (fechaHora == "")
+        String? fechaHora = await JS.InvokeAsync<String>("getDateValue"); // Fecha y Hora del form
+        DateTime fechaTentativa; // Fecha y Hora del trueque
+        DateTime now = DateTime.Now; // Fecha y Hora actuales
+
+        // Validación para que la fecha no sea vacía, sea válida y no sea anterior a hoy
+        if (!DateTime.TryParse(fechaHora, out fechaTentativa) || string.IsNullOrEmpty(fechaHora) || fechaTentativa < now)
         {
-            return "Por favor, seleccione la fecha y hora tentativas para el treuque";
+            return "Seleccione una fecha y hora válidas";
         }
-        DateTime fechaTentativa = DateTime.Parse(fechaHora);
-        if (fechaTentativa.Month < DateTime.Now.Month || fechaTentativa.Day < DateTime.Now.Day)
+
+        // Validación para que la fecha sea con al menos 24 horas de anticipación
+        if (fechaTentativa < now.AddDays(1))
         {
-            return "La fecha tiene que ser de hoy en adelante.";
+            return "El plazo mínimo para realizar trueques es de 24hs";
         }
-        if (fechaTentativa.Hour < 8 || fechaTentativa.Hour > 19)
+
+        // Validación para que la hora esté entre las 9:00 y las 19:00 y la fecha no sea un domingo
+        if (fechaTentativa.DayOfWeek == DayOfWeek.Sunday || fechaTentativa.Hour < 9 || (fechaTentativa.Hour == 19 && fechaTentativa.Minute > 0) || fechaTentativa.Hour > 19)
         {
-            return "El horario debe ser entre las 8:00 y las 19:00";
+            return "El horario para realizar trueques es de Lunes a Sábados de 9 a 19";
         }
-        if (fechaTentativa.DayOfWeek == DayOfWeek.Sunday)
-        {
-            return "La ferretería está cerrada durante los domingos.";
-        }
-        if (fechaTentativa.Hour < DateTime.Now.Hour || (fechaTentativa.Hour == DateTime.Now.Hour && fechaTentativa.Minute < DateTime.Now.Minute))
-        {
-            return "El horario no puede ser anterior al actual";
-        }
+
         fecha = fechaTentativa;
         return "";
     }
-    private async void mostrarError(String? alerta)
-    {
-        tituloMsj = "Error";
-        alertMsj = "info";
-        contenidoMsj = alerta;
-        await JS.InvokeVoidAsync("toggleModal");
-    }
+   
 }
