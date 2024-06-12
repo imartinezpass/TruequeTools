@@ -1,8 +1,10 @@
 ﻿@page "/modificar"
 
 @using System.ComponentModel.DataAnnotations
+@using TruequeTools.Data
 @using TruequeTools.Entities
 
+@inject TruequeToolsDataContext appDbContext
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NavigationManager NavMan
 @inject IServiciosUsuario UsuarioService
@@ -199,9 +201,24 @@
 
 	public async Task HandleSubmitContraseña()
 	{
+		var usuario = appDbContext.Usuarios.Where(x => x.Contraseña == ModeloContraseña.ContraseñaActual && x.Deleted == false).FirstOrDefault();
+
+		if (usuario is null)
+		{
+			MensajeError2 = "Error: la contraseña actual no es correcta";
+			return;
+		}
+		else if (usuario.Contraseña == ModeloContraseña.ContraseñaNueva)
+		{
+			MensajeError2 = "Error: la contraseña no puede ser igual a la actual";
+			return;
+		}
+
 		try
 		{
-			//Logica de modificar contraseña
+			usuario.Contraseña = ModeloContraseña.ContraseñaNueva;
+
+			await UsuarioService.OverwriteUsuarioById(usuario);
 
 			exito2 = true;
 		}
