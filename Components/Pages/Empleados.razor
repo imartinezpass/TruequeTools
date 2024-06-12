@@ -47,7 +47,8 @@
                                     <th>Nombre</th>
                                     <th>Apellido</th>
                                     <th>Sucursal</th>
-                                    <th style="min-width: 120px;"></th> <!-- Utiliza min-width para asegurar un ancho mínimo -->
+                                    @* OCULTO PARA LA DEMO 2 *@
+                                    @*<th style="min-width: 120px;"></th> <!-- Utiliza min-width para asegurar un ancho mínimo -->*@
                                 </tr>
                             </thead>
                             <tbody>
@@ -59,13 +60,14 @@
                                         <td>@emp.Nombre</td>
                                         <td>@emp.Apellido</td>
                                         <td>@emp.Sucursal!.Nombre</td>
-                                        <td style="text-align: right;">
+                                        @* OCULTO PARA LA DEMO 2 *@
+                                        @*<td style="text-align: right;">
                                             <div class="d-flex justify-content-end">
                                                 <div class="btn-group" style="margin-right: 1rem;">
                                                     <button class="btn btn-danger rounded" data-bs-toggle="modal" data-bs-target="#ModalEliminar" @onclick="@(() =>BorrarEmpleado(emp.Id))">Eliminar</button>
                                                 </div>
                                             </div>
-                                        </td>
+                                        </td>*@ 
                                     </tr>                
                                 }
                             </tbody>
@@ -101,27 +103,3 @@
     }
 
 }
-
-@*
-disparar un modal desde codigo - no borrar
-
-try
-{
-	await JS.InvokeVoidAsync("toggleModal");
-}
-catch (Exception e)
-{
-	await JS.InvokeVoidAsync("alert", e.ToString());
-}
-
-<!-- 
-<script>
-function toggleModal() {
-
-    bootstrap.Modal.getOrCreateInstance("#ModalMensaje").toggle();
-}
-</script>
--->
-
-disparar un modal desde codigo - no borrar 
-*@

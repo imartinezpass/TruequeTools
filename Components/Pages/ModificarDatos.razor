@@ -54,7 +54,7 @@
 						<ValidationMessage For="() => ModeloUsuario.FechaNacimiento" class="text-danger" />
 					</div>
 					<div class="form-floating mb-3">
-						<InputSelect @bind-Value="@ModeloUsuario.SucursalId" class="form-control" autocomplete="sucursal" aria-required="true" placeholder="" maxlength="50">
+						<InputSelect @bind-Value="@ModeloUsuario.SucursalId" disabled="@IsDisabled" class="form-control" autocomplete="sucursal" aria-required="true" placeholder="" maxlength="50">
 							@foreach (var suc in sucursales)
 							{
 								<option value="@suc.Id">@suc.Nombre</option>
@@ -133,6 +133,7 @@
 	string? MensajeError2;
 	public bool exito1 = false;
 	public bool exito2 = false;
+	public bool IsDisabled = false;
 	public int UserId;
 	public int SucursalId;
 
@@ -163,6 +164,11 @@
 		UserId = int.Parse(authState.User!.FindFirst("UsuarioId")!.Value);
 		usuarioActual = await UsuarioService.ReadUsuarioById((int)UserId!);
 		SucursalId = usuarioActual.SucursalId;
+
+		if(usuarioActual.Rol == "Employee")
+		{
+			IsDisabled = true;
+		}
 
 		ModeloUsuario.Nombre = usuarioActual.Nombre!;
 		ModeloUsuario.Apellido = usuarioActual.Apellido!;

@@ -45,7 +45,11 @@
                                     estilo = "table-success";
                                 }
                                 <tr class="@estilo">
-                                    <td>@realizada?.Publicacion!.Nombre</td>
+                                    <td>
+                                        <NavLink class="text-primary" data-bs-toggle="modal" data-bs-target="#ModalPublicacion" @onclick="@(() => SwitchPublicacion(realizada!.Publicacion!))">
+                                            @realizada.Publicacion!.Nombre
+                                        </NavLink>
+                                    </td>
                                     <td>@realizada?.Texto</td>
                                     @if (realizada!.Respuesta == null)
                                     {
@@ -97,7 +101,11 @@
                                     estilo = "table-success";
                                 }
                                 <tr class="@estilo">
-                                    <td>@recibida?.Publicacion!.Nombre</td>
+                                    <td>
+                                        <NavLink class="text-primary" data-bs-toggle="modal" data-bs-target="#ModalPublicacion" @onclick="@(() => SwitchPublicacion(recibida!.Publicacion!))">
+                                            @recibida?.Publicacion!.Nombre
+                                        </NavLink>
+                                    </td>
                                     <td>@recibida?.Texto</td>
                                     @if (recibida!.Respuesta == null)
                                     {
@@ -129,6 +137,8 @@
     </div>
 </div>
 
+<PublicacionModal PublicacionActual="publicacion" />
+
 <Responder 
     PreguntaId="PreguntaId"
     PublicacionId="PublicacionId"
@@ -139,9 +149,16 @@
     List<Pregunta> PreguntasRealizadas { get; set; } = new();
     List<Pregunta> PreguntasRecibidas { get; set; } = new();
 
+    Publicacion publicacion = new();
+
     int PreguntaId { get; set; }
     int PublicacionId { get; set; }
     string? PreguntaText { get; set; }
+
+    void SwitchPublicacion(Publicacion p)
+    {
+        publicacion = p;
+    }
 
     protected override async Task OnInitializedAsync()
     {
