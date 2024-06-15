@@ -1,0 +1,53 @@
+﻿@inject IJSRuntime JS
+
+@rendermode InteractiveServer
+
+<!-- Modal -->
+<div class="modal fade" id="ModalModificar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="staticBackdropLabel">Modificar datos del empleado #@EmpleadoId</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CerrarModal"></button>
+			</div>
+			<div class="modal-body">
+				@if (exito)
+				{
+					<div class="alert alert-success" role="alert">
+						Se modificaron los datos del empleado !
+					</div>
+				}
+				else
+				{
+					<div class="alert alert-warning" role="alert">
+						CAMBIO DE SUCURSAL
+					</div>
+					<button class="w-100 btn btn-lg btn-dark" @onclick="@(() =>ModificarEmpleado(EmpleadoId))">Confirmar</button>
+				}
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+
+	[Parameter]
+	public int EmpleadoId { get; set; }
+
+	public bool exito = false;
+
+	private void ModificarEmpleado(int empleadoId)
+	{
+		exito = true;
+		StateHasChanged();
+	}
+
+	public async void CerrarModal()
+	{
+		if (exito)
+		{
+			await JS.InvokeVoidAsync("refreshPage");
+		}
+	}
+
+}

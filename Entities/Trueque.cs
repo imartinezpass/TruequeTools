@@ -25,10 +25,13 @@ namespace TruequeTools.Entities
         //METADATA
 
         [Column("estado")]
-        public int Estado { get; set; } = 0; //0 pendiente, -1 no concretado, 1 concretado sin ventas, 2 concretado con ventas
+        public int Estado { get; set; } = 0; //0 pendiente, -1 no concretado, 1 concretado
 
         [Column("hasVentas")]
         public bool HasVentas { get; set; } = false;
+
+        [Column("cargaCompleted")]
+        public bool CargaCompleted { get; set; } = false;
 
         //CLAVES EXTERNAS
 

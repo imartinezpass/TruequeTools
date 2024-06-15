@@ -52,7 +52,7 @@
 									<td style="text-align: right;">
 										<div class="d-flex justify-content-end">
 											<div class="btn-group" style="margin-right: 1rem;">
-												<button class="btn btn-secondary rounded" style="margin-right: 0.5rem;" @onclick="@(() => ModificarSucursal(suc.Id))" data-bs-toggle="modal" data-bs-target="#ModalSucursal">Editar</button>
+												<button class="btn btn-dark rounded" style="margin-right: 0.5rem;" @onclick="@(() => ModificarSucursal(suc.Id))" data-bs-toggle="modal" data-bs-target="#ModalSucursal">Editar</button>
 												<button class="btn btn-danger rounded" @onclick="@(() => BorrarSucursal(suc.Id))" data-bs-toggle="modal" data-bs-target="#ModalBorrar">Eliminar</button>
 											</div>
 										</div>
@@ -71,7 +71,7 @@
 </div>
 
 <SucursalesEdit Id="PubliId"/>
-<SucursalesBorrar Id="PubliId" />
+<SucursalesEliminar Id="PubliId" />
 
 @code {
 

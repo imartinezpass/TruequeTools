@@ -25,9 +25,12 @@ namespace TruequeTools.Entities
         //DATOS INGRESADOS POR EL USUARIO
 
         [Column("nombre")]
-        public int Nombre { get; set; }
+        public string? Nombre { get; set; }
 
-        [Column("monto")]
+		[Column("cantidad")]
+		public int Cantidad { get; set; }
+
+		[Column("monto")]
         public double Monto { get; set; }
 
         //CLAVES EXTERNAS

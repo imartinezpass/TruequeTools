@@ -62,11 +62,12 @@
                                         <td style="text-align: right;">
                                             <div class="d-flex justify-content-end">
                                                 <div class="btn-group" style="margin-right: 1rem;">
+                                                    <button class="btn btn-dark rounded" style="margin-right: 0.5rem;" data-bs-toggle="modal" data-bs-target="#ModalModificar" @onclick="@(() =>ModificarEmpleado(emp.Id))">Editar</button>
                                                     <button class="btn btn-danger rounded" data-bs-toggle="modal" data-bs-target="#ModalEliminar" @onclick="@(() =>BorrarEmpleado(emp.Id))">Eliminar</button>
                                                 </div>
                                             </div>
                                         </td>
-                                    </tr>                
+                                    </tr>                                  
                                 }
                             </tbody>
                         </table>
@@ -78,7 +79,8 @@
     </div>
 </div>
 
-<EmpleadosEdit />
+<EmpleadosAlta />
+<EmpleadosModificar EmpleadoId="EmpleadoId" />
 <EmpleadosEliminar EmpleadoId="EmpleadoId" />
 
 @code {
@@ -96,6 +98,11 @@
     }
 
     void BorrarEmpleado(int id)
+    {
+        EmpleadoId = id;
+    }
+
+    void ModificarEmpleado(int id)
     {
         EmpleadoId = id;
     }

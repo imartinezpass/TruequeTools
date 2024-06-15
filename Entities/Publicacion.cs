@@ -38,7 +38,10 @@ namespace TruequeTools.Entities
         [Column("fechaPublicacion")]
         public DateOnly FechaPublicacion { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
-        [Column("isPremium")]
+		[Column("fechaPremium")]
+		public DateOnly FechaPremium { get; set; } = DateOnly.FromDateTime(DateTime.Now);
+
+		[Column("isPremium")]
         public bool IsPremium { get; set; } = false;
 
         [Column("hasImages")]

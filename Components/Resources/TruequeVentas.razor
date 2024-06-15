@@ -1,0 +1,44 @@
+﻿@inject IJSRuntime JS
+
+<!-- Modal -->
+<div class="modal fade" id="ModalVentas" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Cargar ventas del trueque #@TruequeId</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CerrarModal"></button>
+            </div>
+            <div class="modal-body">
+                @if (exito)
+                {
+                    <div class="alert alert-success" role="alert">
+                        Se cargaron los productos !
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning" role="alert">
+                        CARGA DE PRODUCTOS
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public int TruequeId { get; set; }
+
+    bool exito = false;
+
+    public async void CerrarModal()
+    {
+        if (exito)
+        {
+            await JS.InvokeVoidAsync("refreshPage");
+        }
+    }
+
+}

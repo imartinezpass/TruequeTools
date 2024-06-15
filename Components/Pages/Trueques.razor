@@ -74,19 +74,20 @@
                                         estilo = "table-secondary";
                                         comentario = "Trueque pendiente";
                                     }
-                                    else if(t.Estado == 1)
+                                    else 
                                     {
                                         estado = "Completado";
                                         estilo = "table-success";
-                                        comentario = "Trueque completado sin ventas";
+                                        if (t.HasVentas)
+                                        {
+                                            comentario = "Trueque completado con ventas";
+                                        }
+                                        else
+                                        {
+                                            comentario = "Trueque completado sin ventas";
+                                        } 
                                     }
-                                    else
-                                    {
-                                        estado = "Completado";
-                                        estilo = "table-success";
-                                        comentario = "Trueque completado con ventas";
-                                    }
-
+                                                
                                     context.Entry(t).Reference(p => p.Oferta).Load();
                                     context.Entry(t.Oferta!).Reference(p => p.PublicacionQueOfrezco).Load();
                                     context.Entry(t.Oferta!).Reference(p => p.PublicacionQueOferto).Load();
@@ -117,6 +118,16 @@
                                                 </div>
                                             </td>
                                         }
+                                        else if (t.Estado == 1 && !t.CargaCompleted)
+                                        {
+                                            <td style="text-align: right;">
+                                                <div class="d-flex justify-content-end">
+                                                    <div class="btn-group" style="margin-right: 1rem;">
+                                                        <button class="btn btn-dark rounded" @onclick="@(() =>CargarProductos(t.Id))" data-bs-toggle="modal" data-bs-target="#ModalVentas">Cargar Ventas</button>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        }
                                         else
                                         {
                                             <td>@estado</td>
@@ -140,6 +151,7 @@
 
 <TruequeConfirmar TruequeId="TruequeId" />
 <TruequeEliminar TruequeId="TruequeId" />
+<TruequeVentas TruequeId="TruequeId" />
 <PublicacionModal PublicacionActual="publicacion" />
 
 @code {
@@ -183,6 +195,11 @@
 
     private void RechazarTrueque(int truequeId)
     { 
+        TruequeId = truequeId;
+    }
+
+    private void CargarProductos(int truequeId)
+    {
         TruequeId = truequeId;
     }
 
