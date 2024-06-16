@@ -1,6 +1,11 @@
 ﻿@page "/estadisticas"
 
+@using ChartJs.Blazor.Common
+@using ChartJs.Blazor.PieChart
+@using ChartJs.Blazor.Util
 @using TruequeTools.Entities
+
+@inject IServiciosTrueque TruequeService
 
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
 
@@ -29,8 +34,10 @@
                     </div>
                 }
                 else
-                {
-                    <h1>GRAFICOS CON ESTADISTICAS</h1>
+                {    
+                   <div class="container">
+                        <Chart Config="config"></Chart>
+                    </div>                                     
                 }
             }
         </div> 
@@ -41,13 +48,48 @@
 
     List<Trueque> trueques = new List<Trueque>();
 
+    private PieConfig? config;
     bool cargando = true;
 
     protected override async Task OnInitializedAsync()
     {
         await Task.Delay(500);
-        //lectura de trueques completados
+        trueques = await TruequeService.ReadAllTrueques();
         cargando = false;
+
+        config = new PieConfig
+        {
+            Options = new PieOptions
+            {
+                Responsive = true,
+                Title = new OptionsTitle
+                {
+                    Display = true,
+                    Text = "Trueques Totales"
+                }
+            }
+        };
+
+        foreach (string titulo in new[] { "Completados", "Rechazados", "Pendientes" })
+        {
+            config.Data.Labels.Add(titulo);
+        }
+
+        var totalAceptados = trueques.Where(t => t.Estado == 1).Count();
+        var totalRechazados = trueques.Where(t => t.Estado == -1).Count();
+        var totalPendientes = trueques.Where(t => t.Estado == 0).Count();
+
+        PieDataset<int> dataset = new PieDataset<int>(new[] { totalAceptados, totalRechazados, totalPendientes })
+        {
+            BackgroundColor = new[]
+            {
+                ColorUtil.ColorHexString(75, 192, 192), // Slice 3 aka "Green"
+                ColorUtil.ColorHexString(255, 99, 132), // Slice 1 aka "Red"
+                ColorUtil.ColorHexString(255, 205, 86), // Slice 2 aka "Yellow"
+            }
+        };
+
+        config.Data.Datasets.Add(dataset);
     }
 
 }
