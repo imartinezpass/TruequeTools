@@ -14,6 +14,12 @@
 
         <div class="col-lg-4 col-md-6 col-12 mb-3">
             <div class="card" style="margin:1rem">
+                @if (publi.IsPremium)
+                {
+                    <div style="position:absolute; top:0; right:0; background-color:gold; color:black; padding:0.5rem; font-weight:bold; border-bottom-left-radius:10px;">
+                        Producto Destacado
+                    </div>
+                }
                 @if (@publi.HasImages)
                 {
                     context.Entry(publi).Collection(p => p.Imagenes!).Load(); @*Traigo las Imagenes de la Publicacion*@
@@ -25,7 +31,7 @@
                     <img class="card-img-top-svg" src=resources/blank.svg alt="Foto del Producto">
                 }
                 <div class="card-body">
-                    <h4 style="margin:0">@publi.Nombre</h4>
+                    <h4 style="margin:0">@publi.Nombre</h4>         
                 </div>
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item">Sucursal: <b>@publi.Sucursal!.Nombre</b></li>

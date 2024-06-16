@@ -1,4 +1,9 @@
-﻿@inject IJSRuntime JS
+﻿@using TruequeTools.Entities
+
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IServiciosSucursal SucursalService
+@inject IServiciosUsuario UsuarioService
+@inject IJSRuntime JS
 
 @rendermode InteractiveServer
 
@@ -7,7 +12,7 @@
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h1 class="modal-title fs-5" id="staticBackdropLabel">Modificar datos del empleado #@EmpleadoId</h1>
+				<h1 class="modal-title fs-5" id="staticBackdropLabel">Modificar datos del empleado #@Empleado.Id</h1>
 				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CerrarModal"></button>
 			</div>
 			<div class="modal-body">
@@ -19,10 +24,16 @@
 				}
 				else
 				{
-					<div class="alert alert-warning" role="alert">
-						CAMBIO DE SUCURSAL
-					</div>
-					<button class="w-100 btn btn-lg btn-dark" @onclick="@(() =>ModificarEmpleado(EmpleadoId))">Confirmar</button>
+					<div class="form-floating mb-3">
+						<InputSelect @bind-Value="SucursalId" class="form-control" autocomplete="sucursal" aria-required="true" placeholder="" maxlength="50">
+							@foreach (var suc in Sucursales!)
+							{
+								<option value="@suc.Id">@suc.Nombre</option>
+							}
+						</InputSelect>
+						<label for="sucursal">Sucursal</label>
+					</div>	
+					<button class="w-100 btn btn-lg btn-dark" @onclick="@(() =>ModificarEmpleado())">Confirmar</button>
 				}
 			</div>
 		</div>
@@ -32,12 +43,25 @@
 @code {
 
 	[Parameter]
-	public int EmpleadoId { get; set; }
+	public Usuario? Empleado { get; set; }
+
+	[Parameter]
+	public List<Sucursal>? Sucursales { get; set; }
 
 	public bool exito = false;
+	public int SucursalId;
 
-	private void ModificarEmpleado(int empleadoId)
+	protected override Task OnParametersSetAsync()
 	{
+		SucursalId = Empleado!.SucursalId;
+		return Task.CompletedTask;
+	}
+
+	private async void ModificarEmpleado()
+	{
+		Usuario e = await UsuarioService.FindEmpleado(Empleado!.Id);
+		e.SucursalId = SucursalId;
+		await UsuarioService.OverwriteUsuarioById(e);
 		exito = true;
 		StateHasChanged();
 	}

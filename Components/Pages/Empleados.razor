@@ -5,6 +5,7 @@
 
 @inject TruequeToolsDataContext context
 @inject IServiciosUsuario UsuarioService
+@inject IServiciosSucursal SucursalService
 @inject NavigationManager NavManager
 @inject IJSRuntime JS
 
@@ -62,7 +63,7 @@
                                         <td style="text-align: right;">
                                             <div class="d-flex justify-content-end">
                                                 <div class="btn-group" style="margin-right: 1rem;">
-                                                    <button class="btn btn-dark rounded" style="margin-right: 0.5rem;" data-bs-toggle="modal" data-bs-target="#ModalModificar" @onclick="@(() =>ModificarEmpleado(emp.Id))">Editar</button>
+                                                    <button class="btn btn-dark rounded" style="margin-right: 0.5rem;" data-bs-toggle="modal" data-bs-target="#ModalModificar" @onclick="@(() =>ModificarEmpleado(emp))">Editar</button>
                                                     <button class="btn btn-danger rounded" data-bs-toggle="modal" data-bs-target="#ModalEliminar" @onclick="@(() =>BorrarEmpleado(emp.Id))">Eliminar</button>
                                                 </div>
                                             </div>
@@ -80,20 +81,23 @@
 </div>
 
 <EmpleadosAlta />
-<EmpleadosModificar EmpleadoId="EmpleadoId" />
+<EmpleadosModificar Empleado="Empleado" Sucursales="sucursales" />
 <EmpleadosEliminar EmpleadoId="EmpleadoId" />
 
 @code {
 
     List<Usuario> empleados = new List<Usuario>();
+    List<Sucursal> sucursales = new List<Sucursal>();
 
     bool cargando = true;
     public int EmpleadoId;
+    public Usuario Empleado = new();
 
     protected override async Task OnInitializedAsync()
     {
         await Task.Delay(500);
-        empleados = await UsuarioService.ReadAllNotDeletedEmpleados(); //LECTURA DE TODAS los empleados
+        empleados = await UsuarioService.ReadAllNotDeletedEmpleados();
+        sucursales = await SucursalService.ReadAllSucursales();
         cargando = false;
     }
 
@@ -102,9 +106,9 @@
         EmpleadoId = id;
     }
 
-    void ModificarEmpleado(int id)
+    void ModificarEmpleado(Usuario emp)
     {
-        EmpleadoId = id;
+        Empleado = emp;
     }
 
 }

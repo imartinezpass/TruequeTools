@@ -1,4 +1,6 @@
-﻿@inject IJSRuntime JS
+﻿@using TruequeTools.Entities
+
+@inject IJSRuntime JS
 
 <!-- Modal -->
 <div class="modal fade" id="ModalVentas" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -12,14 +14,75 @@
                 @if (exito)
                 {
                     <div class="alert alert-success" role="alert">
-                        Se cargaron los productos !
+                        Se actualizó el estado !
                     </div>
                 }
                 else
                 {
-                    <div class="alert alert-warning" role="alert">
-                        CARGA DE PRODUCTOS
-                    </div>
+                    <div class="form-floating mb-3">
+                        <InputSelect @bind-Value="opcion" class="form-control" autocomplete="sucursal" aria-required="true" placeholder="" maxlength="50">
+                            <option value="1">Trueque sin ventas</option>
+                            <option value="2">Trueque con ventas</option>
+                        </InputSelect>
+                        <label for="categoria">Seleccione una opcion</label>
+                    </div>       
+                    @if(opcion == 2)
+                    {
+                        <hr />
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" placeholder="Nombre del producto" @bind="producto.Nombre" />
+                            <label for="nombreProducto">Nombre del producto</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <InputNumber @bind-Value="producto.Cantidad" class="form-control" placeholder="Cantidad" min="1" max="100" />
+                            <label for="cantidadProducto">Cantidad</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <InputNumber @bind-Value="producto.Monto" class="form-control" placeholder="Precio" />
+                            <label for="precioProducto">Precio</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <button type="button" class="btn btn-success mt-2 d-block mx-auto text-center" @onclick="AgregarProducto">Agregar</button>
+                        </div>
+                        @if(productos.Count > 0)
+                        {
+                            <div class="table-responsive">
+                                <!-- Añade esta clase para hacer la tabla responsiva -->
+                                <table class="table table-bordered caption-top">
+                                    <thead>
+                                        <tr>
+                                            <th>Nombre</th>
+                                            <th>Precio</th>
+                                            <th>Cantidad</th>
+                                            <th>Total</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach(var p in productos)
+                                        {
+                                            <tr>
+                                                <td>@p.Nombre</td>
+                                                <td>$@p.Monto</td>
+                                                <td>@p.Cantidad</td>
+                                                <td>$@(p.Monto * p.Cantidad)</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-dark"></button>
+                                                </td>
+                                            </tr>
+                                        }    
+                                    </tbody>
+                                </table>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-secondary" role="alert">
+                                Agrega productos a la lista...
+                            </div>
+                        }
+                    }
+                    <button class="w-100 btn btn-lg btn-dark" @onclick="Guardar">Guardar</button>
                 }
             </div>
         </div>
@@ -31,7 +94,49 @@
     [Parameter]
     public int TruequeId { get; set; }
 
+    public List<Producto> productos = new();
+
+    public Producto producto = new();
+
     bool exito = false;
+    int opcion;
+
+    void AgregarProducto()
+    {
+        Producto p = new Producto
+        {
+            Cantidad = producto.Cantidad,
+            Nombre = producto.Nombre,
+            Monto = producto.Monto
+        };
+        productos.Add(p);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        opcion = 1;
+    }
+
+    public async void Guardar()
+    {
+        if(opcion == 1)
+        {
+            //carga sin productos 
+            exito = true;
+            StateHasChanged();
+        }
+        else if(opcion == 2 && productos.Count > 0)
+        {
+            //carga con productos
+            exito = true;
+            StateHasChanged();
+        }
+        else
+        {
+            //error por no cargar productos
+            await JS.InvokeVoidAsync("alert", "ALERTA");
+        }
+    }
 
     public async void CerrarModal()
     {
