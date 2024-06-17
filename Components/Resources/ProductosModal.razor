@@ -1,0 +1,60 @@
+﻿@using TruequeTools.Entities
+
+@inject IServiciosProducto ProductoService
+
+<!-- Modal -->
+<div class="modal fade" id="ModalProductos" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="staticBackdropLabel">Trueque #@TruequeId</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <!-- Añade esta clase para hacer la tabla responsiva -->
+                    <table class="table table-bordered caption-top">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Precio</th>
+                                <th>Cantidad</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var p in Productos)
+                            {
+                                <tr>
+                                    <td>@p.Nombre</td>
+                                    <td>@p.Monto</td>
+                                    <td>@p.Cantidad</td>
+                                    <td>$@(p.Monto * p.Cantidad)</td>
+                                </tr>       
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <hr />
+                <h5 style="text-align:center"><b>Monto total vendido $@total</b></h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public int TruequeId { get; set; }
+
+    public List<Producto> Productos = new();
+
+    public double total;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Productos = await ProductoService.ReadProductosByTruequeId(TruequeId);
+        total = Productos.Sum(p => p.Monto * p.Cantidad);
+    }
+
+}

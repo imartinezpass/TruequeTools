@@ -1,4 +1,5 @@
-﻿using TruequeTools.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using TruequeTools.Data;
 using TruequeTools.Entities;
 
 /*
@@ -18,6 +19,20 @@ namespace TruequeTools.Services
 
         private readonly TruequeToolsDataContext contexto = context;
 
+        public async Task CargarProductos(List<Producto> productos)
+        {
+            foreach (Producto p in productos) 
+            { 
+                contexto.Productos.Add(p);
+                await contexto.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<Producto>> ReadProductosByTruequeId(int TruequeId)
+        {
+            var productos = await contexto.Productos.Where(p => p.TruequeId == TruequeId).ToListAsync();
+            return productos!;
+        }
     }
 
 }

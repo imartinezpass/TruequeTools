@@ -10,6 +10,7 @@ namespace TruequeTools.Services
 {
     public interface IServiciosProducto
     {
- 
+        public Task CargarProductos(List<Producto> productos);
+        public Task<List<Producto>> ReadProductosByTruequeId(int id);
     }
 }

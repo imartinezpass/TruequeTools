@@ -80,7 +80,7 @@
                                         estilo = "table-success";
                                         if (t.HasVentas)
                                         {
-                                            comentario = "Trueque completado con ventas";
+                                            comentario = "Trueque completado con";
                                         }
                                         else
                                         {
@@ -106,7 +106,19 @@
                                                 @t.Oferta!.PublicacionQueOfrezco!.Nombre
                                             </NavLink> 
                                         </td>
-                                        <td>@comentario</td> 
+                                        @if (t.HasVentas)
+                                        {
+                                            <td>
+                                                @comentario
+                                                <NavLink class="text-primary" data-bs-toggle="modal" data-bs-target="#ModalProductos" @onclick="@(() =>VerProductos(t.Id))">
+                                                    ventas
+                                                </NavLink>
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                           <td>@comentario</td>   
+                                        }
                                         @if (t.Estado == 0)
                                         {
                                             <td style="text-align: right;">
@@ -123,7 +135,7 @@
                                             <td style="text-align: right;">
                                                 <div class="d-flex justify-content-end">
                                                     <div class="btn-group" style="margin-right: 1rem;">
-                                                        <button class="btn btn-dark rounded" @onclick="@(() =>CargarProductos(t.Id))" data-bs-toggle="modal" data-bs-target="#ModalVentas">Cargar Ventas</button>
+                                                        <button class="btn btn-dark rounded" @onclick="@(() =>CargarProductos(t.Id))" data-bs-toggle="modal" data-bs-target="#ModalVentas">Ventas</button>
                                                     </div>
                                                 </div>
                                             </td>
@@ -153,6 +165,7 @@
 <TruequeEliminar TruequeId="TruequeId" />
 <TruequeVentas TruequeId="TruequeId" />
 <PublicacionModal PublicacionActual="publicacion" />
+<ProductosModal TruequeId="TruequeId" />
 
 @code {
 
@@ -199,6 +212,11 @@
     }
 
     private void CargarProductos(int truequeId)
+    {
+        TruequeId = truequeId;
+    }
+
+    private void VerProductos(int truequeId)
     {
         TruequeId = truequeId;
     }
