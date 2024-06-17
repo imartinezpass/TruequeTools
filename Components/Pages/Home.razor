@@ -48,6 +48,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         publicaciones = await PublicacionService.ReadAllPublicacionesActivas12(); //Traigo las primeras 12 publicaciones
+        publicaciones.Sort((x, y) => y.IsPremium.CompareTo(x.IsPremium)); //Traigo las premium primero
 
         await Task.Delay(500); // Espera 0.5 segundos y muestra el spinner durante ese tiempo
         showSpinner = false; // Desactiva el spinner

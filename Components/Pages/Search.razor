@@ -98,6 +98,7 @@
             .Where(p => p.Nombre != null && p.CategoriaId == selectedFilter && p.Deleted == false)
             .ToList();
         }
+        publicaciones.Sort((x, y) => y.IsPremium.CompareTo(x.IsPremium)); //Traigo las premium primero
         busquedaRealizada = true;
         showSpinner = false;
         StateHasChanged();

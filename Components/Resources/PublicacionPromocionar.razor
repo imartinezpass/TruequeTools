@@ -1,0 +1,86 @@
+﻿@using TruequeTools.Entities
+
+@inject IServiciosPublicacion PublicacionService
+@inject IJSRuntime JS
+
+<!-- Modal -->
+<div class="modal fade" id="ModalPromocionar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h1 class="modal-title fs-5" id="staticBackdropLabel">Promocionar la publicacion #@PublicacionActual!.Id</h1>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CerrarModal"></button>
+			</div>
+			<div class="modal-body">
+				@if (exito)
+				{
+					<div class="alert alert-success" role="alert">
+						Operacion exitosa !
+					</div>
+				}
+				else
+				{
+					<div class="alert alert-secondary" role="alert">
+						Promocionar una publicacion permite que tu producto sea mas visible en la pagina, llegando asi a mas gente. 
+						Por el precio de $7.500 tu producto tendrá la insignia de destacado por una semana y tendrá mayor visibilidad
+						durante ese periodo de tiempo
+					</div>
+					<hr />
+					<div class="form-floating mb-3">
+						<InputSelect @bind-Value="opcion" class="form-control" autocomplete="sucursal" aria-required="true" placeholder="" maxlength="50">
+							<option value="0">Normal</option>
+							<option value="1">Premium</option>
+						</InputSelect>
+						<label for="categoria">Seleccione una opcion</label>
+					</div>
+					<button class="w-100 btn btn-lg btn-dark" @onclick="Guardar">Guardar</button>
+				}
+			</div>
+		</div>
+	</div>
+</div>
+
+@code {
+
+	[Parameter]
+	public Publicacion? PublicacionActual { get; set; }
+
+	bool exito = false;
+	int opcion;
+
+	protected override void OnParametersSet()
+	{
+		if (PublicacionActual!.IsPremium)
+		{
+			opcion = 1;
+		}
+		else
+		{
+			opcion = 0;
+		}
+	}
+
+	public async Task Guardar()
+	{
+		if(opcion == 1)
+		{
+			PublicacionActual!.IsPremium = true;
+		}
+		else
+		{
+			PublicacionActual!.IsPremium = false;
+		}
+		await PublicacionService.OverwritePublicacionById(PublicacionActual);
+		exito = true;
+		StateHasChanged();
+	}
+
+	public async void CerrarModal()
+	{
+		if (exito)
+		{
+			await JS.InvokeVoidAsync("refreshPage");
+		}
+	}
+
+}
