@@ -38,7 +38,25 @@ namespace TruequeTools.Services
 			await contexto.SaveChangesAsync();
 		}
 
-		public async Task<Trueque> OverwriteTruequeById(Trueque trueque)
+        public async Task<double> GetPromedioVentas()
+        {
+            var trueques = await contexto.Trueques.Include(t => t.Productos).Where(x => x.HasVentas == true).ToListAsync();
+            return trueques.Average(t => t.Productos!.Sum(x => x.Monto * x.Cantidad));
+        }
+
+        public async Task<double> GetTotalVentas()
+        {
+            var trueques = await contexto.Trueques.Include(t => t.Productos).Where(x => x.HasVentas == true).ToListAsync();
+            return trueques.Sum(t => t.Productos!.Sum(x => x.Monto * x.Cantidad));
+        }
+
+        public async Task<double> GetTotalVentasSucursal(int sucursalId)
+        {
+            var result = await contexto.Trueques.Where(s => s.Oferta!.Usuario!.SucursalId == sucursalId && s.HasVentas == true).ToListAsync();
+            return result.Sum(t => t.Productos!.Sum(x => x.Monto * x.Cantidad));
+        }
+
+        public async Task<Trueque> OverwriteTruequeById(Trueque trueque)
         {
            
             var truequeExistente = await contexto.Trueques.FindAsync(trueque.Id);

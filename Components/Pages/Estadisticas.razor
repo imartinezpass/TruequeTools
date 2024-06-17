@@ -6,6 +6,7 @@
 @using TruequeTools.Entities
 
 @inject IServiciosTrueque TruequeService
+@inject IServiciosSucursal SucursalService
 
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
 
@@ -34,10 +35,49 @@
                     </div>
                 }
                 else
-                {    
-                   <div class="container">
-                        <Chart Config="config"></Chart>
-                    </div>                                     
+                {
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-6">
+                                <Chart Config="config1"></Chart>
+                            </div>
+                            <div class="col-6">
+                                <Chart Config="config2"></Chart>
+                            </div>
+                        </div   
+                        <div class="row"> 
+                            <div class="col-12">
+                                <div class="table-responsive">
+                                    <!-- Añade esta clase para hacer la tabla responsiva -->
+                                    <table class="table table-bordered caption-top">
+                                        <caption>Top 3 Sucursales</caption>
+                                        <thead>
+                                            <tr>    
+                                                <th>Sucursal</th>
+                                                <th>Total de Ventas por Trueques</th>                         
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var suc in topSucursales)
+                                            {     
+                                                <tr class="table-secondary">
+                                                    <td>@suc.Sucursal.Nombre</td>
+                                                    <td>$@suc.TotalVentas</td>                                                     
+                                                </tr>                                  
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="row"> 
+                            <div class="col-12">
+                                <h6 style="text-align:center">El <b>monto total</b> de ventas por trueques es de $@total</h6>
+                                <h6 style="text-align:center">El <b>monto promedio</b> de ventas por trueques es de $@promedio</h6>
+                            </div>
+                    </div>
                 }
             }
         </div> 
@@ -47,32 +87,53 @@
 @code {
 
     List<Trueque> trueques = new List<Trueque>();
+    List<Sucursal> sucursales = new List<Sucursal>();
+    List<(Sucursal Sucursal, double TotalVentas)> topSucursales = new List<(Sucursal, double)>();
 
-    private PieConfig? config;
+    private PieConfig? config1;
+    private PieConfig? config2;
     bool cargando = true;
+    double total;
+    double promedio;
 
     protected override async Task OnInitializedAsync()
     {
         await Task.Delay(500);
         trueques = await TruequeService.ReadAllTrueques();
-        cargando = false;
+        sucursales = await SucursalService.ReadAllSucursales();
+        total = await TruequeService.GetTotalVentas();
+        promedio = await TruequeService.GetPromedioVentas();
 
-        config = new PieConfig
+        foreach(var suc in sucursales)
         {
-            Options = new PieOptions
+            double totalVentas = await TruequeService.GetTotalVentasSucursal(suc.Id);
+            topSucursales.Add((suc, totalVentas));
+        }
+        topSucursales = topSucursales.OrderByDescending(s => s.TotalVentas).Take(3).ToList();
+
+        SetChart1();
+        SetChart2();
+        cargando = false;
+    }
+
+    private void SetChart1()
+    {
+        config1 = new PieConfig
             {
-                Responsive = true,
-                Title = new OptionsTitle
+                Options = new PieOptions
                 {
-                    Display = true,
-                    Text = "Trueques Totales"
+                    Responsive = true,
+                    Title = new OptionsTitle
+                    {
+                        Display = true,
+                        Text = "Trueques Totales"
+                    }
                 }
-            }
-        };
+            };
 
         foreach (string titulo in new[] { "Completados", "Rechazados", "Pendientes" })
         {
-            config.Data.Labels.Add(titulo);
+            config1.Data.Labels.Add(titulo);
         }
 
         var totalAceptados = trueques.Where(t => t.Estado == 1).Count();
@@ -80,16 +141,51 @@
         var totalPendientes = trueques.Where(t => t.Estado == 0).Count();
 
         PieDataset<int> dataset = new PieDataset<int>(new[] { totalAceptados, totalRechazados, totalPendientes })
-        {
-            BackgroundColor = new[]
             {
+                BackgroundColor = new[]
+                {
                 ColorUtil.ColorHexString(75, 192, 192), // Slice 3 aka "Green"
                 ColorUtil.ColorHexString(255, 99, 132), // Slice 1 aka "Red"
                 ColorUtil.ColorHexString(255, 205, 86), // Slice 2 aka "Yellow"
             }
-        };
+            };
 
-        config.Data.Datasets.Add(dataset);
+        config1.Data.Datasets.Add(dataset);
+    }
+
+    private void SetChart2()
+    {
+        config2 = new PieConfig
+            {
+                Options = new PieOptions
+                {
+                    Responsive = true,
+                    Title = new OptionsTitle
+                    {
+                        Display = true,
+                        Text = "Trueques Completados"
+                    }
+                }
+            };
+
+        foreach (string titulo in new[] { "Con Ventas", "Sin Ventas" })
+        {
+            config2.Data.Labels.Add(titulo);
+        }
+
+        var totalConVentas = trueques.Where(t => t.HasVentas == true && t.Estado == 1).Count();
+        var totalSinVentas = trueques.Where(t => t.HasVentas == false && t.Estado == 1).Count();
+
+        PieDataset<int> dataset = new PieDataset<int>(new[] { totalConVentas, totalSinVentas })
+            {
+                BackgroundColor = new[]
+                {
+                ColorUtil.ColorHexString(75, 192, 192), // Slice 3 aka "Green"
+                ColorUtil.ColorHexString(255, 99, 132), // Slice 1 aka "Red"
+            }
+            };
+
+        config2.Data.Datasets.Add(dataset);
     }
 
 }
