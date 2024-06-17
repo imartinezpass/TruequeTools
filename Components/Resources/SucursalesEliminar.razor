@@ -2,6 +2,10 @@
 
 @inject NavigationManager NavMan
 @inject IServiciosSucursal SucursalService
+@inject IServiciosUsuario UsuarioService
+@inject IServiciosPublicacion PublicacionService
+@inject IServiciosOferta OfertaService
+@inject IServiciosTrueque TruequeService
 @inject IJSRuntime JS
 
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
@@ -39,7 +43,7 @@
 						{
 							<div>
 								<div class="alert alert-warning" role="alert">
-									Al eliminar una sucursal todas las ofertas y truqeues pendientes que dependan de la misma seran eliminadas. Los usuarios y publicaciones seran reasignados a la sucursal "Central". ¿Desea continuar?
+									Al eliminar una sucursal todas las ofertas aceptadas y trueques pendientes que dependan de la misma seran eliminados. Todos los usuarios y publicaciones dependientes de la sucursal seran reasignados a "Central". ¿Desea continuar? <b>Este cambio no se puede deshacer</b>
 								</div>
 							</div>
 							<button class="w-100 btn btn-lg btn-dark" @onclick="Confirmar">Eliminar Sucursal</button>
@@ -67,11 +71,10 @@
 	public async Task Confirmar()
 	{
 		await SucursalService.DeleteSucursal(Id); //Baja Logica
-		/*
-		 * Pendiente definir las acciones post borrado,
-		 * que hago con las Ofertas,Trueques,Usuarios y Publicaciones
-		 * que dependen de la sucursal borrada
-		 */
+		await TruequeService.DeleteTruequePendienteBySucursal(Id); //Borra fisicamente los trueques pendientes
+		await OfertaService.DeleteOfertaPendienteBySucursal(Id); //Borra fisicamente las ofertas aceptadas (a.k.a trueques pendientes)
+		await PublicacionService.MigrateSucursalPublicaciones(Id); //Migrado de las publicaciones activas a la sucursal central
+		await UsuarioService.MigrateSucursalUsuario(Id); //Migrado de los usuarios activos a la sucursal central
 		exito = true;
 		StateHasChanged();
 	}

@@ -18,6 +18,7 @@ namespace TruequeTools.Services
         public Task RechazarOfertasTruequeCompletado(int publicacionId, string motivo);
         public Task<bool> PublicacionComprometida(int publicacionId);
         public Task<bool> PublicacionHasOfertas(int publicacionId);
+        public Task DeleteOfertaPendienteBySucursal(int sucursalId);
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.JSInterop;
 using TruequeTools.Data;
 using TruequeTools.Entities;
 
@@ -91,6 +92,18 @@ namespace TruequeTools.Services
         {
             return contexto.Ofertas.AnyAsync(o => o.PublicacionQueOfertoId == publicacionId || o.PublicacionQueOfrezcoId == publicacionId);
         }
-    }
+
+		public async Task DeleteOfertaPendienteBySucursal(int oldSucursalId)
+		{
+			var ofertas = await contexto.Ofertas.Where(x => x.PublicacionQueOferto!.SucursalId == oldSucursalId && x.Estado == 1).ToListAsync();
+
+			foreach (var o in ofertas)
+			{
+                contexto.Ofertas.Remove(o);
+			}
+
+			await contexto.SaveChangesAsync();
+		}
+	}
 
 }

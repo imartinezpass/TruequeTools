@@ -26,7 +26,19 @@ namespace TruequeTools.Services
             await contexto.SaveChangesAsync();
         }
 
-        public async Task<Trueque> OverwriteTruequeById(Trueque trueque)
+		public async Task DeleteTruequePendienteBySucursal(int oldSucursalId)
+		{
+			var trueques = await contexto.Trueques.Where(x => x.Oferta!.PublicacionQueOferto!.SucursalId == oldSucursalId && x.Estado == 0).ToListAsync();
+
+			foreach (var t in trueques)
+			{
+				contexto.Trueques.Remove(t);
+			}
+
+			await contexto.SaveChangesAsync();
+		}
+
+		public async Task<Trueque> OverwriteTruequeById(Trueque trueque)
         {
            
             var truequeExistente = await contexto.Trueques.FindAsync(trueque.Id);

@@ -15,6 +15,7 @@ namespace TruequeTools.Services
         public Task<List<Trueque>> ReadAllTrueques();
         public Task<List<Trueque>> ReadTruequesBySucursal(int sucursalId);
         public Task<Trueque> OverwriteTruequeById(Trueque trueque);
-        
-    }
+		public Task DeleteTruequePendienteBySucursal(int sucursalId);
+
+	}
 }

@@ -25,6 +25,18 @@ namespace TruequeTools.Services
             return usuario!;
         }
 
+        public async Task MigrateSucursalUsuario(int oldSucursalId)
+        {    
+            var usuarios = await contexto.Usuarios.Where(x => x.SucursalId == oldSucursalId && !x.Deleted).ToListAsync();
+
+            foreach (var u in usuarios)
+            {
+                u.SucursalId = 1;
+            }
+ 
+            await contexto.SaveChangesAsync();
+        }
+
         public async Task<Usuario> OverwriteUsuarioById(Usuario usuario)
         {
             var usuarioExistente = await FindEmpleado(usuario.Id); 

@@ -127,6 +127,17 @@ namespace TruequeTools.Services
             return result;
         }
 
-    }
+		public async Task MigrateSucursalPublicaciones(int oldSucursalId)
+		{
+			var publicaciones = await contexto.Publicaciones.Where(x => x.SucursalId == oldSucursalId && !x.Deleted).ToListAsync();
+
+            foreach (var p in publicaciones)
+			{
+				p.SucursalId = 1;
+			}
+
+			await contexto.SaveChangesAsync();
+		}
+	}
 
 }

@@ -21,6 +21,7 @@ namespace TruequeTools.Services
         public Task<List<Publicacion>> ReadAllPublicacionesCurrentUser(int userId);
         public Task<Publicacion> OverwritePublicacionById(Publicacion publicacion);
         public Task<List<Oferta>> ReadAllOfertasOfPublicacion(int publicacionId);
+        public Task MigrateSucursalPublicaciones(int oldSucursalId);
 
     }
 }
