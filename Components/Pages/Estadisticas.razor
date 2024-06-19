@@ -28,13 +28,7 @@
             }
             else
             {
-                @if (trueques.Count == 0)
-                {
-                    <div class="alert alert-warning" role="alert">
-                        No hay datos para mostrar...
-                    </div>
-                }
-                else
+                @if (trueques.Count != 0  && trueques.Any(t => t.HasVentas == true))
                 {
                     <div class="container">
                         <div class="row">
@@ -79,6 +73,12 @@
                             </div>
                     </div>
                 }
+                else
+                {
+                    <div class="alert alert-warning" role="alert">
+                        No hay datos para mostrar...
+                    </div>       
+                }
             }
         </div> 
     </div>
@@ -100,7 +100,7 @@
     {
         await Task.Delay(500);
         trueques = await TruequeService.ReadAllTrueques();
-        if(trueques.Count != 0)
+        if(trueques.Count != 0  && trueques.Any(t => t.HasVentas == true))
         {
            sucursales = await SucursalService.ReadAllSucursales();
             total = await TruequeService.GetTotalVentas();
@@ -111,11 +111,10 @@
                 double totalVentas = await TruequeService.GetTotalVentasSucursal(suc.Id);
                 topSucursales.Add((suc, totalVentas));
             }
-            topSucursales = topSucursales.OrderByDescending(s => s.TotalVentas).Take(3).ToList();
-
-            SetChart1(); 
-            SetChart2();
+            topSucursales = topSucursales.OrderByDescending(s => s.TotalVentas).Take(3).ToList();      
         }   
+        SetChart1(); 
+        SetChart2();
         cargando = false;
     }
 
