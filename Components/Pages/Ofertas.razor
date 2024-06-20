@@ -88,7 +88,20 @@
                                     <td>@realizada?.PublicacionQueOferto!.Sucursal!.Nombre</td>
                                     <td>@realizada?.Fecha.ToShortDateString() @realizada?.Fecha.ToShortTimeString()</td>
                                     <td>@comentario</td>
-                                    <td><b>@estado</b></td>    
+                                    @if (realizada!.Estado == 0)
+                                    {
+                                        <td style="text-align: right;">
+                                            <div class="d-flex justify-content-end">
+                                                <div class="btn-group" style="margin-right: 1rem;">
+                                                    <button class="btn btn-dark rounded" style="margin-right: 0.5rem;" @onclick="@(() => CancelarOferta(realizada))">Cancelar</button>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    }
+                                    else
+                                    {
+                                        <td><b>@estado</b></td>
+                                    }
                                 </tr>
                             }
                         </tbody>
@@ -252,7 +265,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h1 class="modal-title fs-5">Aceptar Oferta</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" @onclick="CerrarModalAceptar"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 @if (publicRecibComp || publicMiaComp)
@@ -284,6 +297,32 @@
     </div>
 </div>
 
+<div class="modal fade" id="ModalCancelar" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Cancelar Oferta</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @if (cancelada)
+                {
+                    <div class="alert alert-success" role="alert">
+                        Se canceló la oferta !
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning" role="alert">
+                        ¿Desea cancelar la ofera realizada?
+                    </div>
+                    <button type="submit" class="w-100 btn btn-lg btn-dark" @onclick="Cancelar">Cancelar</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
 <PublicacionModal PublicacionActual="publicacion" />
 
 <script>
@@ -292,6 +331,9 @@
     }
     function toggleModalAceptar() {
         bootstrap.Modal.getOrCreateInstance("#ModalAceptar").toggle();
+    }
+    function toggleModalCancelar() {
+        bootstrap.Modal.getOrCreateInstance("#ModalCancelar").toggle();
     }
     function refreshPage() {
         location.reload();
@@ -307,6 +349,7 @@
     private MotivoViewModel Modelo { get; set; } = new();
 
     bool exito = false;
+    bool cancelada = false;
     string? MensajeError;
     Oferta ofertaActual = new();
     Publicacion publicacion = new();
@@ -314,6 +357,14 @@
     void SwitchPublicacion(Publicacion p)
     {
         publicacion = p;
+    }
+
+    public async Task Cancelar()
+    {
+        cancelada = true;
+        ofertaActual.Estado = -1;
+        ofertaActual.Motivo = "El usuario canceló la oferta";
+        await OfertaService.OverwriteOfertaById(ofertaActual);
     }
 
     public async Task CargarMotivo(EditContext editContext)
@@ -324,24 +375,15 @@
         await OfertaService.OverwriteOfertaById(ofertaActual);
     }
 
-    public async void CerrarModal()
+    public void CerrarModal()
     {
-        if (exito)
-        {
-            await JS.InvokeVoidAsync("refreshPage");
-        }
-        else
+        if (!exito)
         {
             Modelo = new MotivoViewModel();
             MensajeError = null;
             exito = false;
             StateHasChanged();
         }
-    }
-
-    public async void CerrarModalAceptar()
-    {
-        await JS.InvokeVoidAsync("refreshPage");
     }
 
     protected override async Task OnInitializedAsync()
@@ -377,7 +419,7 @@
     {
         publicRecibComp = await OfertaService.PublicacionComprometida(oferta.PublicacionQueOfertoId);
         publicMiaComp = await OfertaService.PublicacionComprometida(oferta.PublicacionQueOfrezcoId);
-        
+
         try // necesaria por un problema del iterops de javascript
         {
             await JS.InvokeVoidAsync("toggleModalAceptar");
@@ -410,8 +452,23 @@
             ofertaActual = oferta;
             await JS.InvokeVoidAsync("toggleModalRechazar");
         }
-        catch           // ignorar
+        catch (Exception ex)
         {
+            await JS.InvokeVoidAsync("alert", ex.ToString());
+        }
+        StateHasChanged();
+    }
+
+    public async Task CancelarOferta(Oferta oferta)
+    {
+        try // necesaria por un problema del iterops de javascript
+        {
+            ofertaActual = oferta;
+            await JS.InvokeVoidAsync("toggleModalCancelar");
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", ex.ToString());            
         }
         StateHasChanged();
     }
