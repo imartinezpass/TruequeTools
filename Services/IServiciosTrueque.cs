@@ -13,12 +13,13 @@ namespace TruequeTools.Services
         public Task CreateTrueque(Trueque t);
         public Task<Trueque> ReadTruequeById(int id);
         public Task<List<Trueque>> ReadAllTrueques();
+        public Task<List<Trueque>> ReadTruequesEntreFechas(DateTime fechaInicio, DateTime fechaFin);
         public Task<List<Trueque>> ReadTruequesBySucursal(int sucursalId);
         public Task<Trueque> OverwriteTruequeById(Trueque trueque);
 		public Task DeleteTruequePendienteBySucursal(int sucursalId);
-        public Task<double> GetTotalVentas();
-        public Task<double> GetPromedioVentas(); 
-        public Task<double> GetTotalVentasSucursal(int sucursalId);
+        public Task<double> GetTotalVentas(DateTime fechaInicio, DateTime fechaFin);
+        public Task<double> GetPromedioVentas(DateTime fechaInicio, DateTime fechaFin); 
+        public Task<double> GetTotalVentasSucursal(int sucursalId, DateTime fechaInicio, DateTime fechaFin);
 
 	}
 }

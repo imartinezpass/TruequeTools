@@ -38,21 +38,21 @@ namespace TruequeTools.Services
 			await contexto.SaveChangesAsync();
 		}
 
-        public async Task<double> GetPromedioVentas()
+        public async Task<double> GetPromedioVentas(DateTime fechaInicio, DateTime fechaFin)
         {
-            var trueques = await contexto.Trueques.Include(t => t.Productos).Where(x => x.HasVentas == true).ToListAsync();
+            var trueques = await contexto.Trueques.Include(t => t.Productos).Where(x => x.HasVentas == true && contexto.Ofertas.Any(o => o.Id == x.OfertaId && o.Fecha >= fechaInicio && o.Fecha <= fechaFin)).ToListAsync();
             return trueques.Average(t => t.Productos!.Sum(x => x.Monto * x.Cantidad));
         }
 
-        public async Task<double> GetTotalVentas()
+        public async Task<double> GetTotalVentas(DateTime fechaInicio, DateTime fechaFin)
         {
-            var trueques = await contexto.Trueques.Include(t => t.Productos).Where(x => x.HasVentas == true).ToListAsync();
+            var trueques = await contexto.Trueques.Include(t => t.Productos).Where(x => x.HasVentas == true && contexto.Ofertas.Any(o => o.Id == x.OfertaId && o.Fecha >= fechaInicio && o.Fecha <= fechaFin)).ToListAsync();
             return trueques.Sum(t => t.Productos!.Sum(x => x.Monto * x.Cantidad));
         }
 
-        public async Task<double> GetTotalVentasSucursal(int sucursalId)
+        public async Task<double> GetTotalVentasSucursal(int sucursalId, DateTime fechaInicio, DateTime fechaFin)
         {
-            var result = await contexto.Trueques.Where(s => s.Oferta!.Usuario!.SucursalId == sucursalId && s.HasVentas == true).ToListAsync();
+            var result = await contexto.Trueques.Where(s => s.Oferta!.Usuario!.SucursalId == sucursalId && s.HasVentas == true && contexto.Ofertas.Any(o => o.Id == s.OfertaId && o.Fecha >= fechaInicio && o.Fecha <= fechaFin)).ToListAsync();
             return result.Sum(t => t.Productos!.Sum(x => x.Monto * x.Cantidad));
         }
 
@@ -79,6 +79,15 @@ namespace TruequeTools.Services
         {
             var result = await contexto.Trueques.ToListAsync();
             return result;
+        }
+
+        public async Task<List<Trueque>> ReadTruequesEntreFechas(DateTime fechaInicio, DateTime fechaFin)
+        {
+            var trueques = await contexto.Trueques
+                .Where(t => contexto.Ofertas.Any(o => o.Id == t.OfertaId && o.Fecha >= fechaInicio && o.Fecha<=fechaFin))
+                .ToListAsync();
+
+            return trueques;
         }
 
         public async Task<Trueque> ReadTruequeById(int id)

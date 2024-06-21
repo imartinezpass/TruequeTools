@@ -13,6 +13,15 @@
 @attribute [Authorize(Roles = "Admin")]
 
 <div class="row">
+    <div class="form-floating mb-3">
+                <InputDate @bind-Value="fechaInicio" class="form-control" aria-required="true" placeholder="" maxlength="50"/>
+                <label for="fecha-nacimiento">Fecha de Inicio</label>
+    </div>
+    <div class="form-floating mb-3">
+                <InputDate @bind-Value="fechaFin" class="form-control" aria-required="true" placeholder="" maxlength="50" />
+                <label for="fecha-nacimiento">Fecha de Fin</label>
+    </div>
+    <button type="button" class="w-100 btn btn-lg btn-dark" @onclick="ActualizarEstadisticasClick">Actualizar</button>
     <div class="col-lg-12 pt-4 pb-4 border">
         <h1 style="text-align:center">Estadisticas</h1>
         <h2 style="text-align:center">Conoce tus Rendimientos </h2>
@@ -28,7 +37,7 @@
             }
             else
             {
-                @if (trueques.Count != 0  && trueques.Any(t => t.HasVentas == true))
+                @if (trueques.Count != 0 )
                 {
                     <div class="container">
                         <div class="row">
@@ -96,26 +105,57 @@
     double total;
     double promedio;
 
+    DateTime fechaInicio = new DateTime(2024, 2, 29);
+    DateTime fechaFin = DateTime.Today;
+
     protected override async Task OnInitializedAsync()
     {
-        await Task.Delay(500);
-        trueques = await TruequeService.ReadAllTrueques();
-        if(trueques.Count != 0  && trueques.Any(t => t.HasVentas == true))
-        {
-           sucursales = await SucursalService.ReadAllSucursales();
-            total = await TruequeService.GetTotalVentas();
-            promedio = await TruequeService.GetPromedioVentas();
+        await ActualizarEstadisticas();
+    }
 
-            foreach(var suc in sucursales)
+    private async Task ActualizarEstadisticas()
+    {
+        topSucursales.Clear();
+        await Task.Delay(500);
+        trueques = await TruequeService.ReadTruequesEntreFechas(fechaInicio,fechaFin);
+
+        if(trueques.Count != 0)
+        {
+            sucursales = await SucursalService.ReadAllSucursales();
+            if(trueques.Any(t => t.HasVentas == true))
             {
-                double totalVentas = await TruequeService.GetTotalVentasSucursal(suc.Id);
-                topSucursales.Add((suc, totalVentas));
+                total = await TruequeService.GetTotalVentas(fechaInicio,fechaFin);
+                promedio = await TruequeService.GetPromedioVentas(fechaInicio,fechaFin);
+
+                foreach(var suc in sucursales)
+                {
+                    double totalVentas = await TruequeService.GetTotalVentasSucursal(suc.Id,fechaInicio,fechaFin);
+                    topSucursales.Add((suc, totalVentas));
+                }
+                topSucursales = topSucursales.OrderByDescending(s => s.TotalVentas).Take(3).ToList();     
             }
-            topSucursales = topSucursales.OrderByDescending(s => s.TotalVentas).Take(3).ToList();      
+            else
+            {
+                total = 0;
+                promedio = 0;
+                foreach(var suc in sucursales)
+                {
+                    double totalVentas = 0;
+                    topSucursales.Add((suc, totalVentas));
+                }
+                topSucursales = topSucursales.OrderByDescending(s => s.TotalVentas).Take(3).ToList();
+            }
+
         }   
         SetChart1(); 
         SetChart2();
         cargando = false;
+    }
+
+    private async Task ActualizarEstadisticasClick()
+    {
+        cargando = true;
+        await ActualizarEstadisticas();
     }
 
     private void SetChart1()
