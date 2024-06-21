@@ -26,7 +26,7 @@
     <div class="col-lg-12 pt-4 pb-4 border">
         <h1 style="text-align:center">Estadisticas</h1>
         <h2 style="text-align:center">Conoce tus Rendimientos </h2>
-        <h3 style="text-align:center">Desde el @fechaInicio.ToString("dd/MM/yyyy") al @fechaFin.ToString("dd/MM/yyyy") </h3>
+        <h3 style="text-align:center">Desde el @fechaInicioTitulo.ToString("dd/MM/yyyy") al @fechaFinTitulo.ToString("dd/MM/yyyy") </h3>
         <hr />
         <div class="form-floating mb-3">
             @if (cargando)
@@ -158,6 +158,8 @@
     double promedio;
 
     DateTime fechaCreacion = new DateTime(2024, 2, 29);
+    DateTime fechaInicioTitulo = new DateTime(2024, 2, 29);
+    DateTime fechaFinTitulo = DateTime.Today;
     DateTime fechaInicio = new DateTime(2024, 2, 29);
     DateTime fechaFin = DateTime.Today;
 
@@ -211,16 +213,18 @@
         if (fechaInicio > fechaFin || fechaInicio > DateTime.Today || fechaFin > DateTime.Today || fechaInicio < fechaCreacion || fechaFin < fechaCreacion)
         {
             try // necesaria por un problema del iterops de javascript
-        {
-            await JS.InvokeVoidAsync("toggleModalError");
-        }
-        catch (Exception ex)
-        {
-            await JS.InvokeVoidAsync("alert", ex.ToString());            
-        }
+            {
+                await JS.InvokeVoidAsync("toggleModalError");
+            }
+            catch (Exception ex)
+            {
+                await JS.InvokeVoidAsync("alert", ex.ToString());            
+            }
         }
         else
         {
+            fechaInicioTitulo = fechaInicio;
+            fechaFinTitulo = fechaFin;
             cargando = true;
             await ActualizarEstadisticas();
         }

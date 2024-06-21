@@ -21,8 +21,24 @@
     <div class="col-lg-12 pt-4 pb-4 border">
         <h1 style="text-align:center">Trueques</h1>
         <h2 style="text-align:center">@nombreSucursal</h2>
+        @if (mostrarAdmin)
+        {
+            <h3 style="text-align:center">Desde el @fechaInicioTitulo.ToString("dd/MM/yyyy") al @fechaFinTitulo.ToString("dd/MM/yyyy") </h3>
+        }
         <hr />
         <div class="form-floating mb-3">
+            @if (mostrarAdmin)
+            {
+                <div class="form-floating mb-3">
+                    <InputDate @bind-Value="fechaInicio" class="form-control" aria-required="true" placeholder="" maxlength="50" />
+                    <label for="fecha-nacimiento">Fecha de Inicio</label>
+                </div>
+                <div class="form-floating mb-3">
+                    <InputDate @bind-Value="fechaFin" class="form-control" aria-required="true" placeholder="" maxlength="50" />
+                    <label for="fecha-nacimiento">Fecha de Fin</label>
+                </div>
+                <button type="button" class="w-100 btn btn-lg btn-dark" @onclick="ActualizarTruequesClick">Actualizar</button>
+            }
             @if (cargando)
             {
                 <div class="d-flex justify-content-center">
@@ -155,6 +171,57 @@
     </div>
 </div>
 
+<div class="modal fade" id="FechaInvalidaModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5">Fechas invalidas</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @if (fechaInicio > fechaFin)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        La fecha de inicio no puede ser posterior a la fecha de fin!
+                    </div>
+                }
+                @if (fechaInicio > DateTime.Today)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        La fecha de inicio no puede ser posterior a la fecha de hoy!
+                    </div>
+                }
+                @if (fechaFin > DateTime.Today)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        La fecha de fin no puede ser posterior a la fecha de hoy!
+                    </div>
+                }
+                @if (fechaInicio < fechaCreacion)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        La fecha de inicio no puede ser anterior a la fecha de creacion!
+                        Fecha creacion: @fechaCreacion.ToString("dd/MM/yyyy")
+                    </div>
+                }
+                @if (fechaFin < fechaCreacion)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        La fecha de fin no puede ser anterior a la fecha de creacion!
+                        Fecha creacion: @fechaCreacion.ToString("dd/MM/yyyy")
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleModalError() {
+        bootstrap.Modal.getOrCreateInstance("#FechaInvalidaModal").toggle();
+    }
+</script>
+
 <script>
     function refreshPage() {
         location.reload();
@@ -171,8 +238,15 @@
 
     List<Trueque> trueques = new List<Trueque>();
 
+    DateTime fechaCreacion = new DateTime(2024, 2, 29);
+    DateTime fechaInicioTitulo = new DateTime(2024, 2, 29);
+    DateTime fechaFinTitulo = DateTime.Today;
+    DateTime fechaInicio = new DateTime(2024, 2, 29);
+    DateTime fechaFin = DateTime.Today;
+
     bool cargando = true;
     string? nombreSucursal;
+    bool mostrarAdmin;
     int TruequeId;
     Publicacion publicacion = new();
 
@@ -183,22 +257,53 @@
 
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userId = int.Parse(authState.User!.FindFirst("UsuarioId")!.Value);
+        await ActualizarTrueques();
+    }
+
+    private async Task ActualizarTrueques()
+    {
         await Task.Delay(500);
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var sucursalId = int.Parse(authState.User!.FindFirst("SucursalId")!.Value);
         var userId = int.Parse(authState.User!.FindFirst("UsuarioId")!.Value);
-        if(userId == 1)
+        var sucursalId = int.Parse(authState.User!.FindFirst("SucursalId")!.Value);
+        if (userId == 1)
         {
-            trueques = await TruequeService.ReadAllTrueques();
+            trueques = await TruequeService.ReadTruequesEntreFechas(fechaInicio,fechaFin);
             nombreSucursal = "Todas las Sucursales";
+            mostrarAdmin = true;
         }
         else
         {
             trueques = await TruequeService.ReadTruequesBySucursal(sucursalId);
             Sucursal suc = await SucursalService.ReadSucursalById(sucursalId);
             nombreSucursal = "Sucursal " + suc.Nombre;
+            mostrarAdmin = false;
         }
         cargando = false;
+    }
+
+    private async Task ActualizarTruequesClick()
+    {
+        if (fechaInicio > fechaFin || fechaInicio > DateTime.Today || fechaFin > DateTime.Today || fechaInicio < fechaCreacion || fechaFin < fechaCreacion)
+        {
+            try // necesaria por un problema del iterops de javascript
+            {
+                await JS.InvokeVoidAsync("toggleModalError");
+            }
+            catch (Exception ex)
+            {
+                await JS.InvokeVoidAsync("alert", ex.ToString());
+            }
+        }
+        else
+        {
+            fechaInicioTitulo = fechaInicio;
+            fechaFinTitulo = fechaFin;
+            cargando = true;
+            await ActualizarTrueques();
+        }
     }
 
     private void AceptarTrueque(int truequeId)
