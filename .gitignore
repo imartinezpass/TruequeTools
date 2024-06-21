@@ -412,3 +412,7 @@ FodyWeavers.xsd
 /Migrations/20240607222614_Demo2.Designer.cs
 /Migrations/20240608154818_nombre_migracionLPM.cs
 /Migrations/20240608154818_nombre_migracionLPM.Designer.cs
+/Migrations/20240615134624_FinalMigration.cs
+/Migrations/20240615134624_FinalMigration.Designer.cs
+/Migrations/20240618230053_numero100.cs
+/Migrations/20240618230053_numero100.Designer.cs
