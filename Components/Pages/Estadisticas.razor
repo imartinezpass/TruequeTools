@@ -173,6 +173,7 @@
         topSucursales.Clear();
         await Task.Delay(500);
 
+        fechaFin = fechaFin.AddHours(23).AddMinutes(59);
         trueques = await TruequeService.ReadTruequesEntreFechas(fechaInicio,fechaFin);
 
         if(trueques.Count != 0)

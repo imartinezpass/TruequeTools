@@ -270,6 +270,7 @@
         var sucursalId = int.Parse(authState.User!.FindFirst("SucursalId")!.Value);
         if (userId == 1)
         {
+            fechaFin = fechaFin.AddHours(23).AddMinutes(59);
             trueques = await TruequeService.ReadTruequesEntreFechas(fechaInicio,fechaFin);
             nombreSucursal = "Todas las Sucursales";
             mostrarAdmin = true;
