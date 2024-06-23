@@ -5,11 +5,14 @@
 @using ChartJs.Blazor.Util
 @using TruequeTools.Entities
 @using TruequeTools.Data
+@using TruequeTools.Components.Resources
 
 @inject IJSRuntime JS
 @inject TruequeToolsDataContext context
 @inject IServiciosTrueque TruequeService
 @inject IServiciosSucursal SucursalService
+
+
 
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
 
@@ -37,7 +40,7 @@
     <div class="col-lg-12 pt-4 pb-4 border">
         <h1 style="text-align:center">Estadisticas</h1>
         <h2 style="text-align:center">Conoce tus Rendimientos </h2>
-        <h3 style="text-align:center">Desde el @fechaInicioTitulo.ToString("dd/MM/yyyy") al @fechaFinTitulo.ToString("dd/MM/yyyy") </h3>
+        <h3 style="text-align:center">Desde el @fechaInicioTitulo.ToString("dd/MM/yyyy") al @fechaFinTitulo.ToString("dd/MM/yyyy") @nombreSucursal</h3>
         <hr />
         <div class="form-floating mb-3">
             @if (cargando)
@@ -111,7 +114,6 @@
 <div class="row">
     <div class="col-lg-12 pt-4 pb-4 border">
         <h1 style="text-align:center">Trueques</h1>
-        <h2 style="text-align:center">@nombreSucursal</h2>
         <hr />
         <div class="form-floating mb-3">
             @if (cargando)
@@ -140,8 +142,6 @@
                                     <th>Id</th>
                                     <th>Sucursal</th>
                                     <th>Fecha y Hora</th>
-                                    <th>Producto 1</th>
-                                    <th>Producto 2</th>
                                     <th>Comentarios</th>                            
                                 </tr> 
                             </thead>
@@ -159,25 +159,12 @@
                                         <td>@t.Id</td>
                                         <td>@t.Oferta!.PublicacionQueOferto!.Sucursal!.Nombre</td>
                                         <td>@t.Oferta!.Fecha.ToShortDateString() @t.Oferta!.Fecha.ToShortTimeString()</td>
-                                        <td>
-                                            <NavLink class="text-primary" data-bs-toggle="modal" data-bs-target="#ModalPublicacion" @onclick="@(() => SwitchPublicacion(@t.Oferta!.PublicacionQueOferto!))">
-                                                @t.Oferta!.PublicacionQueOferto!.Nombre
-                                            </NavLink>
-                                        </td>
-                                        <td>
-                                            <NavLink class="text-primary" data-bs-toggle="modal" data-bs-target="#ModalPublicacion" @onclick="@(() => SwitchPublicacion(@t.Oferta!.PublicacionQueOfrezco!))">
-                                                @t.Oferta!.PublicacionQueOfrezco!.Nombre
-                                            </NavLink> 
-                                        </td>
-                                        @if (t.HasVentas)
-                                        {
                                             <td>
                                                 @comentario
                                                 <NavLink class="text-primary" data-bs-toggle="modal" data-bs-target="#ModalProductos" @onclick="@(() =>VerProductos(t.Id))">
                                                     ventas
                                                 </NavLink>
-                                            </td>
-                                        }                                
+                                            </td>                               
                                     </tr>
                                 }
                             </tbody>
@@ -240,6 +227,14 @@
     }
 </script>
 
+<script>
+    function refreshPage() {
+        location.reload();
+    }
+</script>
+
+<!-- <ProductosModal TruequeId="TruequeId" /> -->
+
 @code {
 
     List<Trueque> trueques = new List<Trueque>();
@@ -262,7 +257,7 @@
     bool mostrar = true;
 
     int TruequeId;
-    string? nombreSucursal="";
+    string? nombreSucursal="de todas las sucursales";
     Publicacion publicacion = new();
 
     protected override async Task OnInitializedAsync()
@@ -279,6 +274,7 @@
         if (sucursalActual == 0)
         {
             mostrar = true;
+            nombreSucursal="de todas las sucursales";
             trueques = await TruequeService.ReadTruequesEntreFechas(fechaInicio,fechaFin);
             truequesCompletados = await TruequeService.ReadTruequesEntreFechasConVentas(fechaInicio,fechaFin);
             await EstadisticasTodasLasSucursales();
@@ -286,6 +282,8 @@
         else
         {
             mostrar = false;
+            var sucu = await SucursalService.ReadSucursalById(sucursalActual);
+            nombreSucursal = "de la sucursal " + sucu.Nombre;
             trueques = await TruequeService.ReadTruequesEntreFechasYSucursal(fechaInicio, fechaFin, sucursalActual);
             truequesCompletados = await TruequeService.ReadTruequesEntreFechasYSucursalConVentas(fechaInicio, fechaFin, sucursalActual);
             await EstadisticasPorSucursal();
@@ -348,7 +346,7 @@
     {
         if (fechaInicio > fechaFin || fechaInicio > DateTime.Today || fechaFin > DateTime.Today.AddHours(23).AddMinutes(59) || fechaInicio < fechaCreacion || fechaFin < fechaCreacion)
         {
-            try // necesaria por un problema del iterops de javascript
+            try
             {
                 await JS.InvokeVoidAsync("toggleModalError");
             }
@@ -441,10 +439,5 @@
     private void VerProductos(int truequeId)
     {
         TruequeId = truequeId;
-    }
-
-    void SwitchPublicacion(Publicacion p)
-    {
-        publicacion = p;
     }
 }
