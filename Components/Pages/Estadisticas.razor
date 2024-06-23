@@ -4,8 +4,10 @@
 @using ChartJs.Blazor.PieChart
 @using ChartJs.Blazor.Util
 @using TruequeTools.Entities
+@using TruequeTools.Data
 
 @inject IJSRuntime JS
+@inject TruequeToolsDataContext context
 @inject IServiciosTrueque TruequeService
 @inject IServiciosSucursal SucursalService
 
@@ -15,12 +17,21 @@
 
 <div class="row">
     <div class="form-floating mb-3">
-                <InputDate @bind-Value="fechaInicio" class="form-control" aria-required="true" placeholder="" maxlength="50"/>
+                <InputDate @bind-Value="@fechaInicio" class="form-control" aria-required="true" placeholder="" maxlength="50"/>
                 <label for="fecha-nacimiento">Fecha de Inicio</label>
     </div>
     <div class="form-floating mb-3">
-                <InputDate @bind-Value="fechaFin" class="form-control" aria-required="true" placeholder="" maxlength="50" />
+                <InputDate @bind-Value="@fechaFin" class="form-control" aria-required="true" placeholder="" maxlength="50" />
                 <label for="fecha-nacimiento">Fecha de Fin</label>
+    </div>
+    <div class="form-floating mb-3">
+                <InputSelect @bind-Value="@sucursalActual" class="form-control" aria-required="true" placeholder="" maxlength="50">
+                    <option value=0>Todas las sucursales</option>
+                    @foreach (var cat in sucursales)
+                    {
+                        <option value="@cat.Id">@cat.Nombre</option>
+                    }
+                </InputSelect>
     </div>
     <button type="button" class="w-100 btn btn-lg btn-dark" @onclick="ActualizarEstadisticasClick">Actualizar</button>
     <div class="col-lg-12 pt-4 pb-4 border">
@@ -54,7 +65,8 @@
                             <div class="col-12">
                                 <div class="table-responsive">
                                     <!-- Añade esta clase para hacer la tabla responsiva -->
-                                    <table class="table table-bordered caption-top">
+                                    @if(mostrar){
+                                         <table class="table table-bordered caption-top">
                                         <caption>Top 3 Sucursales</caption>
                                         <thead>
                                             <tr>    
@@ -72,6 +84,7 @@
                                             }
                                         </tbody>
                                     </table>
+                                    }
                                 </div>
                             </div>
                         </div>
@@ -92,6 +105,87 @@
                 }
             }
         </div> 
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12 pt-4 pb-4 border">
+        <h1 style="text-align:center">Trueques</h1>
+        <h2 style="text-align:center">@nombreSucursal</h2>
+        <hr />
+        <div class="form-floating mb-3">
+            @if (cargando)
+            {
+                <div class="d-flex justify-content-center">
+                    <div class="spinner-border" role="status">
+                        <span class="sr-only"></span>
+                    </div>
+                </div>
+            }
+            else
+            {
+                @if (trueques.Count == 0)
+                {
+                    <div class="alert alert-warning" role="alert">
+                        No hay trueques para mostrar...
+                    </div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <!-- Añade esta clase para hacer la tabla responsiva -->
+                        <table class="table table-bordered caption-top">
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Sucursal</th>
+                                    <th>Fecha y Hora</th>
+                                    <th>Producto 1</th>
+                                    <th>Producto 2</th>
+                                    <th>Comentarios</th>                            
+                                </tr> 
+                            </thead>
+                            <tbody>
+                                @foreach (var t in truequesCompletados)
+                                {
+                                    var estilo = "table-success";
+                                    var comentario = "Trueque completado con";
+                                                
+                                    context.Entry(t).Reference(p => p.Oferta).Load();
+                                    context.Entry(t.Oferta!).Reference(p => p.PublicacionQueOfrezco).Load();
+                                    context.Entry(t.Oferta!).Reference(p => p.PublicacionQueOferto).Load();
+                                    context.Entry(t.Oferta!.PublicacionQueOferto!).Reference(p => p.Sucursal).Load();
+                                    <tr class="@estilo">
+                                        <td>@t.Id</td>
+                                        <td>@t.Oferta!.PublicacionQueOferto!.Sucursal!.Nombre</td>
+                                        <td>@t.Oferta!.Fecha.ToShortDateString() @t.Oferta!.Fecha.ToShortTimeString()</td>
+                                        <td>
+                                            <NavLink class="text-primary" data-bs-toggle="modal" data-bs-target="#ModalPublicacion" @onclick="@(() => SwitchPublicacion(@t.Oferta!.PublicacionQueOferto!))">
+                                                @t.Oferta!.PublicacionQueOferto!.Nombre
+                                            </NavLink>
+                                        </td>
+                                        <td>
+                                            <NavLink class="text-primary" data-bs-toggle="modal" data-bs-target="#ModalPublicacion" @onclick="@(() => SwitchPublicacion(@t.Oferta!.PublicacionQueOfrezco!))">
+                                                @t.Oferta!.PublicacionQueOfrezco!.Nombre
+                                            </NavLink> 
+                                        </td>
+                                        @if (t.HasVentas)
+                                        {
+                                            <td>
+                                                @comentario
+                                                <NavLink class="text-primary" data-bs-toggle="modal" data-bs-target="#ModalProductos" @onclick="@(() =>VerProductos(t.Id))">
+                                                    ventas
+                                                </NavLink>
+                                            </td>
+                                        }                                
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            }
+        </div>
     </div>
 </div>
 
@@ -139,6 +233,7 @@
     </div>
 </div>
 
+
 <script>
     function toggleModalError() {
         bootstrap.Modal.getOrCreateInstance("#FechaInvalidaModal").toggle();
@@ -148,6 +243,7 @@
 @code {
 
     List<Trueque> trueques = new List<Trueque>();
+    List<Trueque> truequesCompletados = new List<Trueque>();
     List<Sucursal> sucursales = new List<Sucursal>();
     List<(Sucursal Sucursal, double TotalVentas)> topSucursales = new List<(Sucursal, double)>();
 
@@ -161,10 +257,17 @@
     DateTime fechaInicioTitulo = new DateTime(2024, 2, 29);
     DateTime fechaFinTitulo = DateTime.Today;
     DateTime fechaInicio = new DateTime(2024, 2, 29);
-    DateTime fechaFin = DateTime.Today;
+    DateTime fechaFin = DateTime.Today.AddHours(23).AddMinutes(59);
+    int sucursalActual = 0;
+    bool mostrar = true;
+
+    int TruequeId;
+    string? nombreSucursal="";
+    Publicacion publicacion = new();
 
     protected override async Task OnInitializedAsync()
     {
+        sucursales = await SucursalService.ReadAllSucursales();
         await ActualizarEstadisticas();
     }
 
@@ -173,12 +276,30 @@
         topSucursales.Clear();
         await Task.Delay(500);
 
-        fechaFin = fechaFin.AddHours(23).AddMinutes(59);
-        trueques = await TruequeService.ReadTruequesEntreFechas(fechaInicio,fechaFin);
+        if (sucursalActual == 0)
+        {
+            mostrar = true;
+            trueques = await TruequeService.ReadTruequesEntreFechas(fechaInicio,fechaFin);
+            truequesCompletados = await TruequeService.ReadTruequesEntreFechasConVentas(fechaInicio,fechaFin);
+            await EstadisticasTodasLasSucursales();
+        }
+        else
+        {
+            mostrar = false;
+            trueques = await TruequeService.ReadTruequesEntreFechasYSucursal(fechaInicio, fechaFin, sucursalActual);
+            truequesCompletados = await TruequeService.ReadTruequesEntreFechasYSucursalConVentas(fechaInicio, fechaFin, sucursalActual);
+            await EstadisticasPorSucursal();
+        } 
+        SetChart1(); 
+        SetChart2();
+        cargando = false;
+    }
+
+    private async Task EstadisticasTodasLasSucursales()
+    {
 
         if(trueques.Count != 0)
         {
-            sucursales = await SucursalService.ReadAllSucursales();
             if(trueques.Any(t => t.HasVentas == true))
             {
                 total = await TruequeService.GetTotalVentas(fechaInicio,fechaFin);
@@ -204,14 +325,28 @@
             }
 
         }   
-        SetChart1(); 
-        SetChart2();
-        cargando = false;
+    }
+
+    private async Task EstadisticasPorSucursal()
+    {
+        if(trueques.Count != 0)
+        {
+            if(trueques.Any(t => t.HasVentas == true))
+            {
+                total = await TruequeService.GetTotalVentasSucursal(sucursalActual,fechaInicio,fechaFin);
+                promedio = await TruequeService.GetPromedioVentasSucursal(sucursalActual,fechaInicio,fechaFin);
+            }
+            else
+            {
+                total = 0;
+                promedio = 0;
+            }
+        }   
     }
 
     private async Task ActualizarEstadisticasClick()
     {
-        if (fechaInicio > fechaFin || fechaInicio > DateTime.Today || fechaFin > DateTime.Today || fechaInicio < fechaCreacion || fechaFin < fechaCreacion)
+        if (fechaInicio > fechaFin || fechaInicio > DateTime.Today || fechaFin > DateTime.Today.AddHours(23).AddMinutes(59) || fechaInicio < fechaCreacion || fechaFin < fechaCreacion)
         {
             try // necesaria por un problema del iterops de javascript
             {
@@ -303,4 +438,13 @@
         config2.Data.Datasets.Add(dataset);
     }
 
+    private void VerProductos(int truequeId)
+    {
+        TruequeId = truequeId;
+    }
+
+    void SwitchPublicacion(Publicacion p)
+    {
+        publicacion = p;
+    }
 }
