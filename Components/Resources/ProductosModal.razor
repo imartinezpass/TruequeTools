@@ -1,6 +1,7 @@
 ﻿@using TruequeTools.Entities
 
 @inject IServiciosProducto ProductoService
+@inject IJSRuntime JS
 
 <!-- Modal -->
 <div class="modal fade" id="ModalProductos" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -53,8 +54,15 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        Productos = await ProductoService.ReadProductosByTruequeId(TruequeId);
-        total = Productos.Sum(p => p.Monto * p.Cantidad);
+        try
+        {
+            Productos = await ProductoService.ReadProductosByTruequeId(TruequeId);
+            total = Productos.Sum(p => p.Monto * p.Cantidad);
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", ex.ToString());
+        }
     }
 
 }

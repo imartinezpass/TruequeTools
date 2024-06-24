@@ -12,34 +12,34 @@
 @inject IServiciosTrueque TruequeService
 @inject IServiciosSucursal SucursalService
 
-
-
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
 
 @attribute [Authorize(Roles = "Admin")]
 
 <div class="row">
-    <div class="form-floating mb-3">
-                <InputDate @bind-Value="@fechaInicio" class="form-control" aria-required="true" placeholder="" maxlength="50"/>
-                <label for="fecha-nacimiento">Fecha de Inicio</label>
+    <div class="col-lg-12 pt-4 pb-4 border" style="margin-bottom:1.1rem">
+        <div class="form-floating mb-3">
+            <InputDate @bind-Value="@fechaInicio" class="form-control" aria-required="true" placeholder="" maxlength="50" />
+            <label for="fecha-inicio">Inicio</label>
+        </div>
+        <div class="form-floating mb-3">
+            <InputDate @bind-Value="@fechaFin" class="form-control" aria-required="true" placeholder="" maxlength="50" />
+            <label for="fecha-fin">Fin</label>
+        </div>
+        <div class="form-floating mb-3">
+            <InputSelect @bind-Value="@sucursalActual" class="form-control" aria-required="true" placeholder="" maxlength="50">
+                <option value=0>Todas las sucursales</option>
+                @foreach (var cat in sucursales)
+                {
+                    <option value="@cat.Id">@cat.Nombre</option>
+                }
+            </InputSelect>
+            <label for="sucursal">Sucursal</label>
+        </div>
+        <button type="button" class="w-100 btn btn-lg btn-dark" @onclick="ActualizarEstadisticasClick">Filtrar</button>
     </div>
-    <div class="form-floating mb-3">
-                <InputDate @bind-Value="@fechaFin" class="form-control" aria-required="true" placeholder="" maxlength="50" />
-                <label for="fecha-nacimiento">Fecha de Fin</label>
-    </div>
-    <div class="form-floating mb-3">
-                <InputSelect @bind-Value="@sucursalActual" class="form-control" aria-required="true" placeholder="" maxlength="50">
-                    <option value=0>Todas las sucursales</option>
-                    @foreach (var cat in sucursales)
-                    {
-                        <option value="@cat.Id">@cat.Nombre</option>
-                    }
-                </InputSelect>
-    </div>
-    <button type="button" class="w-100 btn btn-lg btn-dark" @onclick="ActualizarEstadisticasClick">Actualizar</button>
-    <div class="col-lg-12 pt-4 pb-4 border">
+    <div class="col-lg-12 pt-4 pb-4 border" style="margin-bottom:1.1rem">
         <h1 style="text-align:center">Estadisticas</h1>
-        <h2 style="text-align:center">Conoce tus Rendimientos </h2>
         <h3 style="text-align:center">Desde el @fechaInicioTitulo.ToString("dd/MM/yyyy") al @fechaFinTitulo.ToString("dd/MM/yyyy") @nombreSucursal</h3>
         <hr />
         <div class="form-floating mb-3">
@@ -63,42 +63,86 @@
                             <div class="col-6">
                                 <Chart Config="config2"></Chart>
                             </div>
-                        </div   
+                        </div>
+                        <hr />
+                        <div class="row">
+                            <div class="col-12">
+                                <h6 style="text-align:center">El <b>monto total</b> de ventas por trueques es de $@total</h6>
+                                <h6 style="text-align:center">El <b>monto promedio</b> de ventas por trueques es de $@promedio</h6>
+                            </div>
+                        </div>
                         <div class="row"> 
                             <div class="col-12">
                                 <div class="table-responsive">
                                     <!-- Añade esta clase para hacer la tabla responsiva -->
                                     @if(mostrar){
-                                         <table class="table table-bordered caption-top">
-                                        <caption>Top 3 Sucursales</caption>
-                                        <thead>
-                                            <tr>    
-                                                <th>Sucursal</th>
-                                                <th>Total de Ventas por Trueques</th>                         
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var suc in topSucursales)
-                                            {     
-                                                <tr class="table-secondary">
-                                                    <td>@suc.Sucursal.Nombre</td>
-                                                    <td>$@suc.TotalVentas</td>                                                     
-                                                </tr>                                  
-                                            }
-                                        </tbody>
-                                    </table>
+                                        <table class="table table-bordered caption-top">
+                                            <caption>Top 3 Sucursales</caption>
+                                            <thead>
+                                                <tr>    
+                                                    <th>Sucursal</th>
+                                                    <th>Total de Ventas por Trueques</th>                         
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var suc in topSucursales)
+                                                {     
+                                                    <tr class="table-secondary">
+                                                        <td>@suc.Sucursal.Nombre</td>
+                                                        <td>$@suc.TotalVentas</td>                                                     
+                                                    </tr>                                  
+                                                }
+                                            </tbody>
+                                        </table>
                                     }
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <hr />
-                    <div class="row"> 
+                        <div class="row">
                             <div class="col-12">
-                                <h6 style="text-align:center">El <b>monto total</b> de ventas por trueques es de $@total</h6>
-                                <h6 style="text-align:center">El <b>monto promedio</b> de ventas por trueques es de $@promedio</h6>
+                                <div class="table-responsive">
+                                    <!-- Añade esta clase para hacer la tabla responsiva -->
+                                    @if (mostrar)
+                                    {
+                                        <table class="table table-bordered caption-top">
+                                            <caption>Trueques con Ventas</caption>
+                                            <thead>
+                                                <tr>
+                                                    <th>Id</th>
+                                                    <th>Sucursal</th>
+                                                    <th>Fecha y Hora</th>
+                                                    <th>Comentarios</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach (var t in truequesCompletados)
+                                                {
+                                                    var estilo = "table-success";
+                                                    var comentario = "Trueque completado con";
+
+                                                    context.Entry(t).Reference(p => p.Oferta).Load();
+                                                    context.Entry(t.Oferta!).Reference(p => p.PublicacionQueOfrezco).Load();
+                                                    context.Entry(t.Oferta!).Reference(p => p.PublicacionQueOferto).Load();
+                                                    context.Entry(t.Oferta!.PublicacionQueOferto!).Reference(p => p.Sucursal).Load();
+                                                    <tr class="@estilo">
+                                                        <td>@t.Id</td>
+                                                        <td>@t.Oferta!.PublicacionQueOferto!.Sucursal!.Nombre</td>
+                                                        <td>@t.Oferta!.Fecha.ToShortDateString() @t.Oferta!.Fecha.ToShortTimeString()</td>
+                                                        <td>
+                                                            @comentario
+                                                            <NavLink class="text-primary" data-bs-toggle="modal" data-bs-target="#ModalProductos" @onclick="@(() =>VerProductos(t.Id))">
+                                                                ventas
+                                                            </NavLink>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    }                                 
+                                </div>
                             </div>
-                    </div>
+                        </div>
+                    </div>                                                       
                 }
                 else
                 {
@@ -108,71 +152,6 @@
                 }
             }
         </div> 
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-lg-12 pt-4 pb-4 border">
-        <h1 style="text-align:center">Trueques</h1>
-        <hr />
-        <div class="form-floating mb-3">
-            @if (cargando)
-            {
-                <div class="d-flex justify-content-center">
-                    <div class="spinner-border" role="status">
-                        <span class="sr-only"></span>
-                    </div>
-                </div>
-            }
-            else
-            {
-                @if (trueques.Count == 0)
-                {
-                    <div class="alert alert-warning" role="alert">
-                        No hay trueques para mostrar...
-                    </div>
-                }
-                else
-                {
-                    <div class="table-responsive">
-                        <!-- Añade esta clase para hacer la tabla responsiva -->
-                        <table class="table table-bordered caption-top">
-                            <thead>
-                                <tr>
-                                    <th>Id</th>
-                                    <th>Sucursal</th>
-                                    <th>Fecha y Hora</th>
-                                    <th>Comentarios</th>                            
-                                </tr> 
-                            </thead>
-                            <tbody>
-                                @foreach (var t in truequesCompletados)
-                                {
-                                    var estilo = "table-success";
-                                    var comentario = "Trueque completado con";
-                                                
-                                    context.Entry(t).Reference(p => p.Oferta).Load();
-                                    context.Entry(t.Oferta!).Reference(p => p.PublicacionQueOfrezco).Load();
-                                    context.Entry(t.Oferta!).Reference(p => p.PublicacionQueOferto).Load();
-                                    context.Entry(t.Oferta!.PublicacionQueOferto!).Reference(p => p.Sucursal).Load();
-                                    <tr class="@estilo">
-                                        <td>@t.Id</td>
-                                        <td>@t.Oferta!.PublicacionQueOferto!.Sucursal!.Nombre</td>
-                                        <td>@t.Oferta!.Fecha.ToShortDateString() @t.Oferta!.Fecha.ToShortTimeString()</td>
-                                            <td>
-                                                @comentario
-                                                <NavLink class="text-primary" data-bs-toggle="modal" data-bs-target="#ModalProductos" @onclick="@(() =>VerProductos(t.Id))">
-                                                    ventas
-                                                </NavLink>
-                                            </td>                               
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-            }
-        </div>
     </div>
 </div>
 
@@ -220,7 +199,6 @@
     </div>
 </div>
 
-
 <script>
     function toggleModalError() {
         bootstrap.Modal.getOrCreateInstance("#FechaInvalidaModal").toggle();
@@ -233,7 +211,7 @@
     }
 </script>
 
-<!-- <ProductosModal TruequeId="TruequeId" /> -->
+<ProductosModal TruequeId="TruequeId" />
 
 @code {
 
