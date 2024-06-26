@@ -1,0 +1,81 @@
+﻿@page "/pagarpromocion/{idPublicacion:int}"
+
+@* para pasar info entre la pág publicación y la pag abonar *@
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+
+@inject ProtectedSessionStorage ProtectedSessionStore
+@inject NavigationManager NavMan
+
+@rendermode @(new InteractiveServerRenderMode(prerender:false))
+
+@attribute [Authorize(Roles = "User,Admin")]
+
+<PageTitle>Pagar promoción</PageTitle>
+
+<div class="row">
+    <div class="col-lg-4 offset-lg-4 pt-4 pb-4 border" style="margin-bottom:1.1rem">
+        <h1 style="text-align:center">Abonar una promoción</h1>
+        <EditForm Model="@Modelo" OnValidSubmit="Pagar" FormName="PaymentForm">
+            <DataAnnotationsValidator />
+            <hr />
+            <ValidationSummary class="text-danger" role="alert" />
+            @if (!string.IsNullOrEmpty(MensajeError))
+            {
+                <div class="alert alert-danger mt-3" role="alert">
+                    @MensajeError
+                </div>
+            }
+            <div class="form-floating mb-3">
+                <InputNumber @bind-Value="Modelo.NumeroTarjeta" class="form-control" autocomplete="nombre" aria-required="true" placeholder="" maxlength="50" />
+                <label for="numero-tarjeta">Numero de tarjeta</label>
+                <ValidationMessage For="() => Modelo.NumeroTarjeta" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText @bind-Value="Modelo.NombreTitular" class="form-control" autocomplete="nombre-titular" aria-required="true" placeholder="" maxlength="50" />
+                <label for="nombre-titular">Nombre del titular</label>
+                <ValidationMessage For="() => Modelo.NombreTitular" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputNumber @bind-Value="Modelo.AñoVencimiento" class="form-control" autocomplete="año-vencimiento" aria-required="true" placeholder="" maxlength="50" />
+                <label for="año-nacimiento">Año de vencimiento</label>
+                <ValidationMessage For="() => Modelo.AñoVencimiento" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputNumber @bind-Value="Modelo.MesVencimiento" class="form-control" autocomplete="mes-vencimiento" aria-required="true" placeholder="" maxlength="50" />
+                <label for="año-nacimiento">Mes de vencimiento</label>
+                <ValidationMessage For="() => Modelo.MesVencimiento" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputNumber @bind-Value="Modelo.CVC" class="form-control" autocomplete="cvc" aria-required="true" placeholder="" maxlength="50" />
+                <label for="cvc">CVC</label>
+                <ValidationMessage For="() => Modelo.CVC" class="text-danger" />
+            </div>
+            <button type="submit" class="w-100 btn btn-lg btn-dark">Pagar</button>
+        </EditForm>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public int idPublicacion { get; set; } = 0;
+
+    private String? MensajeError;
+
+    [SupplyParameterFromForm]
+    private TarjetaViewModel Modelo { get; set; } = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var resultPago = await ProtectedSessionStore.GetAsync<string>("controlPagoUsuario");
+        if (resultPago.Value != "EnCurso" | idPublicacion == 0)
+        {
+            NavMan.NavigateTo("/");
+        }
+
+    }
+
+    public async Task Pagar()
+    {
+
+    }
+
+}

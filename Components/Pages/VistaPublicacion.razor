@@ -3,6 +3,10 @@
 @using TruequeTools.Data
 @using TruequeTools.Entities
 
+@* para pasar info entre la pág publicación y la pag abonar *@
+@using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage
+@inject ProtectedSessionStorage ProtectedSessionStore
+
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject TruequeToolsDataContext context
 @inject IServiciosPublicacion PublicacionService
@@ -47,7 +51,7 @@
                             @foreach (var img in PublicacionActual.Imagenes!)
                             {
                                 <div class="col-md-4 col-sm-6 mb-3 d-flex justify-content-center">
-                                    <img src="images/@img.FotoUrl" class="card-img-top-vp"  />
+                                    <img src="images/@img.FotoUrl" class="card-img-top-vp" />
                                 </div>
                             }
                         </div>
@@ -84,7 +88,7 @@
                         }
                         else
                         {
-                            <div class="mb-2 oferta-cuerpo-vp">                          
+                            <div class="mb-2 oferta-cuerpo-vp">
                                 <p>Todavía no hay preguntas en la publicacion...</p>
                             </div>
                         }
@@ -147,26 +151,33 @@
 <PublicacionEliminar PublicacionActual="PublicacionActual" /> @*MODAL CON LA FUNCION ELIMINAR*@
 
 <PublicacionModificar PublicacionId="PublicacionActual.Id"
-            PublicacionActual="PublicacionActual" 
-            ListaSucursales="ListaSucursales"
-            ListaCategorias="ListaCategorias"/> @*MODAL CON LA FUNCION MODIFICAR*@
+                      PublicacionActual="PublicacionActual"
+                      ListaSucursales="ListaSucursales"
+                      ListaCategorias="ListaCategorias" /> @*MODAL CON LA FUNCION MODIFICAR*@
 
 <PublicacionOfertar PublicacionId="PublicacionActual.Id"
-            UserRequesterId="UsuarioId"
-            PublicacionActual="PublicacionActual"
-            MisPublicaciones="MisPublicaciones"
-            OfertasPublicacionActual="OfertasPublicacionActual" /> @*MODAL CON LA FUNCION OFERTAR*@
+                    UserRequesterId="UsuarioId"
+                    PublicacionActual="PublicacionActual"
+                    MisPublicaciones="MisPublicaciones"
+                    OfertasPublicacionActual="OfertasPublicacionActual" /> @*MODAL CON LA FUNCION OFERTAR*@
 
 <PublicacionPreguntar PublicacionId="PublicacionActual.Id"
-            UserRequesterId="UsuarioId"
-            PublicacionOwnerId="PublicacionActual.UsuarioId" /> @*MODAL CON LA FUNCION PREGUNTAR*@
+                      UserRequesterId="UsuarioId"
+                      PublicacionOwnerId="PublicacionActual.UsuarioId" /> @*MODAL CON LA FUNCION PREGUNTAR*@
 
+<Modal tituloModal="tituloPromocion" alertModal="alertaPromocion"
+       contenidoModal="msjPromocion"></Modal>
 @code {
 
     [Parameter]
     public int Id { get; set; }
 
     public bool cargando { get; set; }
+
+    // control de mensaje de promoción
+    public string? tituloPromocion { get; set; }
+    public string? alertaPromocion { get; set; }
+    public string? msjPromocion { get; set; }
 
     public Publicacion PublicacionActual { get; set; } = new();
     public List<Publicacion> MisPublicaciones { get; set; } = new();
@@ -180,6 +191,7 @@
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         UsuarioId = int.Parse(authState.User!.FindFirst("UsuarioId")!.Value);
+        validarEstadoPago();
     }
 
     protected override async Task OnParametersSetAsync()
@@ -194,4 +206,30 @@
         cargando = false;
     }
 
+    private async void validarEstadoPago()
+    {
+        var resultPago = await ProtectedSessionStore.GetAsync<string>("controlPagoUsuario");
+        var publiPromocionada = await ProtectedSessionStore.GetAsync<int>("publicacionPromocionada");
+        if (resultPago.Value == null)
+        {
+            return;
+        }
+        if (resultPago.Value == "exitoPromocion" && publiPromocionada.Value == PublicacionActual.Id)
+        {
+            tituloPromocion = "Publicacion promocionada";
+            alertaPromocion = "info";
+            msjPromocion = "El pago fue exitoso !";
+
+            PublicacionActual!.IsPremium = true;
+            await PublicacionService.OverwritePublicacionById(PublicacionActual);
+            StateHasChanged();
+        }
+        if (resultPago.Value == "fallo")
+        {
+            tituloPromocion = "Error";
+            alertaPromocion = "danger";
+            msjPromocion = "Pago fallido";
+        }
+        await ProtectedSessionStore.SetAsync("controlPagoUsuario", null!);
+    }
 }
