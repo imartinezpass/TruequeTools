@@ -94,6 +94,8 @@
             NavMan.NavigateTo("/");
         }
         await ProtectedSessionStore.SetAsync("controlPagoUsuario", "fallo"); // preventivo
+        await ProtectedSessionStore.SetAsync("publicacionPromocionada", idPublicacion);
+        await Task.Delay(500);
     }
 
     public async Task Pagar()
@@ -107,7 +109,7 @@
             cargando = false;
             StateHasChanged();
             await ProtectedSessionStore.SetAsync("controlPagoUsuario", "exitoPromocion");
-            await ProtectedSessionStore.SetAsync("publicacionPromocionada", idPublicacion);
+            // await ProtectedSessionStore.SetAsync("publicacionPromocionada", idPublicacion);
             NavMan.NavigateTo("/publicacion/" + idPublicacion);
         }
     }

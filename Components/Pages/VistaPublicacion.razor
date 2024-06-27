@@ -231,9 +231,9 @@
                 modalComponente?.ToggleModal();
                 StateHasChanged();
             }
-            if (resultPago.Value == "fallo" && publiPromocionada.Value == PublicacionActual.Id)
+            if ((resultPago.Value == "fallo" | resultPago.Value == "EnCurso") && publiPromocionada.Value == PublicacionActual.Id)
             {
-                tituloPromocion = "Error";
+                tituloPromocion = "No se ha podido realizar la operación";
                 alertaPromocion = "danger";
                 msjPromocion = "Pago fallido";
                 modalComponente?.ToggleModal();
