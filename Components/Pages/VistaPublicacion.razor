@@ -231,7 +231,7 @@
                 modalComponente?.ToggleModal();
                 StateHasChanged();
             }
-            if (resultPago.Value == "fallo")
+            if (resultPago.Value == "fallo" && publiPromocionada.Value == PublicacionActual.Id)
             {
                 tituloPromocion = "Error";
                 alertaPromocion = "danger";
