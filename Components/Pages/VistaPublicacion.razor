@@ -165,8 +165,9 @@
                       UserRequesterId="UsuarioId"
                       PublicacionOwnerId="PublicacionActual.UsuarioId" /> @*MODAL CON LA FUNCION PREGUNTAR*@
 
-<Modal tituloModal="tituloPromocion" alertModal="alertaPromocion"
-       contenidoModal="msjPromocion"></Modal>
+
+<Modal @ref="modalComponente" tituloModal="@tituloPromocion" alertModal="@alertaPromocion"
+       contenidoModal="@msjPromocion"></Modal>
 @code {
 
     [Parameter]
@@ -178,6 +179,7 @@
     public string? tituloPromocion { get; set; }
     public string? alertaPromocion { get; set; }
     public string? msjPromocion { get; set; }
+    public Modal? modalComponente;
 
     public Publicacion PublicacionActual { get; set; } = new();
     public List<Publicacion> MisPublicaciones { get; set; } = new();
@@ -208,28 +210,40 @@
 
     private async void validarEstadoPago()
     {
-        var resultPago = await ProtectedSessionStore.GetAsync<string>("controlPagoUsuario");
-        var publiPromocionada = await ProtectedSessionStore.GetAsync<int>("publicacionPromocionada");
-        if (resultPago.Value == null)
+        try
         {
-            return;
+            var resultPago = await ProtectedSessionStore.GetAsync<string>("controlPagoUsuario");
+            var publiPromocionada = await ProtectedSessionStore.GetAsync<int>("publicacionPromocionada");
+            if (resultPago.Value == null)
+            {
+                return;
+            }
+            if (resultPago.Value == "exitoPromocion" && publiPromocionada.Value == PublicacionActual.Id)
+            {
+                await Task.Delay(500); // problemas de concurrencia xd
+                tituloPromocion = "Publicacion promocionada";
+                alertaPromocion = "info";
+                msjPromocion = "El pago fue exitoso !";
+                PublicacionActual!.IsPremium = true;
+                await PublicacionService.OverwritePublicacionById(PublicacionActual);
+                await ProtectedSessionStore.SetAsync("controlPagoUsuario", null);
+                await ProtectedSessionStore.SetAsync("publicacionPromocionada", 0);
+                modalComponente?.ToggleModal();
+                StateHasChanged();
+            }
+            if (resultPago.Value == "fallo")
+            {
+                tituloPromocion = "Error";
+                alertaPromocion = "danger";
+                msjPromocion = "Pago fallido";
+                modalComponente?.ToggleModal();
+                StateHasChanged();
+            }
+            await ProtectedSessionStore.SetAsync("controlPagoUsuario", null!);
         }
-        if (resultPago.Value == "exitoPromocion" && publiPromocionada.Value == PublicacionActual.Id)
+        catch (Exception e)
         {
-            tituloPromocion = "Publicacion promocionada";
-            alertaPromocion = "info";
-            msjPromocion = "El pago fue exitoso !";
 
-            PublicacionActual!.IsPremium = true;
-            await PublicacionService.OverwritePublicacionById(PublicacionActual);
-            StateHasChanged();
         }
-        if (resultPago.Value == "fallo")
-        {
-            tituloPromocion = "Error";
-            alertaPromocion = "danger";
-            msjPromocion = "Pago fallido";
-        }
-        await ProtectedSessionStore.SetAsync("controlPagoUsuario", null!);
     }
 }

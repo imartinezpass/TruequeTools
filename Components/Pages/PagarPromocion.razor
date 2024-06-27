@@ -13,69 +13,144 @@
 <PageTitle>Pagar promoción</PageTitle>
 
 <div class="row">
-    <div class="col-lg-4 offset-lg-4 pt-4 pb-4 border" style="margin-bottom:1.1rem">
-        <h1 style="text-align:center">Abonar una promoción</h1>
-        <EditForm Model="@Modelo" OnValidSubmit="Pagar" FormName="PaymentForm">
-            <DataAnnotationsValidator />
-            <hr />
-            <ValidationSummary class="text-danger" role="alert" />
-            @if (!string.IsNullOrEmpty(MensajeError))
-            {
-                <div class="alert alert-danger mt-3" role="alert">
-                    @MensajeError
+    @if (cargando)
+    {
+        <ul class="d-flex justify-content-center">
+            <div class="spinner-border" role="status">
+                <span class="sr-only"></span>
+            </div>
+        </ul>
+    }
+    else
+    {
+
+        <div class="col-lg-4 offset-lg-4 pt-4 pb-4 border" style="margin-bottom:1.1rem">
+            <h1 style="text-align:center">Abonar una promoción</h1>
+            <EditForm Model="@Modelo" OnValidSubmit="Pagar" FormName="PaymentForm">
+                <DataAnnotationsValidator />
+                <hr />
+                <ValidationSummary class="text-danger" role="alert" />
+                @if (!string.IsNullOrEmpty(MensajeError))
+                {
+                    <div class="alert alert-danger mt-3" role="alert">
+                        @MensajeError
+                    </div>
+                }
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="Modelo.NumeroTarjeta" class="form-control" autocomplete="nombre" aria-required="true" placeholder="" maxlength="50" />
+                    <label for="numero-tarjeta">Numero de tarjeta</label>
+                    <ValidationMessage For="() => Modelo.NumeroTarjeta" class="text-danger" />
                 </div>
-            }
-            <div class="form-floating mb-3">
-                <InputNumber @bind-Value="Modelo.NumeroTarjeta" class="form-control" autocomplete="nombre" aria-required="true" placeholder="" maxlength="50" />
-                <label for="numero-tarjeta">Numero de tarjeta</label>
-                <ValidationMessage For="() => Modelo.NumeroTarjeta" class="text-danger" />
-            </div>
-            <div class="form-floating mb-3">
-                <InputText @bind-Value="Modelo.NombreTitular" class="form-control" autocomplete="nombre-titular" aria-required="true" placeholder="" maxlength="50" />
-                <label for="nombre-titular">Nombre del titular</label>
-                <ValidationMessage For="() => Modelo.NombreTitular" class="text-danger" />
-            </div>
-            <div class="form-floating mb-3">
-                <InputNumber @bind-Value="Modelo.AñoVencimiento" class="form-control" autocomplete="año-vencimiento" aria-required="true" placeholder="" maxlength="50" />
-                <label for="año-nacimiento">Año de vencimiento</label>
-                <ValidationMessage For="() => Modelo.AñoVencimiento" class="text-danger" />
-            </div>
-            <div class="form-floating mb-3">
-                <InputNumber @bind-Value="Modelo.MesVencimiento" class="form-control" autocomplete="mes-vencimiento" aria-required="true" placeholder="" maxlength="50" />
-                <label for="año-nacimiento">Mes de vencimiento</label>
-                <ValidationMessage For="() => Modelo.MesVencimiento" class="text-danger" />
-            </div>
-            <div class="form-floating mb-3">
-                <InputNumber @bind-Value="Modelo.CVC" class="form-control" autocomplete="cvc" aria-required="true" placeholder="" maxlength="50" />
-                <label for="cvc">CVC</label>
-                <ValidationMessage For="() => Modelo.CVC" class="text-danger" />
-            </div>
-            <button type="submit" class="w-100 btn btn-lg btn-dark">Pagar</button>
-        </EditForm>
-    </div>
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="Modelo.NombreTitular" class="form-control" autocomplete="nombre-titular" aria-required="true" placeholder="" maxlength="50" />
+                    <label for="nombre-titular">Nombre del titular</label>
+                    <ValidationMessage For="() => Modelo.NombreTitular" class="text-danger" />
+                </div>
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="Modelo.AñoVencimiento" class="form-control" autocomplete="año-vencimiento" aria-required="true" placeholder="" maxlength="50" />
+                    <label for="año-nacimiento">Año de vencimiento</label>
+                    <ValidationMessage For="() => Modelo.AñoVencimiento" class="text-danger" />
+                </div>
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="Modelo.MesVencimiento" class="form-control" autocomplete="mes-vencimiento" aria-required="true" placeholder="" maxlength="50" />
+                    <label for="año-nacimiento">Mes de vencimiento</label>
+                    <ValidationMessage For="() => Modelo.MesVencimiento" class="text-danger" />
+                </div>
+                <div class="form-floating mb-3">
+                    <InputText @bind-Value="Modelo.CVC" class="form-control" autocomplete="cvc" aria-required="true" placeholder="" maxlength="50" />
+                    <label for="cvc">CVC</label>
+                    <ValidationMessage For="() => Modelo.CVC" class="text-danger" />
+                </div>
+                <button type="submit" class="w-100 btn btn-lg btn-dark">Pagar</button>
+            </EditForm>
+        </div>
+    }
 </div>
+
+
+<Modal @ref="modalComponente" tituloModal="@tituloPromocion" alertModal="@alertaPromocion"
+       contenidoModal="@msjPromocion"></Modal>
 @code {
     [Parameter]
     public int idPublicacion { get; set; } = 0;
+    public Boolean cargando { get; set; } = false;
 
     private String? MensajeError;
 
     [SupplyParameterFromForm]
     private TarjetaViewModel Modelo { get; set; } = new();
 
-    protected override async Task OnParametersSetAsync()
+    // control de mensaje de promoción
+    public string? tituloPromocion { get; set; }
+    public string? alertaPromocion { get; set; } = "alert";
+    public string? msjPromocion { get; set; }
+    public Modal? modalComponente;
+
+    protected override async Task OnInitializedAsync()
     {
         var resultPago = await ProtectedSessionStore.GetAsync<string>("controlPagoUsuario");
         if (resultPago.Value != "EnCurso" | idPublicacion == 0)
         {
             NavMan.NavigateTo("/");
         }
-
+        await ProtectedSessionStore.SetAsync("controlPagoUsuario", "fallo"); // preventivo
     }
 
     public async Task Pagar()
     {
-
+        validarCampos();
+        if (MensajeError == null)
+        {
+            cargando = true;
+            StateHasChanged();
+            await Task.Delay(500);
+            cargando = false;
+            StateHasChanged();
+            await ProtectedSessionStore.SetAsync("controlPagoUsuario", "exitoPromocion");
+            await ProtectedSessionStore.SetAsync("publicacionPromocionada", idPublicacion);
+            NavMan.NavigateTo("/publicacion/" + idPublicacion);
+        }
     }
 
+    private async void validarCampos()
+    {
+        if (int.Parse(Modelo.AñoVencimiento) < DateTime.Now.Year)
+        {
+            MensajeError = "Ingrese un año válido";
+            return;
+        }
+        if (int.Parse(Modelo.MesVencimiento) < DateTime.Now.Month)
+        {
+            MensajeError = "El mes no puede ser anterior al actual.";
+            return;
+        }
+        // validacion extra para los escenarios: conexion fallida, fondos insuficientes
+        if (double.Parse(Modelo.NumeroTarjeta) == 4029222222222222)
+        {
+            MensajeError = "No se ha podido establecer una conexión";
+            cargando = true;
+            StateHasChanged();
+            await Task.Delay(500);
+            cargando = false;
+            tituloPromocion = "Error de conexión";
+            msjPromocion = "No se ha podido establecer una conexión";
+            modalComponente?.ToggleModal();
+            StateHasChanged();
+            return;
+        }
+        if (double.Parse(Modelo.NumeroTarjeta) == 4029333333333333)
+        {
+            MensajeError = "La tarjeta ingresada no posee fondos suficientes";
+            StateHasChanged();
+            await Task.Delay(500);
+            cargando = false;
+            tituloPromocion = "Fondos insuficientes";
+            msjPromocion = "La tarjeta ingresada no posee fondos suficientes";
+            modalComponente?.ToggleModal();
+            StateHasChanged();
+            return;
+        }
+        MensajeError = null;
+        StateHasChanged();
+    }
 }

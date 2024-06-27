@@ -20,7 +20,7 @@
             <div class="modal-body">
                 @if (publicacionPromocionada == true)
                 {
-                    <div class="alert alert-success" role="alert">
+                    <div class="alert alert-info" role="alert">
                         La publicación ya se encuentra promocionada.
                     </div>
                 }
@@ -52,6 +52,8 @@
     public Publicacion? PublicacionActual { get; set; }
     int opcion;
     Boolean publicacionPromocionada { get; set; } = false;
+
+
 
     protected override void OnParametersSet()
     {
