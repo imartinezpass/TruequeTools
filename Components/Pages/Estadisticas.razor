@@ -112,6 +112,7 @@
                                                     <th>Sucursal</th>
                                                     <th>Fecha y Hora</th>
                                                     <th>Comentarios</th>
+                                                    <th>Monto</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -119,6 +120,7 @@
                                                 {
                                                     var estilo = "table-success";
                                                     var comentario = "Trueque completado con";
+                                                    montoPorTrueque(t.Id);
 
                                                     context.Entry(t).Reference(p => p.Oferta).Load();
                                                     context.Entry(t.Oferta!).Reference(p => p.PublicacionQueOfrezco).Load();
@@ -134,6 +136,7 @@
                                                                 ventas
                                                             </NavLink>
                                                         </td>
+                                                        <td>$@totalTrueque</td>
                                                     </tr>
                                                 }
                                             </tbody>
@@ -168,12 +171,6 @@
                         La fecha de inicio no puede ser posterior a la fecha de fin!
                     </div>
                 }
-                @if(fechaInicio > DateTime.Today)
-                {
-                    <div class="alert alert-danger" role="alert">
-                        La fecha de inicio no puede ser posterior a la fecha de hoy!
-                    </div>
-                }
                 @if(fechaFin > DateTime.Today)
                 {
                     <div class="alert alert-danger" role="alert">
@@ -184,13 +181,6 @@
                     {
                     <div class="alert alert-danger" role="alert">
                         La fecha de inicio no puede ser anterior a la fecha de creacion!
-                        Fecha creacion: @fechaCreacion.ToString("dd/MM/yyyy")
-                    </div>
-                }
-                @if (fechaFin < fechaCreacion)
-                    {
-                    <div class="alert alert-danger" role="alert">
-                        La fecha de fin no puede ser anterior a la fecha de creacion!
                         Fecha creacion: @fechaCreacion.ToString("dd/MM/yyyy")
                     </div>
                 }
@@ -224,6 +214,7 @@
     private PieConfig? config2;
     bool cargando = true;
     double total;
+    double totalTrueque;
     double promedio;
 
     DateTime fechaCreacion = new DateTime(2024, 2, 29);
@@ -417,5 +408,17 @@
     private void VerProductos(int truequeId)
     {
         TruequeId = truequeId;
+    }
+
+    private async void montoPorTrueque(int truequeId)
+    {
+        try
+        {
+            totalTrueque = await TruequeService.GetMontoVentas(truequeId);
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", ex.ToString());
+        }
     }
 }

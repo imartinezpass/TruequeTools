@@ -20,6 +20,7 @@ namespace TruequeTools.Services
         public Task<List<Trueque>> ReadTruequesBySucursal(int sucursalId);
         public Task<Trueque> OverwriteTruequeById(Trueque trueque);
 		public Task DeleteTruequePendienteBySucursal(int sucursalId);
+        public Task<double> GetMontoVentas(int idTrueque);
         public Task<double> GetTotalVentas(DateTime fechaInicio, DateTime fechaFin);
         public Task<double> GetPromedioVentas(DateTime fechaInicio, DateTime fechaFin);
         public Task<double> GetPromedioVentasSucursal(int sucursalId, DateTime fechaInicio, DateTime fechaFin);

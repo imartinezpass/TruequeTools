@@ -74,6 +74,13 @@ namespace TruequeTools.Services
             return trueques.Sum(t => t.Productos!.Sum(x => x.Monto * x.Cantidad));
         }
 
+        public async Task<double> GetMontoVentas(int idTrueque)
+        {
+            var trueque = await contexto.Trueques.FindAsync(idTrueque);
+
+            return trueque!.Productos!.Sum(x => x.Monto * x.Cantidad);
+        }
+
         public async Task<double> GetTotalVentasSucursal(int sucursalId, DateTime fechaInicio, DateTime fechaFin)
         {
             var result = await contexto.Trueques
