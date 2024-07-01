@@ -1,6 +1,5 @@
 ﻿@using TruequeTools.Entities
 
-@inject IServiciosProducto ProductoService
 @inject IJSRuntime JS
 
 <!-- Modal -->
@@ -48,21 +47,14 @@
     [Parameter]
     public int TruequeId { get; set; }
 
-    public List<Producto> Productos = new();
+    [Parameter]
+    public List<Producto> Productos { get; set; } = new();
 
     public double total;
 
-    protected override async Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
-        try
-        {
-            Productos = await ProductoService.ReadProductosByTruequeId(TruequeId);
-            total = Productos.Sum(p => p.Monto * p.Cantidad);
-        }
-        catch (Exception ex)
-        {
-            await JS.InvokeVoidAsync("alert", ex.ToString());
-        }
+        total = Productos.Sum(p => p.Monto * p.Cantidad);
     }
 
 }

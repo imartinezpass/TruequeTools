@@ -10,6 +10,7 @@
 @inject IServiciosTrueque TruequeService
 @inject IServiciosOferta OfertaService
 @inject IServiciosSucursal SucursalService
+@inject IServiciosProducto ProductoService
 @inject IServiciosPublicacion PublicacionService
 @inject IJSRuntime JS
 
@@ -165,11 +166,12 @@
 <TruequeEliminar TruequeId="TruequeId" />
 <TruequeVentas TruequeId="TruequeId" />
 <PublicacionModal PublicacionActual="publicacion" />
-<ProductosModal TruequeId="TruequeId" />
+<ProductosModal TruequeId="TruequeId" Productos="productos" />
 
 @code {
 
     List<Trueque> trueques = new List<Trueque>();
+    List<Producto> productos = new List<Producto>();
 
     bool cargando = true;
     string? nombreSucursal;
@@ -222,9 +224,21 @@
         TruequeId = truequeId;
     }
 
-    private void VerProductos(int truequeId)
+    private async void VerProductos(int truequeId)
     {
         TruequeId = truequeId;
+
+        try
+        {
+            productos = await ProductoService.ReadProductosByTruequeId(TruequeId);   
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", ex.ToString());
+        }
+
+        StateHasChanged();
+
     }
 
 }

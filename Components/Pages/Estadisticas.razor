@@ -11,6 +11,7 @@
 @inject TruequeToolsDataContext context
 @inject IServiciosTrueque TruequeService
 @inject IServiciosSucursal SucursalService
+@inject IServiciosProducto ProductoService
 
 @rendermode @(new InteractiveServerRenderMode(prerender:false))
 
@@ -201,13 +202,14 @@
     }
 </script>
 
-<ProductosModal TruequeId="TruequeId" />
+<ProductosModal TruequeId="TruequeId" Productos="productos" />
 
 @code {
 
     List<Trueque> trueques = new List<Trueque>();
     List<Trueque> truequesCompletados = new List<Trueque>();
     List<Sucursal> sucursales = new List<Sucursal>();
+    List<Producto> productos = new List<Producto>();
     List<(Sucursal Sucursal, double TotalVentas)> topSucursales = new List<(Sucursal, double)>();
 
     private PieConfig? config1;
@@ -348,24 +350,22 @@
                 }
             };
 
-        foreach (string titulo in new[] { "Completados", "Rechazados", "Pendientes" })
+        foreach (string titulo in new[] { "Completados", "Rechazados" })
         {
             config1.Data.Labels.Add(titulo);
         }
 
         var totalAceptados = trueques.Where(t => t.Estado == 1).Count();
-        var totalRechazados = trueques.Where(t => t.Estado == -1).Count();
-        var totalPendientes = trueques.Where(t => t.Estado == 0).Count();
+        var totalRechazados = trueques.Where(t => t.Estado == -1).Count();    
 
-        PieDataset<int> dataset = new PieDataset<int>(new[] { totalAceptados, totalRechazados, totalPendientes })
+        PieDataset<int> dataset = new PieDataset<int>(new[] { totalAceptados, totalRechazados })
+        {
+            BackgroundColor = new[]
             {
-                BackgroundColor = new[]
-                {
                 ColorUtil.ColorHexString(75, 192, 192), // Slice 3 aka "Green"
-                ColorUtil.ColorHexString(255, 99, 132), // Slice 1 aka "Red"
-                ColorUtil.ColorHexString(255, 205, 86), // Slice 2 aka "Yellow"
+                ColorUtil.ColorHexString(255, 99, 132), // Slice 1 aka "Red"              
             }
-            };
+        };
 
         config1.Data.Datasets.Add(dataset);
     }
@@ -405,9 +405,21 @@
         config2.Data.Datasets.Add(dataset);
     }
 
-    private void VerProductos(int truequeId)
+    private async void VerProductos(int truequeId)
     {
         TruequeId = truequeId;
+
+        try
+        {
+            productos = await ProductoService.ReadProductosByTruequeId(TruequeId);
+        }
+        catch (Exception ex)
+        {
+            await JS.InvokeVoidAsync("alert", ex.ToString());
+        }
+
+        StateHasChanged();
+    
     }
 
     private async void montoPorTrueque(int truequeId)
