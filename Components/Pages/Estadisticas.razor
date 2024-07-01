@@ -75,7 +75,7 @@
                             <div class="col-12">
                                 <div class="table-responsive">
                                     <!-- Añade esta clase para hacer la tabla responsiva -->
-                                    @if(mostrar){
+                                    @if(mostrarTopSucursales){
                                         <table class="table table-bordered caption-top">
                                             <caption>Top 3 Sucursales</caption>
                                             <thead>
@@ -102,7 +102,7 @@
                             <div class="col-12">
                                 <div class="table-responsive">
                                     <!-- Añade esta clase para hacer la tabla responsiva -->
-                                    @if (mostrar)
+                                    @if (truequesCompletados.Count() != 0)
                                     {
                                         <table class="table table-bordered caption-top">
                                             <caption>Trueques con Ventas</caption>
@@ -116,29 +116,29 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach (var t in truequesCompletados)
-                                                {
-                                                    var estilo = "table-success";
-                                                    var comentario = "Trueque completado con";
-                                                    montoPorTrueque(t.Id);
+                                                    @foreach (var t in truequesCompletados)
+                                                    {
+                                                        var estilo = "table-success";
+                                                        var comentario = "Trueque completado con";
+                                                        montoPorTrueque(t.Id);
 
-                                                    context.Entry(t).Reference(p => p.Oferta).Load();
-                                                    context.Entry(t.Oferta!).Reference(p => p.PublicacionQueOfrezco).Load();
-                                                    context.Entry(t.Oferta!).Reference(p => p.PublicacionQueOferto).Load();
-                                                    context.Entry(t.Oferta!.PublicacionQueOferto!).Reference(p => p.Sucursal).Load();
-                                                    <tr class="@estilo">
-                                                        <td>@t.Id</td>
-                                                        <td>@t.Oferta!.PublicacionQueOferto!.Sucursal!.Nombre</td>
-                                                        <td>@t.Oferta!.Fecha.ToShortDateString() @t.Oferta!.Fecha.ToShortTimeString()</td>
-                                                        <td>
-                                                            @comentario
-                                                            <NavLink class="text-primary" data-bs-toggle="modal" data-bs-target="#ModalProductos" @onclick="@(() =>VerProductos(t.Id))">
-                                                                ventas
-                                                            </NavLink>
-                                                        </td>
-                                                        <td>$@totalTrueque</td>
-                                                    </tr>
-                                                }
+                                                        context.Entry(t).Reference(p => p.Oferta).Load();
+                                                        context.Entry(t.Oferta!).Reference(p => p.PublicacionQueOfrezco).Load();
+                                                        context.Entry(t.Oferta!).Reference(p => p.PublicacionQueOferto).Load();
+                                                        context.Entry(t.Oferta!.PublicacionQueOferto!).Reference(p => p.Sucursal).Load();
+                                                        <tr class="@estilo">
+                                                            <td>@t.Id</td>
+                                                            <td>@t.Oferta!.PublicacionQueOferto!.Sucursal!.Nombre</td>
+                                                            <td>@t.Oferta!.Fecha.ToShortDateString() @t.Oferta!.Fecha.ToShortTimeString()</td>
+                                                            <td>
+                                                                @comentario
+                                                                <NavLink class="text-primary" data-bs-toggle="modal" data-bs-target="#ModalProductos" @onclick="@(() =>VerProductos(t.Id))">
+                                                                    ventas
+                                                                </NavLink>
+                                                            </td>
+                                                            <td>$@totalTrueque</td>
+                                                        </tr>
+                                                    }
                                             </tbody>
                                         </table>
                                     }                                 
@@ -223,7 +223,7 @@
     DateTime fechaInicio = new DateTime(2024, 2, 29);
     DateTime fechaFin = DateTime.Today.AddHours(23).AddMinutes(59);
     int sucursalActual = 0;
-    bool mostrar = true;
+    bool mostrarTopSucursales = true;
 
     int TruequeId;
     string? nombreSucursal="de todas las sucursales";
@@ -242,7 +242,7 @@
 
         if (sucursalActual == 0)
         {
-            mostrar = true;
+            mostrarTopSucursales = true;
             nombreSucursal="de todas las sucursales";
             trueques = await TruequeService.ReadTruequesEntreFechas(fechaInicio,fechaFin);
             truequesCompletados = await TruequeService.ReadTruequesEntreFechasConVentas(fechaInicio,fechaFin);
@@ -250,7 +250,7 @@
         }
         else
         {
-            mostrar = false;
+            mostrarTopSucursales = false;
             var sucu = await SucursalService.ReadSucursalById(sucursalActual);
             nombreSucursal = "de la sucursal " + sucu.Nombre;
             trueques = await TruequeService.ReadTruequesEntreFechasYSucursal(fechaInicio, fechaFin, sucursalActual);
