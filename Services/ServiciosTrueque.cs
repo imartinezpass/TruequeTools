@@ -85,7 +85,7 @@ namespace TruequeTools.Services
         {
             var result = await contexto.Trueques
                 .Include(t => t.Oferta)
-                .ThenInclude(o => o.PublicacionQueOfrezco) // Incluimos la publicacion ofrecida que debería tener la sucursal
+                .ThenInclude(o => o!.PublicacionQueOfrezco) // Incluimos la publicacion ofrecida que debería tener la sucursal
                 .Where(t => t.Oferta!.PublicacionQueOfrezco!.SucursalId == sucursalId &&
                             t.HasVentas == true &&
                             t.Oferta.Fecha >= fechaInicio &&
@@ -155,7 +155,7 @@ namespace TruequeTools.Services
         {
             var trueques = await contexto.Trueques
                 .Include(t => t.Oferta)
-                .ThenInclude(o => o.PublicacionQueOfrezco)
+                .ThenInclude(o => o!.PublicacionQueOfrezco)
                 .Where(t => t.Oferta!.PublicacionQueOfrezco!.SucursalId == sucursalId &&
                     t.HasVentas == true &&
                     t.Oferta.Fecha >= fechaInicio &&
@@ -173,7 +173,10 @@ namespace TruequeTools.Services
 
         public async Task<List<Trueque>> ReadTruequesBySucursal(int sucursalId)
         {
-            var result = await contexto.Trueques.Where(s => s.Oferta!.Usuario!.SucursalId == sucursalId).ToListAsync();
+            var result = await contexto.Trueques
+                .Include(t => t.Oferta)
+                .ThenInclude(o => o!.PublicacionQueOfrezco)
+                .Where(t => t.Oferta!.PublicacionQueOfrezco!.SucursalId == sucursalId).ToListAsync();
             return result;
         }
     }
