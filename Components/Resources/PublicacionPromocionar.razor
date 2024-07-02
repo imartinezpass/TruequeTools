@@ -30,15 +30,7 @@
                         Promocionar una publicacion permite que tu producto sea mas visible en la pagina, llegando así a más gente.
                         Por el precio de $7.500, tu producto tendrá la insignia de destacado por una semana y tendrá mayor visibilidad.
                     </div>
-                    <hr />
-                    <div class="form-floating mb-3">
-                        <InputSelect @bind-Value="opcion" class="form-control" autocomplete="sucursal" aria-required="true" placeholder="" maxlength="50">
-                            <!-- <option value="0">Normal</option> -->
-                            <!-- Lo dejamos como una lista para pretender que existirían más tipos de promoción, pero solo existe 1: el premium -->
-                            <option value="1">Premium</option>
-                        </InputSelect>
-                        <label for="categoria">Seleccione una opcion</label>
-                    </div>
+                    <hr />                  
                     <button class="w-100 btn btn-lg btn-dark" @onclick="IrAAbonar">Ir a abonar</button>
                 }
             </div>
@@ -52,8 +44,6 @@
     public Publicacion? PublicacionActual { get; set; }
     int opcion;
     Boolean publicacionPromocionada { get; set; } = false;
-
-
 
     protected override void OnParametersSet()
     {

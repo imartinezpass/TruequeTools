@@ -69,7 +69,7 @@
                         <div class="row">
                             <div class="col-12">
                                 <h6 style="text-align:center">El <b>monto total</b> de ventas por trueques es de $@total</h6>
-                                <h6 style="text-align:center">El <b>monto promedio</b> de ventas por trueques es de $@promedio</h6>
+                                <h6 style="text-align:center">El <b>monto promedio</b> de ventas por trueques es de $@((int)promedio)</h6>
                             </div>
                         </div>
                         <div class="row"> 
@@ -169,19 +169,19 @@
             <div class="modal-body">
                 @if(fechaInicio > fechaFin){
                     <div class="alert alert-danger" role="alert">
-                        La fecha de inicio no puede ser posterior a la fecha de fin!
+                        La fecha de inicio no puede ser posterior a la fecha de fin !
                     </div>
                 }
                 @if(fechaFin > DateTime.Today)
                 {
                     <div class="alert alert-danger" role="alert">
-                        La fecha de fin no puede ser posterior a la fecha de hoy!
+                        La fecha de fin no puede ser posterior a la fecha de hoy !
                     </div>
                 }
                 @if (fechaInicio < fechaCreacion)
                     {
                     <div class="alert alert-danger" role="alert">
-                        La fecha de inicio no puede ser anterior a la fecha de creacion!
+                        La fecha de inicio no puede ser anterior a la fecha de creacion !
                         Fecha creacion: @fechaCreacion.ToString("dd/MM/yyyy")
                     </div>
                 }
