@@ -54,7 +54,7 @@
             }
             else
             {
-                @if (trueques.Count != 0 )
+                @if (autorizado)
                 {
                     <div class="container">
                         <div class="row">
@@ -215,6 +215,7 @@
     private PieConfig? config1;
     private PieConfig? config2;
     bool cargando = true;
+    bool autorizado = false;
     double total;
     double totalTrueque;
     double promedio;
@@ -247,7 +248,7 @@
             mostrarTopSucursales = true;
             nombreSucursal="de todas las sucursales";
             trueques = await TruequeService.ReadTruequesEntreFechas(fechaInicio,fechaFin);
-            truequesCompletados = await TruequeService.ReadTruequesEntreFechasConVentas(fechaInicio,fechaFin);
+            truequesCompletados = await TruequeService.ReadTruequesEntreFechasConVentas(fechaInicio,fechaFin);       
             await EstadisticasTodasLasSucursales();
         }
         else
@@ -256,11 +257,22 @@
             var sucu = await SucursalService.ReadSucursalById(sucursalActual);
             nombreSucursal = "de la sucursal " + sucu.Nombre;
             trueques = await TruequeService.ReadTruequesEntreFechasYSucursal(fechaInicio, fechaFin, sucursalActual);
-            truequesCompletados = await TruequeService.ReadTruequesEntreFechasYSucursalConVentas(fechaInicio, fechaFin, sucursalActual);
+            truequesCompletados = await TruequeService.ReadTruequesEntreFechasYSucursalConVentas(fechaInicio, fechaFin, sucursalActual);         
             await EstadisticasPorSucursal();
-        } 
-        SetChart1(); 
+        }
+        
+        if (trueques.Any(t => t.Estado == 1 || t.Estado == -1))
+        {
+            autorizado = true;
+        }
+        else
+        {
+            autorizado = false;
+        }
+
+        SetChart1();
         SetChart2();
+
         cargando = false;
     }
 

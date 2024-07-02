@@ -42,11 +42,11 @@ namespace TruequeTools.Services
         {
             var trueques = await contexto.Trueques
                 .Include(t => t.Productos)
-                .Where(t => contexto.Ofertas.Any(o => o.Id == t.OfertaId && o.Fecha >= fechaInicio && o.Fecha <= fechaFin))
+                .Where(t => contexto.Ofertas.Any(o => o.Id == t.OfertaId && o.Fecha >= fechaInicio && o.Fecha <= fechaFin) && t.HasVentas)
                 .ToListAsync();
 
             double totalVentas = trueques.Sum(t => t.Productos!.Sum(p => p.Monto * p.Cantidad));
-            int totalTrueques = trueques.Count;
+            int totalTrueques = trueques.Count();
 
             return totalTrueques > 0 ? totalVentas / totalTrueques : 0;
         }
@@ -59,7 +59,7 @@ namespace TruequeTools.Services
                     .ThenInclude(o => o!.PublicacionQueOfrezco)
                 .Where(t => t.Oferta!.PublicacionQueOfrezco!.SucursalId == sucursalId &&
                             t.Oferta.Fecha >= fechaInicio &&
-                            t.Oferta.Fecha <= fechaFin)
+                            t.Oferta.Fecha <= fechaFin && t.HasVentas)
                 .ToListAsync();
 
             double totalVentas = trueques.Sum(t => t.Productos!.Sum(p => p.Monto * p.Cantidad));
