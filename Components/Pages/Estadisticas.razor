@@ -172,7 +172,7 @@
                         La fecha de inicio no puede ser posterior a la fecha de fin!
                     </div>
                 }
-                @if(fechaFin > DateTime.Today)
+                @if (fechaFin > DateTime.Today.AddHours(23).AddMinutes(59))
                 {
                     <div class="alert alert-danger" role="alert">
                         La fecha de fin no puede ser posterior a la fecha de hoy!
