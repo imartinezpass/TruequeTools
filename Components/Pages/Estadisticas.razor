@@ -224,7 +224,7 @@
     DateTime fechaInicioTitulo = new DateTime(2024, 2, 29);
     DateTime fechaFinTitulo = DateTime.Today;
     DateTime fechaInicio = new DateTime(2024, 2, 29);
-    DateTime fechaFin = DateTime.Today.AddHours(23).AddMinutes(59);
+    DateTime fechaFin = DateTime.Today;
     int sucursalActual = 0;
     bool mostrarTopSucursales = true;
 
@@ -247,8 +247,8 @@
         {
             mostrarTopSucursales = true;
             nombreSucursal="de todas las sucursales";
-            trueques = await TruequeService.ReadTruequesEntreFechas(fechaInicio,fechaFin);
-            truequesCompletados = await TruequeService.ReadTruequesEntreFechasConVentas(fechaInicio,fechaFin);       
+            trueques = await TruequeService.ReadTruequesEntreFechas(fechaInicio, fechaFin.AddHours(23).AddMinutes(59));
+            truequesCompletados = await TruequeService.ReadTruequesEntreFechasConVentas(fechaInicio, fechaFin.AddHours(23).AddMinutes(59));
             await EstadisticasTodasLasSucursales();
         }
         else
@@ -256,8 +256,8 @@
             mostrarTopSucursales = false;
             var sucu = await SucursalService.ReadSucursalById(sucursalActual);
             nombreSucursal = "de la sucursal " + sucu.Nombre;
-            trueques = await TruequeService.ReadTruequesEntreFechasYSucursal(fechaInicio, fechaFin, sucursalActual);
-            truequesCompletados = await TruequeService.ReadTruequesEntreFechasYSucursalConVentas(fechaInicio, fechaFin, sucursalActual);         
+            trueques = await TruequeService.ReadTruequesEntreFechasYSucursal(fechaInicio, fechaFin.AddHours(23).AddMinutes(59), sucursalActual);
+            truequesCompletados = await TruequeService.ReadTruequesEntreFechasYSucursalConVentas(fechaInicio, fechaFin.AddHours(23).AddMinutes(59), sucursalActual);
             await EstadisticasPorSucursal();
         }
         
@@ -283,12 +283,12 @@
         {
             if(trueques.Any(t => t.HasVentas == true))
             {
-                total = await TruequeService.GetTotalVentas(fechaInicio,fechaFin);
-                promedio = await TruequeService.GetPromedioVentas(fechaInicio,fechaFin);
+                total = await TruequeService.GetTotalVentas(fechaInicio, fechaFin.AddHours(23).AddMinutes(59));
+                promedio = await TruequeService.GetPromedioVentas(fechaInicio, fechaFin.AddHours(23).AddMinutes(59));
 
                 foreach(var suc in sucursales)
                 {
-                    double totalVentas = await TruequeService.GetTotalVentasSucursal(suc.Id,fechaInicio,fechaFin);
+                    double totalVentas = await TruequeService.GetTotalVentasSucursal(suc.Id, fechaInicio, fechaFin.AddHours(23).AddMinutes(59));
                     topSucursales.Add((suc, totalVentas));
                 }
                 topSucursales = topSucursales.OrderByDescending(s => s.TotalVentas).Take(3).ToList();     
@@ -314,8 +314,8 @@
         {
             if(trueques.Any(t => t.HasVentas == true))
             {
-                total = await TruequeService.GetTotalVentasSucursal(sucursalActual,fechaInicio,fechaFin);
-                promedio = await TruequeService.GetPromedioVentasSucursal(sucursalActual,fechaInicio,fechaFin);
+                total = await TruequeService.GetTotalVentasSucursal(sucursalActual, fechaInicio, fechaFin.AddHours(23).AddMinutes(59));
+                promedio = await TruequeService.GetPromedioVentasSucursal(sucursalActual, fechaInicio, fechaFin.AddHours(23).AddMinutes(59));
             }
             else
             {
